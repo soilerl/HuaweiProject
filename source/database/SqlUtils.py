@@ -9,6 +9,7 @@ class SqlUtils:
     STR_TABLE_NAME_USER = 'userList'
     STR_TABLE_NAME_MERGE_REQUEST = 'mergeRequest'
     STR_TABLE_NAME_DIFF_REFS = 'diffRefs'
+    STR_TABLE_NAME_NOTES = 'notes'
 
     '''存储的表中的类型'''
     STR_KEY_INT = 'int'

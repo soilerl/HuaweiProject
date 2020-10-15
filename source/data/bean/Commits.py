@@ -96,7 +96,7 @@ class Commits(BeanBase):
 
         @staticmethod
         def parser(src):
-            res = None
+            res = Commits()
             if isinstance(src, dict):
                 res.id = src.get(StringKeyUtils.STR_KEY_ID, None)
                 res.short_id = src.get(StringKeyUtils.STR_KEY_SHORT_ID, None)

@@ -122,6 +122,7 @@ class StringKeyUtils:
 
     """gitlab notes可能会用到"""
     STR_KEY_SYSTEM = 'system'
+    STR_KEY_IS_SYSTEM = 'isSystem'
 
     """gitlab position可能会用到"""
     STR_KEY_NOTES_ID = 'notes_id'

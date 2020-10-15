@@ -160,6 +160,13 @@ class AsyncApiHelper:
             if username == pr_author:
                 notes.change_trigger = -2  # -2 代表作者自己发言
                 return
+
+            """暂时做一个近似"""
+            if position.new_line is None and position.old_line is not None:
+                position.new_line = position.old_line
+
+            notes.change_trigger = -1
+
             diffs = await AsyncApiHelper.getDiffBetweenCommits(session, head_sha, change_sha)
             if diffs is not None and isinstance(diffs, list):
                 for diffData in diffs:
@@ -168,8 +175,28 @@ class AsyncApiHelper:
                         if diff.new_path == notes.position.new_path or diff.old_path == notes.position.old_path:
                             print(diff.diff)
                             """解析diff hunk"""
-                            TextCompareUtils.patchParser(diff.diff)
+                            textChanges = TextCompareUtils.patchParser(diff.diff)
 
+                            dis = 10000000
+                            """依次遍历每个patch 找到每个patch 中距离 original_line 最进的改动距离"""
+                            for textChange in textChanges:
+                                start_left, _, start_right, _ = textChange[0]
+                                status = textChange[1]
+                                """curPos 选取 left， 因为对于变动，comment 的行数属于老版本"""
+                                curPos = start_left - 1
+                                for s in status:
+                                    if s != '+':
+                                        curPos += 1
+                                    if s == '+' or s == '-':
+                                        dis = min(dis, abs(position.new_line - curPos))
+                            if dis <= 10:
+                                if notes.change_trigger == -1:
+                                    notes.change_trigger = dis
+                                else:
+                                    notes.change_trigger = min(notes.change_trigger, dis)
+                            else:
+                                if notes.change_trigger == -1:
+                                    notes.change_trigger = -1
 
     @staticmethod
     def urlAppendParams(url, paramsDict):
@@ -233,22 +260,23 @@ class AsyncApiHelper:
                         if json is not None and isinstance(json, list):
                             commitList = await AsyncApiHelper.parserCommit(json)
 
+                        """获取第一个commit的sha"""
+                        change_sha = commitList[0].id
+
                         """获取notes"""
                         api = AsyncApiHelper.getNotesApi(merge_request_iid)
                         json = await AsyncApiHelper.fetchBeanData(session, api)
                         print(json)
 
-                        """获取第一个commit的sha"""
-                        change_sha = commitList[0].id
-
                         nodesList = []
                         if json is not None and isinstance(json, list):
                             nodesList = await AsyncApiHelper.parserNotes(json)
 
-                        # """分析评论"""
-                        # for nodes in nodesList:
-                        #     if nodes.position is not None:
-                        #         await AsyncApiHelper.judgeChangeTrigger(session, pr_author, change_sha, nodes)
+                        """分析评论"""
+                        for nodes in nodesList:
+                            if nodes.position is not None:
+                                await AsyncApiHelper.judgeChangeTrigger(session, pr_author, change_sha, nodes)
+                                beanList.append(nodes)
 
                         print(beanList)
 

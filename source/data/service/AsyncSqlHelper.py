@@ -3,6 +3,7 @@ from source.config.configPraser import configPraser
 from source.data.bean.Beanbase import BeanBase
 from source.data.bean.DiffRefs import DiffRefs
 from source.data.bean.MergeRequest import MergeRequest
+from source.data.bean.Notes import Notes
 from source.data.bean.User import User
 from source.database.SqlUtils import SqlUtils
 
@@ -20,6 +21,8 @@ class AsyncSqlHelper:
             return SqlUtils.STR_TABLE_NAME_MERGE_REQUEST
         elif isinstance(bean,  DiffRefs):
             return SqlUtils.STR_TABLE_NAME_DIFF_REFS
+        elif isinstance(bean, Notes):
+            return SqlUtils.STR_TABLE_NAME_NOTES
         else:
             return None
 

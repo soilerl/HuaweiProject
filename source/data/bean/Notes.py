@@ -44,7 +44,7 @@ class Notes(BeanBase):
         items = [StringKeyUtils.STR_KEY_ID, StringKeyUtils.STR_KEY_TYPE,
                  StringKeyUtils.STR_KEY_BODY, StringKeyUtils.STR_KEY_AUTHOR_USER_NAME,
                  StringKeyUtils.STR_KEY_CREATE_AT, StringKeyUtils.STR_KEY_UPDATE_AT,
-                 StringKeyUtils.STR_KEY_SYSTEM, StringKeyUtils.STR_KEY_NOTEABLE_ID,
+                 StringKeyUtils.STR_KEY_IS_SYSTEM, StringKeyUtils.STR_KEY_NOTEABLE_ID,
                  StringKeyUtils.STR_KEY_NOTEABLE_TYPE, StringKeyUtils.STR_KEY_NOTEABLE_IID,
                  StringKeyUtils.STR_KEY_CHANGE_TRIGGER]
 
@@ -58,7 +58,7 @@ class Notes(BeanBase):
                  (StringKeyUtils.STR_KEY_AUTHOR_USER_NAME, BeanBase.DATA_TYPE_STRING),
                  (StringKeyUtils.STR_KEY_CREATE_AT, BeanBase.DATA_TYPE_STRING),
                  (StringKeyUtils.STR_KEY_UPDATE_AT, BeanBase.DATA_TYPE_STRING),
-                 (StringKeyUtils.STR_KEY_SYSTEM, BeanBase.DATA_TYPE_BOOLEAN),
+                 (StringKeyUtils.STR_KEY_IS_SYSTEM, BeanBase.DATA_TYPE_BOOLEAN),
                  (StringKeyUtils.STR_KEY_NOTEABLE_ID, BeanBase.DATA_TYPE_INT),
                  (StringKeyUtils.STR_KEY_NOTEABLE_TYPE, BeanBase.DATA_TYPE_STRING),
                  (StringKeyUtils.STR_KEY_NOTEABLE_IID, BeanBase.DATA_TYPE_INT),
@@ -70,7 +70,7 @@ class Notes(BeanBase):
         items = {StringKeyUtils.STR_KEY_ID : self.id, StringKeyUtils.STR_KEY_TYPE: self.type,
                  StringKeyUtils.STR_KEY_BODY: self.body, StringKeyUtils.STR_KEY_AUTHOR_USER_NAME: self.author_user_name,
                  StringKeyUtils.STR_KEY_CREATE_AT: self.created_at, StringKeyUtils.STR_KEY_UPDATE_AT: self.updated_at,
-                 StringKeyUtils.STR_KEY_SYSTEM: self.system, StringKeyUtils.STR_KEY_NOTEABLE_ID: self.noteable_id,
+                 StringKeyUtils.STR_KEY_IS_SYSTEM: self.system, StringKeyUtils.STR_KEY_NOTEABLE_ID: self.noteable_id,
                  StringKeyUtils.STR_KEY_NOTEABLE_TYPE: self.noteable_type,
                  StringKeyUtils.STR_KEY_NOTEABLE_IID: self.noteable_iid,
                  StringKeyUtils.STR_KEY_CHANGE_TRIGGER: self.change_trigger}
