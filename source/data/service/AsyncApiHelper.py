@@ -13,11 +13,14 @@ from source.config.configPraser import configPraser
 
 from source.data.bean.Commits import Commits
 from source.data.bean.Diff import Diff
+from source.data.bean.Discussions import Discussions
 from source.data.bean.MergeRequest import MergeRequest
 from source.data.bean.Notes import Notes
+from source.data.bean.Pipelines import Pipelines
 from source.data.bean.Position import Position
 from source.data.service.AsyncSqlHelper import AsyncSqlHelper
 from source.data.service.GraphqlHelper import GraphqlHelper
+from source.data.service.NoteAnalyser import NoteAnalyser
 from source.data.service.ProxyHelper import ProxyHelper
 from source.data.service.TextCompareUtils import TextCompareUtils
 from source.utils.Logger import Logger
@@ -42,11 +45,11 @@ class AsyncApiHelper:
 
     @staticmethod
     def getAuthorizationHeaders(header):
-        """设置Github 的Token用于验证"""
+        """设置Gitlub 的Token用于验证"""
         if header is not None and isinstance(header, dict):
-            if configPraser.getAuthorizationToken():
-                header[StringKeyUtils.STR_HEADER_AUTHORIZAITON] = (StringKeyUtils.STR_HEADER_TOKEN
-                                                                   + configPraser.getAuthorizationToken())
+            if configPraser.getPrivateToken():
+                header[StringKeyUtils.STR_HEADER_AUTHORIZAITON] = (StringKeyUtils.STR_HEADER_BEARER
+                                                                   + configPraser.getPrivateToken())
         return header
 
     @staticmethod
@@ -69,6 +72,12 @@ class AsyncApiHelper:
     def getMediaTypeHeaders(header):
         if header is not None and isinstance(header, dict):
             header[StringKeyUtils.STR_HEADER_ACCEPT] = StringKeyUtils.STR_HEADER_MEDIA_TYPE
+        return header
+
+    @staticmethod
+    def getContentTypeHeaders(header):
+        if header is not None and isinstance(header, dict):
+            header[StringKeyUtils.STR_HEADER_CONTENT_TYPE] = StringKeyUtils.STR_HEADER_APPLICATION
         return header
 
     @staticmethod
@@ -260,28 +269,65 @@ class AsyncApiHelper:
                         if json is not None and isinstance(json, list):
                             commitList = await AsyncApiHelper.parserCommit(json)
 
-                        """获取第一个commit的sha"""
-                        change_sha = commitList[0].id
+                        """通过Graghql 接口获得所有notes的内容"""
+                        args = {"project": AsyncApiHelper.owner + '/' + AsyncApiHelper.repo, "mr": str(merge_request_iid)}
+                        api = AsyncApiHelper.getGraphQLApi()
+                        query = GraphqlHelper.getMrInformationByIID()
+                        resultJson = await AsyncApiHelper.postGraphqlData(session, api, query, args)
+                        print(resultJson)
 
-                        """获取notes"""
-                        api = AsyncApiHelper.getNotesApi(merge_request_iid)
-                        json = await AsyncApiHelper.fetchBeanData(session, api)
-                        print(json)
+                        mergeRequestData = None
+                        """先解析到mergeRequestData阶段"""
+                        if isinstance(resultJson, dict):
+                            data = resultJson.get(StringKeyUtils.STR_KEY_DATA, None)
+                            if isinstance(data, dict):
+                                projectData = data.get(StringKeyUtils.STR_KEY_PROJECT, None)
+                                if isinstance(projectData, dict):
+                                    mergeRequestData = projectData.get(StringKeyUtils.STR_KEY_MERGE_REQUEST_V4, None)
 
-                        nodesList = []
-                        if json is not None and isinstance(json, list):
-                            nodesList = await AsyncApiHelper.parserNotes(json)
+                        if isinstance(mergeRequestData, dict):
+                            """解析notes"""
+                            notesList = []
+                            notesData = mergeRequestData.get(StringKeyUtils.STR_KEY_NOTES_V4, None)
+                            if notesData is not None and isinstance(notesData, dict):
+                                notesListData = notesData.get(StringKeyUtils.STR_KEY_NODES, None)
+                                if isinstance(notesListData, list):
+                                    for noteData in notesListData:
+                                        note = Notes.parserV4.parser(noteData)
+                                        if note is not None:
+                                            notesList.append(note)
 
-                        """分析评论"""
-                        for nodes in nodesList:
-                            if nodes.position is not None:
-                                await AsyncApiHelper.judgeChangeTrigger(session, pr_author, change_sha, nodes)
-                                beanList.append(nodes)
+                            """解析discussion"""
+                            discussionsList = []
+                            discussionsData = mergeRequestData.get(StringKeyUtils.STR_KEY_DISCUSSIONS_V4, None)
+                            if discussionsData is not None and isinstance(discussionsData, dict):
+                                discussionsListData = discussionsData.get(StringKeyUtils.STR_KEY_NODES, None)
+                                if discussionsListData is not None and isinstance(discussionsListData, list):
+                                    for discussionData in discussionsListData:
+                                        discussion = Discussions.parserV4.parser(discussionData)
+                                        if discussion is not None:
+                                            discussionsList.append(discussion)
+
+                            """解析pipelines"""
+                            pipelinesList = []
+                            pipelinesData = mergeRequestData.get(StringKeyUtils.STR_KEY_PIPELINES_V4, None)
+                            if pipelinesData is not None and isinstance(pipelinesData, dict):
+                                pipelinesListData = pipelinesData.get(StringKeyUtils.STR_KEY_NODES, None)
+                                if pipelinesListData is not None and isinstance(pipelinesListData, list):
+                                    for pipelinesData in pipelinesListData:
+                                        pipeline = Pipelines.parserV4.parser(pipelinesData)
+                                        if pipeline is not None:
+                                            pipelinesList.append(pipeline)
 
                         print(beanList)
+                        await AsyncApiHelper.analysisChangeTrigger(session, notesList, discussionsList,
+                                                                   pipelinesList, pr_author)
 
-                    """数据库存储"""
-                    await AsyncSqlHelper.storeBeanDateList(beanList, mysql)
+                    # """数据库存储"""
+                    # await AsyncSqlHelper.storeBeanDateList(beanList, mysql)
+
+                    """不用数据库 使用本地文本存储"""
+
 
                     # 做了同步处理
                     statistic.lock.acquire()
@@ -299,8 +345,134 @@ class AsyncApiHelper:
                     print(e)
 
     @staticmethod
+    async def analysisChangeTrigger(session, notes, discussions, pipelines, author):
+        """通过notes
+           来分析代码评审的评论是否触发变更
+        """
+        """先遍历notes 做深层分析"""
+        tempList = []
+        for note in notes:
+            """对notes类型识别"""
+            NoteAnalyser.analysisSingleNote(note)
+        for index, note in enumerate(notes):
+            print("index", index, "  type:", note.notesType, "  ", note.commit_sha)
+
+        """notes倒序 切分成不同commit 和  discussion 片段"""
+        notes.reverse()
+
+        timeLineList = []  # 用于存放不同的 discussion和 commit
+
+        for note in notes:
+            if isinstance(note, Notes):
+                if note.notesType == Notes.STR_KEY_OTHER:
+                    """不感兴趣对象直接过滤"""
+                    continue
+                elif note.notesType == Notes.STR_KEY_INLINE_COMMENT:
+                    """用户评论"""
+                    """先寻找discussion"""
+                    for discussion in discussions:
+                        if note.discussion_id == discussion.id:
+                            if discussion.analysisNodesList is None:
+                                discussion.analysisNodesList = []
+                                timeLineList.append(discussion)
+                            discussion.analysisNodesList.append(note)
+                elif note.notesType == Notes.STR_KEY_COMMIT:
+                    """commit 直接放入"""
+
+                    """现在commit只有8位的sha， 通过pipeline作为辅助，补全sha"""
+                    for pipeline in pipelines:
+                        if note.commit_sha == pipeline.sha[:8]:
+                            note.commit_sha = pipeline.sha
+                            break
+                    timeLineList.append(note)
+                elif note.notesType == Notes.STR_KEY_SYSTEM_CHANGE_NOTICE:
+                    """系统提示该表标识  不放入discussion, 但是认为discussion 发生变化"""
+                    for discussion in discussions:
+                        if note.discussion_id == discussion.id:
+                            discussion.change_trigger_system = True
+
+        print(timeLineList)
+        """把 discussion 和 commit 切分成不同的小组"""
+        review_change_pair = []
+        temp_discussions = []  # 用于记录同一大组的 discussion
+        temp_commits = []
+        for event in timeLineList:
+            if isinstance(event, Notes) and event.notesType == Notes.STR_KEY_COMMIT:
+                if temp_discussions.__len__() > 0:  # 需要保证commit是在 discussion 后面
+                    temp_commits.append(event)
+            if isinstance(event, Discussions):
+                if temp_commits.__len__() > 0:
+                    review_change_pair.append([temp_discussions, temp_commits])
+                    temp_discussions = []
+                    temp_commits = []
+                temp_discussions.append(event)
+        """收尾"""
+        if temp_discussions.__len__() > 0 and temp_commits.__len__() > 0:
+            review_change_pair.append([temp_discussions, temp_commits])
+
+        print(review_change_pair)
+        """对每一对 review_change_pair 分析change_trigger"""
+        for discussions, changes in review_change_pair:
+            await AsyncApiHelper.analysisReviewChangePair(session, discussions, changes)
+
+    @staticmethod
+    async def analysisReviewChangePair(session, discussions, changes):
+        for discussion in discussions:
+            """只能确保每个discussion的第一个comment版本是对的
+               如果第一个触发了代码的变更，后面的作为连带的关系，
+               统统认为触发了代码的变更
+            """
+            comment = discussion.analysisNodesList[0]
+            review_sha = comment.position.head_sha  # 我们认为代码评审最新的版本，也就是head_sha的版本
+            review_line = comment.position.new_line
+            review_file = comment.position.new_path  # 一般来说代码评审都是看添加的部分，即new的部分
+
+            if review_line is None:
+                review_line = comment.position.old_path  # 否则指向原来的的行数
+
+            change_trigger = -1  # 先认为没触发
+            INT_MAX_LINE = 10000000
+            for change in changes:
+                change_sha = change.commit_sha
+
+                """请求接口获得两个版本的差异"""
+                diffs = await AsyncApiHelper.getDiffBetweenCommits(session, review_sha, change_sha)
+                if diffs is not None and isinstance(diffs, list):
+                    for diffData in diffs:
+                        diff = Diff.parser.parser(diffData)
+                        if diff is not None:
+                            if diff.new_path == review_file or diff.old_path == review_file:
+                                print(diff.diff)
+                                """解析diff hunk"""
+                                textChanges = TextCompareUtils.patchParser(diff.diff)
+
+                                dis = INT_MAX_LINE
+                                """依次遍历每个patch 找到每个patch 中距离 original_line 最进的改动距离"""
+                                for textChange in textChanges:
+                                    start_left, _, start_right, _ = textChange[0]
+                                    status = textChange[1]
+                                    """curPos 选取 left， 因为对于变动，comment 的行数属于老版本"""
+                                    curPos = start_left - 1
+                                    for s in status:
+                                        if s != '+':
+                                            curPos += 1
+                                        if s == '+' or s == '-':
+                                            dis = min(dis, abs(review_line - curPos))
+                                if dis <= 10:
+                                    if change_trigger == -1:
+                                        change_trigger = dis
+                                    else:
+                                        change_trigger = min(change_trigger, dis)
+                                else:
+                                    if change_trigger == -1:
+                                        change_trigger = -1
+
+
+
+
+    @staticmethod
     def getGraphQLApi():
-        api = StringKeyUtils.API_GITHUB + StringKeyUtils.API_GRAPHQL
+        api = StringKeyUtils.API_GITLAB_GRAPHQL
         return api
 
     @staticmethod
@@ -377,6 +549,7 @@ class AsyncApiHelper:
         headers = {}
         headers = AsyncApiHelper.getUserAgentHeaders(headers)
         headers = AsyncApiHelper.getAuthorizationHeaders(headers)
+        headers = AsyncApiHelper.getContentTypeHeaders(headers)
 
         body = {}
         body = GraphqlHelper.getGraphlQuery(body, query)

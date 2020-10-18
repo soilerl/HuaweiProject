@@ -33,6 +33,10 @@ class GraphqlHelper:
         return GraphqlHelper.STR_KEY_QUERY_PR_ALL
 
     @staticmethod
+    def getMrInformationByIID():
+        return GraphqlHelper.STR_KEY_QUERY_MR_ALL
+
+    @staticmethod
     def getTreeByOid():
         return GraphqlHelper.STR_KEY_QUERY_TREE
 
@@ -511,5 +515,63 @@ query($ids:[ID!]!) {
          }
        }
      } 
+  }
+}"""
+
+    STR_KEY_QUERY_MR_ALL = """query($project:ID!, $mr:String!) {
+  project(fullPath: $project) {
+     id
+     mergeRequest(iid:$mr) {
+      iid
+      sourceBranch
+      targetBranch
+      mergeCommitSha
+      pipelines(first:100) {
+        nodes {
+          iid
+          sha
+          id
+        }
+      }
+      discussions(first:100) {
+        nodes {
+          id
+          notes(first:100) {
+            nodes {
+              id
+              discussion {
+                id
+              }
+            }
+          }
+        }
+      } 
+      notes(first:200) {
+        nodes {
+          createdAt
+          id
+          author {
+            username
+          }
+          system
+          discussion {
+            id
+          }
+          body
+          position {
+            diffRefs {
+              baseSha
+              headSha
+              startSha
+            }
+            filePath
+            newLine
+            newPath
+            oldLine
+            oldPath
+          }
+        }
+      }
+    }
   }
 }"""

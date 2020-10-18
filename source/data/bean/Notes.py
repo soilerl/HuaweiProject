@@ -18,6 +18,12 @@ class Notes(BeanBase):
 
     """
 
+    STR_KEY_OTHER = "notes_type_other"
+    STR_KEY_INLINE_COMMENT = "notes_type_inline_comment"
+    STR_KEY_OUTLINE_COMMENT = "notes_type_outline_comment"
+    STR_KEY_SYSTEM_CHANGE_NOTICE = "notes_type_change_notice"
+    STR_KEY_COMMIT = "notes_type_change_commit"
+
     def __init__(self):
         self.id = None
         self.type = None
@@ -33,6 +39,10 @@ class Notes(BeanBase):
 
         self.author_user_name = None
         self.change_trigger = None
+
+        self.discussion_id = None
+        self.notesType = None  # 用于表示notes的类型
+        self.commit_sha = None  # 如果是commit类型，记录最后一个版本的sha
 
     @staticmethod
     def getIdentifyKeys():
@@ -67,7 +77,7 @@ class Notes(BeanBase):
         return items
 
     def getValueDict(self):
-        items = {StringKeyUtils.STR_KEY_ID : self.id, StringKeyUtils.STR_KEY_TYPE: self.type,
+        items = {StringKeyUtils.STR_KEY_ID: self.id, StringKeyUtils.STR_KEY_TYPE: self.type,
                  StringKeyUtils.STR_KEY_BODY: self.body, StringKeyUtils.STR_KEY_AUTHOR_USER_NAME: self.author_user_name,
                  StringKeyUtils.STR_KEY_CREATE_AT: self.created_at, StringKeyUtils.STR_KEY_UPDATE_AT: self.updated_at,
                  StringKeyUtils.STR_KEY_IS_SYSTEM: self.system, StringKeyUtils.STR_KEY_NOTEABLE_ID: self.noteable_id,
@@ -107,7 +117,43 @@ class Notes(BeanBase):
                     res.position = position
                     position.notes_id = res.id
 
-
                 res.noteable_iid = src.get(StringKeyUtils.STR_KEY_NOTEABLE_IID, None)
 
+            return res
+
+    class parserV4(BeanBase.parser):
+
+        @staticmethod
+        def parser(src):
+            res = None
+            if isinstance(src, dict):
+                res = Notes()
+                res.id = src.get(StringKeyUtils.STR_KEY_ID, None)
+                res.type = src.get(StringKeyUtils.STR_KEY_TYPE, None)
+                res.body = src.get(StringKeyUtils.STR_KEY_BODY, None)
+                """解析用户"""
+                """分析author"""
+                authorUserData = src.get(StringKeyUtils.STR_KEY_AUTHOR, None)
+                if authorUserData is not None and isinstance(authorUserData, dict):
+                    user = User.parserV4.parser(authorUserData)
+                    res.author = user
+                    res.author_user_name = user.username
+
+                res.created_at = src.get(StringKeyUtils.STR_KEY_CREATE_AT_V4, None)
+                # res.updated_at = src.get(StringKeyUtils.STR_KEY_UPDATE_AT, None)
+                res.system = src.get(StringKeyUtils.STR_KEY_SYSTEM, None)
+                """解析position"""
+                positionData = src.get(StringKeyUtils.STR_KEY_POSITION, None)
+                if positionData is not None and isinstance(positionData, dict):
+                    position = Position.parserV4.parser(positionData)
+                    res.position = position
+                    position.notes_id = res.id
+
+                """解析Discussion"""
+                discussionData = src.get(StringKeyUtils.STR_KEY_DISCUSSION_V4, None)
+                if isinstance(discussionData, dict):
+                    from source.data.bean.Discussions import Discussions
+                    discussion = Discussions.parserV4.parser(discussionData)
+                    if discussion is not None:
+                        res.discussion_id = discussion.id
             return res

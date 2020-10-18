@@ -58,3 +58,16 @@ class User(BeanBase):
 
             return res
 
+    class parserV4(BeanBase.parser):
+
+        @staticmethod
+        def parser(src):
+            res = None
+            if isinstance(src, dict):
+                res = User()
+                res.id = src.get(StringKeyUtils.STR_KEY_ID, None)
+                res.name = src.get(StringKeyUtils.STR_KEY_NAME, None)
+                res.username = src.get(StringKeyUtils.STR_KEY_USER_NAME, None)
+                res.state = src.get(StringKeyUtils.STR_KEY_STATE, None)
+
+            return res

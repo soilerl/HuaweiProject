@@ -16,6 +16,7 @@ class StringKeyUtils:
     STR_KEY_FULL_NAME = 'full_name'
     STR_KEY_DESCRIPTION = 'description'
     STR_KEY_CREATE_AT = 'created_at'
+    STR_KEY_CREATE_AT_V4 = 'createdAt'
     STR_KEY_UPDATE_AT = 'updated_at'
     STR_KEY_STARGAZERS_COUNT = 'stargazers_count'
     STR_KEY_WATCHERS_COUNT = 'watchers_count'
@@ -96,6 +97,8 @@ class StringKeyUtils:
     """gitlab MR中可能会使用到的key"""
     STR_KEY_IID = 'iid'
     STR_KEY_PROJECT_ID = 'project_id'
+    STR_KEY_PROJECT = 'project'
+    STR_KEY_MERGE_REQUEST_V4 = 'mergeRequest'
     STR_KEY_MERGED_BY = 'merged_by'
     STR_KEY_CLOSED_BY = 'closed_by'
     STR_KEY_TARGET_BRANCH = 'target_branch'
@@ -108,6 +111,7 @@ class StringKeyUtils:
     STR_KEY_MERGED_BY_USER_NAME = 'merged_by_user_name'
     STR_KEY_CLOSED_BY_USER_NAME = 'closed_by_user_name'
     STR_KEY_AUTHOR_USER_NAME = 'author_user_name'
+    STR_KEY_DIFF_REFS_V4 = 'diffRefs'
 
     """gitlab USER可能会用到"""
     STR_KEY_USER_NAME = 'username'
@@ -119,6 +123,13 @@ class StringKeyUtils:
     STR_KEY_BASE_SHA = 'base_sha'
     STR_KEY_HEAD_SHA = 'head_sha'
     STR_KEY_START_SHA = 'start_sha'
+    STR_KEY_BASE_SHA_V4 = 'baseSha'
+    STR_KEY_HEAD_SHA_V4 = 'headSha'
+    STR_KEY_START_SHA_V4 = 'startSha'
+
+    """gitlab pipeline可能会用到"""
+    STR_KEY_MERGE_REQUEST_ID = 'merge_request_id'
+    STR_KEY_PIPELINES_V4 = 'pipelines'
 
     """gitlab notes可能会用到"""
     STR_KEY_SYSTEM = 'system'
@@ -126,11 +137,16 @@ class StringKeyUtils:
 
     """gitlab position可能会用到"""
     STR_KEY_NOTES_ID = 'notes_id'
+    STR_KEY_NOTES_V4 = 'notes'
     STR_KEY_OLD_PATH = 'old_path'
     STR_KEY_NEW_PATH = 'new_path'
     STR_KEY_POSITION_TYPE = 'position_type'
     STR_KEY_OLD_LINE = 'old_line'
     STR_KEY_NEW_LINE = 'new_line'
+    STR_KEY_OLD_PATH_V4 = 'oldPath'
+    STR_KEY_NEW_PATH_V4 = 'newPath'
+    STR_KEY_OLD_LINE_V4 = 'oldLine'
+    STR_KEY_NEW_LINE_V4 = 'newLine'
 
     """gitlab diff可能会用到"""
     STR_KEY_NEW_FILE = 'new_file'
@@ -138,6 +154,11 @@ class StringKeyUtils:
     STR_KEY_DELETED_FILE = 'deleted_file'
     STR_KEY_DIFF = 'diff'
     STR_KEY_DIFFS = 'diffs'
+
+    """gitlab discussion可能会用到"""
+    STR_KEY_NOTES = 'notes'
+    STR_KEY_DISCUSSIONS_V4 = 'discussions'
+    STR_KEY_DISCUSSION_V4 = 'discussion'
 
     """gitlab Commits"""
     STR_KEY_SHORT_ID = 'short_id'
@@ -336,6 +357,7 @@ class StringKeyUtils:
 
     """gitlab的api接口"""
     API_GITLAB = 'https://gitlab.com/api/v4'
+    API_GITLAB_GRAPHQL = 'https://gitlab.com/api/graphql'
     API_GITLAB_MERGE_PULL_REQUEST = '/projects/:id/merge_requests/:merge_request_iid'
     API_GITLAB_NOTES = '/projects/:id/merge_requests/:merge_request_iid/notes'
     API_GITLAB_COMMITS = '/projects/:id/merge_requests/:merge_request_iid/commits'
@@ -345,8 +367,11 @@ class StringKeyUtils:
     STR_HEADER_PRIVATE_TOKEN = 'PRIVATE-TOKEN'
     STR_HEADER_AUTHORIZAITON = 'Authorization'
     STR_HEADER_TOKEN = 'token '  # 有空格
+    STR_HEADER_BEARER = 'Bearer '  # 有空格
     STR_HEADER_ACCEPT = 'Accept'
+    STR_HEADER_CONTENT_TYPE = 'content-type'
     STR_HEADER_MEDIA_TYPE = 'application/vnd.github.comfort-fade-preview+json'
+    STR_HEADER_APPLICATION = 'application/json'
     STR_HEADER_RATE_LIMIT_REMIAN = 'X-RateLimit-Remaining'
     STR_HEADER_RATE_LIMIT_RESET = 'X-RateLimit-Reset'
     STR_HEADER_USER_AGENT = 'User-Agent'

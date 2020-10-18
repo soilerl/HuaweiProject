@@ -8,6 +8,7 @@
 
 
 from source.data.bean.Beanbase import BeanBase
+from source.data.bean.DiffRefs import DiffRefs
 from source.utils.StringKeyUtils import StringKeyUtils
 
 
@@ -72,14 +73,37 @@ class Position(BeanBase):
             res = None
             if isinstance(src, dict):
                 res = Position()
-                res.notes_id = src.get(StringKeyUtils.STR_KEY_NOTES_ID)
-                res.base_sha = src.get(StringKeyUtils.STR_KEY_BASE_SHA)
-                res.head_sha = src.get(StringKeyUtils.STR_KEY_HEAD_SHA)
-                res.start_sha = src.get(StringKeyUtils.STR_KEY_START_SHA)
-                res.old_path = src.get(StringKeyUtils.STR_KEY_OLD_PATH)
-                res.new_path = src.get(StringKeyUtils.STR_KEY_NEW_PATH)
-                res.position_type = src.get(StringKeyUtils.STR_KEY_POSITION_TYPE)
-                res.old_line = src.get(StringKeyUtils.STR_KEY_OLD_LINE)
-                res.new_line = src.get(StringKeyUtils.STR_KEY_NEW_LINE)
+                res.notes_id = src.get(StringKeyUtils.STR_KEY_NOTES_ID, None)
+                res.base_sha = src.get(StringKeyUtils.STR_KEY_BASE_SHA, None)
+                res.head_sha = src.get(StringKeyUtils.STR_KEY_HEAD_SHA, None)
+                res.start_sha = src.get(StringKeyUtils.STR_KEY_START_SHA, None)
+                res.old_path = src.get(StringKeyUtils.STR_KEY_OLD_PATH, None)
+                res.new_path = src.get(StringKeyUtils.STR_KEY_NEW_PATH, None)
+                res.position_type = src.get(StringKeyUtils.STR_KEY_POSITION_TYPE, None)
+                res.old_line = src.get(StringKeyUtils.STR_KEY_OLD_LINE, None)
+                res.new_line = src.get(StringKeyUtils.STR_KEY_NEW_LINE, None)
+
+            return res
+
+    class parserV4(BeanBase.parser):
+
+        @staticmethod
+        def parser(src):
+            res = None
+            if isinstance(src, dict):
+                res = Position()
+                res.old_path = src.get(StringKeyUtils.STR_KEY_OLD_PATH_V4, None)
+                res.new_path = src.get(StringKeyUtils.STR_KEY_NEW_PATH_V4, None)
+                res.old_line = src.get(StringKeyUtils.STR_KEY_OLD_LINE_V4, None)
+                res.new_line = src.get(StringKeyUtils.STR_KEY_NEW_LINE_V4, None)
+
+                """Graqhl接口需要解析DiffRefs"""
+                diffRefsData = src.get(StringKeyUtils.STR_KEY_DIFF_REFS_V4, None)
+                if isinstance(diffRefsData, dict):
+                    diffRefs = DiffRefs.parserV4.parser(diffRefsData)
+                    if diffRefs is not None:
+                        res.base_sha = diffRefs.base_sha
+                        res.head_sha = diffRefs.head_sha
+                        res.start_sha = diffRefs.start_sha
 
             return res

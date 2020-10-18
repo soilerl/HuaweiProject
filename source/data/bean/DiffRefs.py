@@ -68,3 +68,16 @@ class DiffRefs(BeanBase):
 
             return res
 
+    class parserV4(BeanBase.parser):
+
+        @staticmethod
+        def parser(src):
+            res = None
+            if isinstance(src, dict):
+                res = DiffRefs()
+                res.base_sha = src.get(StringKeyUtils.STR_KEY_BASE_SHA_V4, None)
+                res.head_sha = src.get(StringKeyUtils.STR_KEY_HEAD_SHA_V4, None)
+                res.start_sha = src.get(StringKeyUtils.STR_KEY_START_SHA_V4, None)
+
+            return res
+
