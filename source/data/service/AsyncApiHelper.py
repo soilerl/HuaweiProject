@@ -8,6 +8,7 @@ import traceback
 from datetime import datetime
 
 import aiohttp
+from pandas import DataFrame
 
 from source.config.configPraser import configPraser
 
@@ -25,6 +26,7 @@ from source.data.service.ProxyHelper import ProxyHelper
 from source.data.service.TextCompareUtils import TextCompareUtils
 from source.utils.Logger import Logger
 from source.utils.StringKeyUtils import StringKeyUtils
+from source.utils.pandas.pandasHelper import pandasHelper
 
 
 class AsyncApiHelper:
@@ -221,7 +223,7 @@ class AsyncApiHelper:
     @staticmethod
     async def getDiffBetweenCommits(session, sha1, sha2):
         api = AsyncApiHelper.getCommitCompareApi()
-        api = AsyncApiHelper.urlAppendParams(api, {'from': sha1, 'to': sha2})
+        api = AsyncApiHelper.urlAppendParams(api, {'from': sha1, 'to': sha2, 'straight': True})
         json = await AsyncApiHelper.fetchBeanData(session, api)
         if json is not None and isinstance(json, dict):
             return json.get(StringKeyUtils.STR_KEY_DIFFS, None)
@@ -320,8 +322,21 @@ class AsyncApiHelper:
                                             pipelinesList.append(pipeline)
 
                         print(beanList)
-                        await AsyncApiHelper.analysisChangeTrigger(session, notesList, discussionsList,
+                        comments = await AsyncApiHelper.analysisChangeTrigger(session, notesList, discussionsList,
                                                                    pipelinesList, pr_author)
+
+                        if comments is not None and isinstance(comments, list):
+                            """转化为 CVS文件"""
+                            df = DataFrame(columns=["merge_request_id", "reviewer", "id", "change_trigger", "body"])
+                            for comment in comments:
+                                tempDict = {"merge_request_id": merge_request.iid, "id": comment.id,
+                                            "change_trigger": comment.change_trigger, "body": comment.body,
+                                            "reviewer": comment.author_user_name}
+                                df = df.append(tempDict, ignore_index=True)
+
+                            pandasHelper.writeTSVFile(f"{AsyncApiHelper.repo}_comment.cvs", df,
+                                                      header=pandasHelper.INT_WRITE_WITHOUT_HEADER,
+                                                      writeStyle=pandasHelper.STR_WRITE_STYLE_APPEND_NEW)
 
                     # """数据库存储"""
                     # await AsyncSqlHelper.storeBeanDateList(beanList, mysql)
@@ -369,6 +384,7 @@ class AsyncApiHelper:
                     continue
                 elif note.notesType == Notes.STR_KEY_INLINE_COMMENT:
                     """用户评论"""
+                    note.change_trigger = -1
                     """先寻找discussion"""
                     for discussion in discussions:
                         if note.discussion_id == discussion.id:
@@ -412,11 +428,23 @@ class AsyncApiHelper:
 
         print(review_change_pair)
         """对每一对 review_change_pair 分析change_trigger"""
+
+        """用于存储计算结束的comment"""
+        resultCommentList = []
+
         for discussions, changes in review_change_pair:
-            await AsyncApiHelper.analysisReviewChangePair(session, discussions, changes)
+            await AsyncApiHelper.analysisReviewChangePair(session, discussions, changes, author)
+
+        print(discussions)
+        for note in notes:
+            if note.notesType == Notes.STR_KEY_INLINE_COMMENT:
+                resultCommentList.append(note)
+
+        return resultCommentList
 
     @staticmethod
-    async def analysisReviewChangePair(session, discussions, changes):
+    async def analysisReviewChangePair(session, discussions, changes, author):
+
         for discussion in discussions:
             """只能确保每个discussion的第一个comment版本是对的
                如果第一个触发了代码的变更，后面的作为连带的关系，
@@ -466,6 +494,16 @@ class AsyncApiHelper:
                                 else:
                                     if change_trigger == -1:
                                         change_trigger = -1
+                if change_trigger == 0:
+                    break
+
+            """对每个discussion的notes做结算"""
+            for note in discussion.analysisNodesList:
+                if note.notesType == Notes.STR_KEY_INLINE_COMMENT:
+                    if note.author_user_name == author:
+                        note.change_trigger = -2
+                    else:
+                        note.change_trigger = change_trigger
 
 
 

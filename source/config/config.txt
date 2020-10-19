@@ -19,5 +19,5 @@ commitFetchLoop=10
 timeout=60
 retry=100
 proxy=False
-semaphore=35
+semaphore=20
 api=3
