@@ -552,6 +552,7 @@ query($ids:[ID!]!) {
           id
           author {
             username
+            name
           }
           system
           discussion {

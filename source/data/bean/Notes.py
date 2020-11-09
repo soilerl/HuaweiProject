@@ -38,6 +38,7 @@ class Notes(BeanBase):
         self.noteable_iid = None
 
         self.author_user_name = None
+        self.author_user_full_name = None
         self.change_trigger = None
 
         self.discussion_id = None
@@ -138,6 +139,7 @@ class Notes(BeanBase):
                     user = User.parserV4.parser(authorUserData)
                     res.author = user
                     res.author_user_name = user.username
+                    res.author_user_full_name = user.name
 
                 res.created_at = src.get(StringKeyUtils.STR_KEY_CREATE_AT_V4, None)
                 # res.updated_at = src.get(StringKeyUtils.STR_KEY_UPDATE_AT, None)

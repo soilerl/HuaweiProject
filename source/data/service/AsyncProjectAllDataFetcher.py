@@ -47,14 +47,8 @@ class AsyncProjectAllDataFetcher:
     async def preProcess(loop, limit, start, statistic):
         """准备工作"""
         semaphore = asyncio.Semaphore(configPraser.getSemaphore())  # 对速度做出限制
-        """初始化数据库"""
-        mysql = await getMysqlObj(loop)
-
-        if configPraser.getPrintMode():
-            print("mysql init success")
-
         """多协程"""
-        tasks = [asyncio.ensure_future(AsyncApiHelper.downloadInformation(pull_number, semaphore, mysql, statistic))
+        tasks = [asyncio.ensure_future(AsyncApiHelper.downloadInformation(pull_number, semaphore, statistic))
                  for pull_number in range(start, max(start - limit, 0), -1)]
         await asyncio.wait(tasks)
 
@@ -62,6 +56,6 @@ class AsyncProjectAllDataFetcher:
 if __name__ == '__main__':
     """1. 获取基础数据"""
     # 格式说明: 项目编号repo_id, namespace, name, 需要爬取的pr数量, pr的结束编号
-    projects = [(3836952, "tezos", "tezos", 100, 1100)]
+    projects = [(3836952, "tezos", "tezos", 10, 2000)]
     for p in projects:
         AsyncProjectAllDataFetcher.getDataForRepository(p[0], p[1], p[2], p[3], p[4])

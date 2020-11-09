@@ -229,7 +229,7 @@ class AsyncApiHelper:
             return json.get(StringKeyUtils.STR_KEY_DIFFS, None)
 
     @staticmethod
-    async def downloadInformation(merge_request_iid, semaphore, mysql, statistic):
+    async def downloadInformation(merge_request_iid, semaphore, statistic):
         """获取一个项目 单个merge-request 相关的信息"""
 
         """增加issue  需要仿写downloadInformation函数 
@@ -327,11 +327,14 @@ class AsyncApiHelper:
 
                         if comments is not None and isinstance(comments, list):
                             """转化为 CVS文件"""
-                            df = DataFrame(columns=["merge_request_id", "reviewer", "id", "change_trigger", "body"])
+                            df = DataFrame(columns=["merge_request_id", "reviewer", "reviewer_full_name",
+                                                    "id", "change_trigger", "body", "created_at"])
                             for comment in comments:
-                                tempDict = {"merge_request_id": merge_request.iid, "id": comment.id,
+                                tempDict = {"merge_request_id": merge_request_iid, "id": comment.id,
                                             "change_trigger": comment.change_trigger, "body": comment.body,
-                                            "reviewer": comment.author_user_name}
+                                            "reviewer": comment.author_user_name,
+                                            "reviewer_full_name": comment.author_user_full_name,
+                                            "created_at": merge_request.created_at}
                                 df = df.append(tempDict, ignore_index=True)
 
                             pandasHelper.writeTSVFile(f"{AsyncApiHelper.repo}_comment.cvs", df,
