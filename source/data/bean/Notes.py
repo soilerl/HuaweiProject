@@ -44,6 +44,8 @@ class Notes(BeanBase):
         self.discussion_id = None
         self.notesType = None  # 用于表示notes的类型
         self.commit_sha = None  # 如果是commit类型，记录最后一个版本的sha
+        self.repo = None  # 如果单独存储的话，需要记录项目名称
+        self.merge_request_id = None  # 如果单独存储的话，需要记录mr的number
 
     @staticmethod
     def getIdentifyKeys():
@@ -57,7 +59,8 @@ class Notes(BeanBase):
                  StringKeyUtils.STR_KEY_CREATE_AT, StringKeyUtils.STR_KEY_UPDATE_AT,
                  StringKeyUtils.STR_KEY_IS_SYSTEM, StringKeyUtils.STR_KEY_NOTEABLE_ID,
                  StringKeyUtils.STR_KEY_NOTEABLE_TYPE, StringKeyUtils.STR_KEY_NOTEABLE_IID,
-                 StringKeyUtils.STR_KEY_CHANGE_TRIGGER]
+                 StringKeyUtils.STR_KEY_CHANGE_TRIGGER, StringKeyUtils.STR_KEY_REPO,
+                 StringKeyUtils.STR_KEY_MERGE_REQUEST_ID]
 
         return items
 
@@ -73,7 +76,9 @@ class Notes(BeanBase):
                  (StringKeyUtils.STR_KEY_NOTEABLE_ID, BeanBase.DATA_TYPE_INT),
                  (StringKeyUtils.STR_KEY_NOTEABLE_TYPE, BeanBase.DATA_TYPE_STRING),
                  (StringKeyUtils.STR_KEY_NOTEABLE_IID, BeanBase.DATA_TYPE_INT),
-                 (StringKeyUtils.STR_KEY_CHANGE_TRIGGER, BeanBase.DATA_TYPE_INT)]
+                 (StringKeyUtils.STR_KEY_CHANGE_TRIGGER, BeanBase.DATA_TYPE_INT),
+                 (StringKeyUtils.STR_KEY_REPO, BeanBase.DATA_TYPE_STRING),
+                 (StringKeyUtils.STR_KEY_MERGE_REQUEST_ID, BeanBase.DATA_TYPE_INT)]
 
         return items
 
@@ -84,7 +89,9 @@ class Notes(BeanBase):
                  StringKeyUtils.STR_KEY_IS_SYSTEM: self.system, StringKeyUtils.STR_KEY_NOTEABLE_ID: self.noteable_id,
                  StringKeyUtils.STR_KEY_NOTEABLE_TYPE: self.noteable_type,
                  StringKeyUtils.STR_KEY_NOTEABLE_IID: self.noteable_iid,
-                 StringKeyUtils.STR_KEY_CHANGE_TRIGGER: self.change_trigger}
+                 StringKeyUtils.STR_KEY_CHANGE_TRIGGER: self.change_trigger,
+                 StringKeyUtils.STR_KEY_REPO: self.repo,
+                 StringKeyUtils.STR_KEY_MERGE_REQUEST_ID: self.merge_request_id}
 
         return items
 

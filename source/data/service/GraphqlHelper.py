@@ -526,6 +526,12 @@ query($ids:[ID!]!) {
       sourceBranch
       targetBranch
       mergeCommitSha
+      diffStatsSummary {
+          additions
+          changes
+          deletions
+          fileCount
+      }
       pipelines(first:100) {
         nodes {
           iid
