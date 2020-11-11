@@ -20,6 +20,7 @@ from source.data.bean.Notes import Notes
 from source.data.bean.Pipelines import Pipelines
 from source.data.bean.Position import Position
 from source.data.service.AsyncSqlHelper import AsyncSqlHelper
+from source.data.service.BeanStoreHelper import BeanStoreHelper
 from source.data.service.GraphqlHelper import GraphqlHelper
 from source.data.service.NoteAnalyser import NoteAnalyser
 from source.data.service.ProxyHelper import ProxyHelper
@@ -263,13 +264,13 @@ class AsyncApiHelper:
 
                         pr_author = merge_request.author_user_name
 
-                        """获取commits"""
-                        api = AsyncApiHelper.getCommitApi(merge_request_iid)
-                        json = await AsyncApiHelper.fetchBeanData(session, api)
-                        print(json)
-                        commitList = []
-                        if json is not None and isinstance(json, list):
-                            commitList = await AsyncApiHelper.parserCommit(json)
+                        # """获取commits"""
+                        # api = AsyncApiHelper.getCommitApi(merge_request_iid)
+                        # json = await AsyncApiHelper.fetchBeanData(session, api)
+                        # print(json)
+                        # commitList = []
+                        # if json is not None and isinstance(json, list):
+                        #     commitList = await AsyncApiHelper.parserCommit(json)
 
                         """通过Graghql 接口获得所有notes的内容"""
                         args = {"project": AsyncApiHelper.owner + '/' + AsyncApiHelper.repo, "mr": str(merge_request_iid)}
@@ -288,6 +289,16 @@ class AsyncApiHelper:
                                     mergeRequestData = projectData.get(StringKeyUtils.STR_KEY_MERGE_REQUEST_V4, None)
 
                         if isinstance(mergeRequestData, dict):
+                            """mergeRequest添加一些需要从GrphQL接口拿到的信息  
+                               这次可以重构  暂时懒得改了
+                            """
+                            statsData = mergeRequestData.get(StringKeyUtils.STR_KEY_DIFF_STATUS_SUMMARY, None)
+                            if statsData is not None and isinstance(statsData, dict):
+                                merge_request.additions = statsData.get(StringKeyUtils.STR_KEY_ADDITIONS, None)
+                                merge_request.changes = statsData.get(StringKeyUtils.STR_KEY_CHANGES, None)
+                                merge_request.deletions = statsData.get(StringKeyUtils.STR_KEY_DELETIONS, None)
+                                merge_request.file_count = statsData.get(StringKeyUtils.STR_KEY_FILE_COUNT_V4, None)
+
                             """解析notes"""
                             notesList = []
                             notesData = mergeRequestData.get(StringKeyUtils.STR_KEY_NOTES_V4, None)
@@ -297,6 +308,9 @@ class AsyncApiHelper:
                                     for noteData in notesListData:
                                         note = Notes.parserV4.parser(noteData)
                                         if note is not None:
+                                            """补一些信息"""
+                                            note.merge_request_id = merge_request.iid
+                                            note.repo = merge_request.repository
                                             notesList.append(note)
 
                             """解析discussion"""
@@ -325,21 +339,26 @@ class AsyncApiHelper:
                         comments = await AsyncApiHelper.analysisChangeTrigger(session, notesList, discussionsList,
                                                                    pipelinesList, pr_author)
 
+                        # if comments is not None and isinstance(comments, list):
+                        #     """转化为 CVS文件"""
+                        #     df = DataFrame(columns=["merge_request_id", "reviewer", "reviewer_full_name",
+                        #                             "id", "change_trigger", "body", "created_at"])
+                        #     for comment in comments:
+                        #         tempDict = {"merge_request_id": merge_request_iid, "id": comment.id,
+                        #                     "change_trigger": comment.change_trigger, "body": comment.body,
+                        #                     "reviewer": comment.author_user_name,
+                        #                     "reviewer_full_name": comment.author_user_full_name,
+                        #                     "created_at": merge_request.created_at}
+                        #         df = df.append(tempDict, ignore_index=True)
+                        #
+                        #     pandasHelper.writeTSVFile(f"{AsyncApiHelper.repo}_comment.cvs", df,
+                        #                               header=pandasHelper.INT_WRITE_WITHOUT_HEADER,
+                        #                               writeStyle=pandasHelper.STR_WRITE_STYLE_APPEND_NEW)
+                        """存储notes 这里存储的notes需要保证只有代码评审"""
                         if comments is not None and isinstance(comments, list):
-                            """转化为 CVS文件"""
-                            df = DataFrame(columns=["merge_request_id", "reviewer", "reviewer_full_name",
-                                                    "id", "change_trigger", "body", "created_at"])
-                            for comment in comments:
-                                tempDict = {"merge_request_id": merge_request_iid, "id": comment.id,
-                                            "change_trigger": comment.change_trigger, "body": comment.body,
-                                            "reviewer": comment.author_user_name,
-                                            "reviewer_full_name": comment.author_user_full_name,
-                                            "created_at": merge_request.created_at}
-                                df = df.append(tempDict, ignore_index=True)
+                            BeanStoreHelper.storeBeansToTSV(comments, f"notes.TSV")
 
-                            pandasHelper.writeTSVFile(f"{AsyncApiHelper.repo}_comment.cvs", df,
-                                                      header=pandasHelper.INT_WRITE_WITHOUT_HEADER,
-                                                      writeStyle=pandasHelper.STR_WRITE_STYLE_APPEND_NEW)
+                        BeanStoreHelper.storeBeansToTSV([merge_request], f"mergeRequest.tsv")
 
                     # """数据库存储"""
                     # await AsyncSqlHelper.storeBeanDateList(beanList, mysql)

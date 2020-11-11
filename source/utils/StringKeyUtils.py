@@ -112,6 +112,9 @@ class StringKeyUtils:
     STR_KEY_CLOSED_BY_USER_NAME = 'closed_by_user_name'
     STR_KEY_AUTHOR_USER_NAME = 'author_user_name'
     STR_KEY_DIFF_REFS_V4 = 'diffRefs'
+    STR_KEY_DIFF_STATUS_SUMMARY = 'diffStatsSummary'
+    STR_KEY_FILE_COUNT_V4 = 'fileCount'
+    STR_KEY_FILE_COUNT = 'file_count'
 
     """gitlab USER可能会用到"""
     STR_KEY_USER_NAME = 'username'

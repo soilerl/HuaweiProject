@@ -38,8 +38,14 @@ class MergeRequest(BeanBase):
         self.sha = None
         self.merge_commit_sha = None
         self.squash_commit_sha = None
-        self.changes_count = None
+        self.changes_count = None  # MR中涉及的文件改动块
         self.diff_refs = None  # diff_refs 对象引用，作用暂时不明
+
+        """新增字段标识MR修改状态"""
+        self.additions = None
+        self.changes = None
+        self.deletions = None
+        self.file_count = None
 
         """下面放之前引用对象的标识符作为外键"""
         self.merged_by_user_name = None
@@ -66,7 +72,9 @@ class MergeRequest(BeanBase):
                 StringKeyUtils.STR_KEY_AUTHOR_USER_NAME, StringKeyUtils.STR_KEY_SOURCE_PROJECT_ID,
                 StringKeyUtils.STR_KEY_TARGET_PROJECT_ID, StringKeyUtils.STR_KEY_SHA,
                 StringKeyUtils.STR_KEY_MERGE_COMMIT_SHA, StringKeyUtils.STR_KEY_SQUASH_COMMIT_SHA,
-                StringKeyUtils.STR_KEY_CHANGES_COUNT]
+                StringKeyUtils.STR_KEY_CHANGES_COUNT, StringKeyUtils.STR_KEY_ADDITIONS,
+                StringKeyUtils.STR_KEY_CHANGES, StringKeyUtils.STR_KEY_DELETIONS,
+                StringKeyUtils.STR_KEY_FILE_COUNT]
 
     @staticmethod
     def getItemKeyListWithType():
@@ -91,7 +99,11 @@ class MergeRequest(BeanBase):
                  (StringKeyUtils.STR_KEY_SHA, BeanBase.DATA_TYPE_STRING),
                  (StringKeyUtils.STR_KEY_MERGE_COMMIT_SHA, BeanBase.DATA_TYPE_STRING),
                  (StringKeyUtils.STR_KEY_SQUASH_COMMIT_SHA, BeanBase.DATA_TYPE_STRING),
-                 (StringKeyUtils.STR_KEY_CHANGES_COUNT, BeanBase.DATA_TYPE_INT)]
+                 (StringKeyUtils.STR_KEY_CHANGES_COUNT, BeanBase.DATA_TYPE_INT),
+                 (StringKeyUtils.STR_KEY_ADDITIONS, BeanBase.DATA_TYPE_INT),
+                 (StringKeyUtils.STR_KEY_CHANGES, BeanBase.DATA_TYPE_INT),
+                 (StringKeyUtils.STR_KEY_DELETIONS, BeanBase.DATA_TYPE_INT),
+                 (StringKeyUtils.STR_KEY_FILE_COUNT, BeanBase.DATA_TYPE_INT)]
         return items
 
     def getValueDict(self):
@@ -116,7 +128,11 @@ class MergeRequest(BeanBase):
                  StringKeyUtils.STR_KEY_SHA: self.sha,
                  StringKeyUtils.STR_KEY_MERGE_COMMIT_SHA: self.merge_commit_sha,
                  StringKeyUtils.STR_KEY_SQUASH_COMMIT_SHA: self.squash_commit_sha,
-                 StringKeyUtils.STR_KEY_CHANGES_COUNT: self.changes_count}
+                 StringKeyUtils.STR_KEY_CHANGES_COUNT: self.changes_count,
+                 StringKeyUtils.STR_KEY_ADDITIONS: self.additions,
+                 StringKeyUtils.STR_KEY_CHANGES: self.changes,
+                 StringKeyUtils.STR_KEY_DELETIONS: self.deletions,
+                 StringKeyUtils.STR_KEY_FILE_COUNT: self.file_count}
 
         return items
 
