@@ -356,9 +356,9 @@ class AsyncApiHelper:
                         #                               writeStyle=pandasHelper.STR_WRITE_STYLE_APPEND_NEW)
                         """存储notes 这里存储的notes需要保证只有代码评审"""
                         if comments is not None and isinstance(comments, list):
-                            BeanStoreHelper.storeBeansToTSV(comments, f"notes.TSV")
+                            BeanStoreHelper.storeBeansToTSV(comments, f"../../data/file/notes.tsv")
 
-                        BeanStoreHelper.storeBeansToTSV([merge_request], f"mergeRequest.tsv")
+                        BeanStoreHelper.storeBeansToTSV([merge_request], f"../../data/file/mergeRequest.tsv")
 
                     # """数据库存储"""
                     # await AsyncSqlHelper.storeBeanDateList(beanList, mysql)
