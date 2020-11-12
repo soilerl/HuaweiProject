@@ -4,8 +4,11 @@ import datetime
 import source.data.service.BeanParserHelper as bp
 import source.data.bean.MergeRequest as mr
 
+"""计算评审意见反馈时间"""
+
+
 class MergeRequest:
-    '''解析mergeRequest.tsv需要映射的类'''
+    '''解析mermerge_request_idgeRequest.tsv需要映射的类'''
     def __init__(self, iid, created_at, merged_at, closed_at, state):
         self.iid = iid
         self.created_at = created_at
