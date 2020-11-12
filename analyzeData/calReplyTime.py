@@ -1,6 +1,8 @@
 import analyzeData.common as common
 import csv
 import datetime
+import source.data.service.BeanParserHelper as bp
+import source.data.bean.MergeRequest as mr
 
 class MergeRequest:
     '''解析mergeRequest.tsv需要映射的类'''
@@ -127,3 +129,4 @@ if __name__ == '__main__':
     res = calTime(mergeRequestMap, notesMap)
     for item in res:
         print(item)
+
