@@ -12,17 +12,16 @@ class BeanParserHelper:
         if configPraser.getPrintMode():
             print(columns)
         if isinstance(beanClass, BeanBase):
-            for i in dataTuple:
-                """采用反射机制实例化对象"""
-                obj = beanClass.__class__()
-                itemList = obj.getItemKeyList()
-                for item in itemList:
-                    value = BeanParserHelper.findItemInArray(item, columns, i)
-                    if value is not None:
-                        setattr(obj, item, value)
-                result.append(obj)
-            if configPraser.getPrintMode():
-                print(result.__len__())
+            """采用反射机制实例化对象"""
+            obj = beanClass.__class__()
+            itemList = obj.getItemKeyList()
+            for index, item in enumerate(itemList):
+                value = BeanParserHelper.findItemInArray(item, columns, dataTuple)
+                if value is not None:
+                    setattr(obj, item, value)
+            result.append(obj)
+        if configPraser.getPrintMode():
+            print(result.__len__())
         return result
 
     @staticmethod

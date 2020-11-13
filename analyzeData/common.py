@@ -7,10 +7,10 @@ mergeRequestTsv = "../data/file/mergeRequest.tsv"
 notesTsv = "../data/file/notes.tsv"
 
 
-def readTsvFile(fileName='') -> list:
+def readTsvFile(fileName='', encoding='unicode_escape') -> list:
     """读取csv文件，返回一个存字典的数组，将每一行数据转换成字典"""
     res = []
-    with open(fileName, 'r', encoding='gbk') as tsv:
+    with open(fileName, 'r', encoding=encoding) as tsv:
         tsv_reader = csv.reader(tsv, delimiter='\t')
         tsv_labels = tsv_reader.__next__()
         for record in tsv_reader:
@@ -18,7 +18,6 @@ def readTsvFile(fileName='') -> list:
                 continue
             if len(record[0]) == 0:
                 continue
-            print(record)
             recordMap = {}
             for i in range(1, len(tsv_labels)):
                 recordMap[tsv_labels[i]] = record[i]
