@@ -51,6 +51,7 @@ def readMergeRequestTsvFile(fileName="") -> dict:
 def readNotesTsvFile(fileName="") -> dict:
     #字典的键是merge_request_id，值是一个存放这个mr的所有的notes的数组
     notesMap = {}
+    mergeRequestArr = common.readTsvFile(common.mergeRequestTsv)
     with open(fileName, 'r', encoding='unicode_escape') as notes_tsv:
         tsv_reader = csv.reader(notes_tsv, delimiter='\t')
         tsv_labels = tsv_reader.__next__()
@@ -130,6 +131,6 @@ if __name__ == '__main__':
     mergeRequestMap = readMergeRequestTsvFile(common.mergeRequestTsv)
     notesMap = readNotesTsvFile(common.notesTsv)
     res = calTime(mergeRequestMap, notesMap)
-    for item in res:
-        print(item)
+    # for item in res:
+    #     print(item)
 
