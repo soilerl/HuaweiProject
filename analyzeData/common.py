@@ -1,42 +1,78 @@
 import csv
-import json
 from source.data.bean import MergeRequest, Notes
+import source.utils.pandas.pandasHelper as pandasHelper
+import os
+import source.config.projectConfig as projectConfig
+from source.data.service.BeanParserHelper import BeanParserHelper
 
 #文件路径
 mergeRequestTsv = "../data/file/mergeRequest.tsv"
 notesTsv = "../data/file/notes.tsv"
 
 
-def readTsvFile(fileName='', encoding='unicode_escape') -> list:
-    """读取csv文件，返回一个存字典的数组，将每一行数据转换成字典"""
+#返回以iid为键的存放MergeRequest的字典
+def getMergeRequestMap() -> dict:
+    #键是iid，值是mergeRequest对象
+    mergeRequestMap = {}
+    mergeRequestList = getMergeRequestInstances("mergeRequest.tsv")
+
+    for mergeRequest in mergeRequestList:
+        iid = mergeRequest.iid
+        created_at = mergeRequest.created_at
+        if iid == '' or created_at == '':
+            continue
+        mergeRequestMap[iid] = mergeRequest
+    return mergeRequestMap
+
+#返回以merge_request_id为键，值为这个mergeRequest中所有notes的数组的字典
+def getNotesMap() -> dict:
+    #字典的键是merge_request_id，值是一个存放这个mergeRequest的所有的notes的数组
+    notesMap = {}
+    notesList = getNotesInstances("notes.tsv")
+    for notes in notesList:
+        created_at = notes.created_at
+        merge_request_id = notes.merge_request_id
+        if created_at == '' or merge_request_id == '':
+            continue
+        if merge_request_id in notesMap:
+            notesList = notesMap[merge_request_id]
+            notesList.append(notes)
+        else:
+            notesList = []
+            notesList.append(notes)
+            notesMap[merge_request_id] = notesList
+    return notesMap
+
+
+#传入文件名，返回实例化好的mergeRequest数组
+def getMergeRequestInstances(fileName='') -> []:
     res = []
-    with open(fileName, 'r', encoding=encoding) as tsv:
-        tsv_reader = csv.reader(tsv, delimiter='\t')
-        tsv_labels = tsv_reader.__next__()
-        for record in tsv_reader:
-            if len(record) == 0:
-                continue
-            if len(record[0]) == 0:
-                continue
-            recordMap = {}
-            for i in range(1, len(tsv_labels)):
-                recordMap[tsv_labels[i]] = record[i]
-            res.append(recordMap)
+    df = pandasHelper.pandasHelper.readTSVFile(
+        projectConfig.projectConfig.getRootPath() + os.sep + "data" + os.sep + "file" + os.sep + fileName,
+        header=pandasHelper.pandasHelper.INT_READ_FILE_WITH_HEAD)
+
+    #处理空行
+    df.dropna(subset=["id"], inplace=True)
+
+    for index, row in df.iterrows():
+        t = tuple(row)
+        bean = BeanParserHelper.getBeansFromTuple(MergeRequest.MergeRequest(), MergeRequest.MergeRequest.getItemKeyList(), t)
+        res.extend(bean)
     return res
 
-def getMergeRequestInstanceList(mergeRequestArr=[]) -> []:
-    """根据参数返回赋值完毕的mergeRequest实例列表"""
-    res = []
-    for mergeRequestDict in mergeRequestArr:
-        mergeRequest = MergeRequest.MergeRequest.parser.parser(mergeRequestDict)
-        res.append(mergeRequest)
-    return res
 
-def getNotesInstanceList(notesArr=[]) -> []:
-    """根据参数返回赋值完毕的notes实例列表"""
+#传入要读取的文件名，返回实例化好的Notes数组
+def getNotesInstances(fileName='') -> []:
     res = []
-    for notesDict in notesArr:
-        notes = Notes.Notes.parser.parser(notesDict)
-        res.append(notes)
-    return res
+    df = pandasHelper.pandasHelper.readTSVFile(
+        projectConfig.projectConfig.getRootPath() + os.sep + "data" + os.sep + "file" + os.sep + fileName,
+        header=pandasHelper.pandasHelper.INT_READ_FILE_WITH_HEAD)
 
+    #处理空行
+    df.dropna(subset=["id"], inplace=True)
+
+    for index, row in df.iterrows():
+        t = tuple(row)
+        bean = BeanParserHelper.getBeansFromTuple(Notes.Notes(), Notes.Notes.getItemKeyList(), t)
+        res.extend(bean)
+    return res

@@ -36,11 +36,9 @@ class pandasHelper:
             write_tsv.write(dataFrame.to_csv(sep=StringKeyUtils.STR_SPLIT_SEP_TSV, index=False, header=header))
 
 if __name__ == '__main__':
-    df = pandasHelper.readTSVFile(projectConfig.getRootPath() + os.sep + "data" + os.sep + "file" + os.sep + "mergeRequest.tsv",
+    df = pandasHelper.readTSVFile(projectConfig.getRootPath() + os.sep + "data" + os.sep + "file" + os.sep + "notes.tsv",
                              header=pandasHelper.INT_READ_FILE_WITH_HEAD)
-    print(df.shape)
-    df.dropna(subset=["repository"], inplace=True)
-    print(df.shape)
+    # df.dropna(subset=["id"], inplace=True)
 
     for index,row in df.iterrows():
         print(row)
