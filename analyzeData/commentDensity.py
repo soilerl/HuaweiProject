@@ -2,7 +2,7 @@
 # _*_ coding: utf-8 _*_
 
 
-import common
+import analyzeData.common as common
 import csv
 
 
