@@ -1,4 +1,4 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 import os
 import random
 
@@ -6,7 +6,7 @@ from source.config.projectConfig import projectConfig
 import configparser
 
 
-class configPraser:  # 用于解析config。ini文件
+class configPraser:  # 鐢ㄤ簬瑙ｆ瀽config.ini鏂囦欢
 
     STR_TOKEN = 'token'
     STR_AUTHORIZATION = 'authorization'
@@ -43,7 +43,7 @@ class configPraser:  # 用于解析config。ini文件
     STR_PORT = 'port'
     STR_STANFORD_MODEL_PATH = 'stanfordModelPath'
 
-    cacheDict = {}  # 用于缓存的字典，防止多次访问拖慢速度
+    cacheDict = {}  # 鐢ㄤ簬缂撳瓨鐨勫瓧鍏革紝闃叉澶氭璁块棶鎷栨參閫熷害
 
     @staticmethod
     def getAuthorizationToken():

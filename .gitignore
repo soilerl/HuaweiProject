@@ -8,3 +8,5 @@
 .settings/
 log/
 *.pyc
+*.iml
+*.xml

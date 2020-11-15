@@ -1,9 +1,12 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 import os
 
 import xlrd
 import xlwt
 from datetime import date
+
+from pandas import DataFrame
+
 from source.config.projectConfig import projectConfig
 from _datetime import datetime
 from xlutils import copy
@@ -28,11 +31,11 @@ class ExcelHelper:
     excel_key_list = [STR_KEY_REPO_NAME, STR_KEY_FILE_NAME, STR_KEY_LANGUAGE_NAME,
                       STR_KEY_MESSAGE, STR_KEY_AUTHOR_EMAIL, STR_KEY_WRITTEN_ON,
                       STR_KEY_LINE_NUMBER]
-    '''git comment ˝æ› ‰≥ˆÃßÕ∑
+    '''git commentÊï∞ÊçÆËæìÂá∫Êä¨Â§¥
     '''
 
     excel_key_list_split_word = [STR_KEY_WORD, STR_KEY_FREQUENCY]
-    ''' Õ£”√¥  ‰≥ˆÃßÕ∑
+    ''' ÂÅúÁî®ËØçËæìÂá∫Êä¨Â§¥
     '''
 
     def initExcelFile(self, fileName, sheetName, excel_key_list=None):
@@ -61,11 +64,11 @@ class ExcelHelper:
         return style
 
     def writeExcelRow(self, fileName, sheetName, startRow, startCol, dataList, style):
-        ''' ∏≤∏«  ‘¥Œƒº˛±ÿ–Î¥Ê‘⁄ '''
+        ''' Ë¶ÜÁõñ  Ê∫êÊñá‰ª∂ÂøÖÈ°ªÂ≠òÂú® '''
 
         rbook = xlrd.open_workbook(fileName, formatting_info=True)
         sheetIndex = rbook.sheet_names().index(sheetName)
-        if (sheetIndex == -1):  # sheet≤ª¥Ê‘⁄æÕ
+        if (sheetIndex == -1):  # sheet‰∏çÂ≠òÂú®Â∞±
             return
 
         wbook = copy.copy(rbook)
@@ -91,7 +94,7 @@ class ExcelHelper:
     def appendExcelRow(self, fileName, sheetName, dataList, style):
         rbook = xlrd.open_workbook(fileName, formatting_info=True)
         sheetIndex = rbook.sheet_names().index(sheetName)
-        if (sheetIndex == -1):  # sheet≤ª¥Ê‘⁄æÕ
+        if (sheetIndex == -1):  # sheet‰∏çÂ≠òÂú®Â∞±
             return
 
         wbook = copy.copy(rbook)
@@ -109,7 +112,7 @@ class ExcelHelper:
     def appendExcelRowWithDiffStyle(self, fileName, sheetName, dataList, style):
         rbook = xlrd.open_workbook(fileName, formatting_info=True)
         sheetIndex = rbook.sheet_names().index(sheetName)
-        if (sheetIndex == -1):  # sheet≤ª¥Ê‘⁄æÕ
+        if (sheetIndex == -1):  # sheet‰∏çÂ≠òÂú®Â∞±
             return
 
         wbook = copy.copy(rbook)
@@ -125,11 +128,11 @@ class ExcelHelper:
             print(e)
 
     def writeExcelCol(self, fileName, sheetName, startRow, startCol, dataList, style=None):
-        ''' ∏≤∏«  ‘¥Œƒº˛±ÿ–Î¥Ê‘⁄ '''
+        ''' Ë¶ÜÁõñ  Ê∫êÊñá‰ª∂ÂøÖÈ°ªÂ≠òÂú® '''
 
         rbook = xlrd.open_workbook(fileName, formatting_info=True)
         sheetIndex = rbook.sheet_names().index(sheetName)
-        if (sheetIndex == -1):  # sheet≤ª¥Ê‘⁄æÕ
+        if (sheetIndex == -1):  # sheet‰∏çÂ≠òÂú®Â∞±
             return
 
         wbook = copy.copy(rbook)
@@ -171,62 +174,22 @@ class ExcelHelper:
         print(resData.__len__())
         self.writeExcelCol(fileName, sheetName, startRow, startCol, resData)
 
-    def readTestInputExcel(self):  # ”√”⁄≤‚ ‘
-        source = xlrd.open_workbook(projectConfig.getTestInputExcelPath(), formatting_info=True)
-        print(type(source))
-        print(source.nsheets)
-        print(source.sheet_names())
-        sheet1 = source.sheet_by_index(0)
-        print(sheet1.nrows)
-        print(sheet1.ncols)
-        print(sheet1.row(0))
-        print(sheet1.row(3))
-        print(sheet1.row_values(0))
-        print(sheet1.row_values(3))
-        print(sheet1.col(0))
-        print(sheet1.col_values(2))
-        print(sheet1.cell(1, 5).value)
-        date_value = self.get_date(sheet1.cell(1, 5), source)
-        print(date_value)
-        mDate = date(*date_value[:3])
-        print(mDate)
+    def writeDataFrameToExcel(self, fileName, sheetName, dataframe):
+        """ÂÜôDataframeÂà∞ÊåáÂÆöÁöÑexcel
+           fileName: excelÁöÑÂêçÂ≠ó
+           sheetName: ÂÜôÂÖ•ÁöÑsheetName
+           dataframe: ÈúÄË¶ÅÂÜôÂÖ•ÁöÑdataframe
+        """
+        if isinstance(dataframe, DataFrame):
+            if not os.path.exists(path=fileName):
+                self.initExcelFile(fileName, sheetName)
+            else:
+                self.addSheet(fileName, sheetName)
 
-        wbook = xlwt.Workbook()
-        wsheet = wbook.add_sheet("test")
-        style = xlwt.easyxf('align: vertical center, horizontal center')
-        wsheet.write(0, 0, u' ±º‰', style)
-        wsheet.write(0, 1, 12, style)
-        style2 = xlwt.XFStyle()
-        style2.num_format_str = 'YYYY/MM/DD hh:mm'
-        wsheet.write(0, 2, datetime(*date_value), style2)
-        try:
-            wbook.save('test.xlsx')
-        except Exception as e:
-            print(e)
-
-        s1 = xlrd.open_workbook('test.xlsx')
-        sheet2 = s1.sheet_by_index(0)
-        print(sheet2.row(0))
-        print(datetime.strptime('2020-02-06T21:55:04Z', self.STR_STYLE_DATA_DATE))
-
-    def get_date(self, cell, source):
-        if cell.ctype == xlrd.XL_CELL_DATE:
-            date_value = xlrd.xldate_as_tuple(cell.value, source.datemode)
-            return date_value
-
+            """ÈÅçÂéÜdataframe‰æùÊ¨°Âä†ÂÖ•"""
+            self.appendExcelRow(fileName, sheetName, dataframe.columns, style=self.getNormalStyle())
+            for index, row in dataframe.iterrows():
+                self.appendExcelRow(fileName, sheetName, row, style=self.getNormalStyle())
 
 if __name__ == "__main__":
-    ExcelHelper().readTestInputExcel()
-#      ExcelHelper().initExcelFile(projectConfig.getTestoutputExcelPath(), projectConfig.TEST_OUT_PUT_SHEET_NAME)
-#     ExcelHelper().writeExcelCol(projectConfig.getTestoutputExcelPath(), projectConfig.TEST_OUT_PUT_SHEET_NAME
-#                                 , 1,1, [1,2,3,4,5,7], ExcelHelper.getNormalStyle())
-#     print(ExcelHelper().readExcelCol(projectConfig.getTestoutputExcelPath(), projectConfig.TEST_OUT_PUT_SHEET_NAME
-#                                ,1,0))
-#     ExcelHelper().appendExcelRow(projectConfig.getTestoutputExcelPath(), projectConfig.TEST_OUT_PUT_SHEET_NAME
-#                                  , [1,2,3,4,5,6,7], ExcelHelper.getNormalStyle())
-#     ExcelHelper().appendExcelRow(projectConfig.getTestoutputExcelPath(), projectConfig.TEST_OUT_PUT_SHEET_NAME
-#                                  , [7,6,5,4,3,2,1], ExcelHelper.getNormalStyle())
-#     ExcelHelper().appendExcelRowWithDiffStyle(projectConfig.getTestoutputExcelPath(), projectConfig.TEST_OUT_PUT_SHEET_NAME
-#                                  , [7,1], [ExcelHelper.getNormalStyle(),ExcelHelper.getNormalStyle()])
-#     ExcelHelper().desensitizationExcelCol(projectConfig.getTestoutputExcelPath(), projectConfig.TEST_OUT_PUT_SHEET_NAME,1, 1)
-#       ExcelHelper().addSheet(projectConfig.getDataPath() + os.sep + 'outputIR.xlsx', sheetName='result')
+    pass

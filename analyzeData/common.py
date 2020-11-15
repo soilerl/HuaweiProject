@@ -14,7 +14,7 @@ notesTsv = "../data/file/notes.tsv"
 def getMergeRequestMap() -> dict:
     #键是iid，值是mergeRequest对象
     mergeRequestMap = {}
-    mergeRequestList = getMergeRequestInstances("mergeRequest.tsv")
+    mergeRequestList = getMergeRequestInstances("data/file/mergeRequest/mergeRequest.tsv")
 
     for mergeRequest in mergeRequestList:
         iid = mergeRequest.iid

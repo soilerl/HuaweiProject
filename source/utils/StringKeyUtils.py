@@ -1,10 +1,9 @@
-# coding=gbk
-
+# _*_ coding: utf-8 _*_
 
 class StringKeyUtils:
-    """¸ÃÀàÓÃÓÚ´æ·ÅËùÓĞÊ¹ÓÃµÄÊı¾İÏîkey"""
+    """è¯¥ç±»ç”¨äºå­˜æ”¾æ‰€æœ‰ä½¿ç”¨çš„æ•°æ®é¡¹key"""
 
-    '''ÏîÄ¿ĞÅÏ¢Ê¹ÓÃµÄkey
+    '''é¡¹ç›®ä¿¡æ¯ä½¿ç”¨çš„key
     '''
     STR_KEY_ID = 'id'
     STR_KEY_NUMBER = 'number'
@@ -27,7 +26,7 @@ class StringKeyUtils:
     STR_KEY_PARENT_FULL_NAME = 'parent_full_name'
     STR_KEY_PARENT = 'parent'
 
-    '''ÓÃ»§ĞÅÏ¢Ê¹ÓÃµ½µÄkey '''
+    '''ç”¨æˆ·ä¿¡æ¯ä½¿ç”¨åˆ°çš„key '''
     STR_KEY_LOGIN = 'login'
     STR_KEY_SITE_ADMIN = 'site_admin'
     STR_KEY_TYPE = 'type'
@@ -54,7 +53,7 @@ class StringKeyUtils:
     STR_KEY_HIREABLE_V4 = 'isHireable'
     STR_KEY_WATCHING = 'watching'
 
-    '''pull request¿ÉÄÜ»áÊ¹ÓÃµ½µÄĞÅÏ¢'''
+    '''pull requestå¯èƒ½ä¼šä½¿ç”¨åˆ°çš„ä¿¡æ¯'''
     STR_KEY_STATE = 'state'
     STR_KEY_TITLE = 'title'
     STR_KEY_USER = 'user'
@@ -94,7 +93,7 @@ class StringKeyUtils:
     STR_KEY_OPEN_V3 = 'open'
     STR_KEY_CLOSED_V3 = 'closed'
 
-    """gitlab MRÖĞ¿ÉÄÜ»áÊ¹ÓÃµ½µÄkey"""
+    """gitlab MRä¸­å¯èƒ½ä¼šä½¿ç”¨åˆ°çš„key"""
     STR_KEY_IID = 'iid'
     STR_KEY_PROJECT_ID = 'project_id'
     STR_KEY_PROJECT = 'project'
@@ -116,13 +115,13 @@ class StringKeyUtils:
     STR_KEY_FILE_COUNT_V4 = 'fileCount'
     STR_KEY_FILE_COUNT = 'file_count'
 
-    """gitlab USER¿ÉÄÜ»áÓÃµ½"""
+    """gitlab USERå¯èƒ½ä¼šç”¨åˆ°"""
     STR_KEY_USER_NAME = 'username'
     STR_KEY_NOTEABLE_ID = 'noteable_id'
     STR_KEY_NOTEABLE_IID = 'noteable_iid'
     STR_KEY_NOTEABLE_TYPE = 'noteable_type'
 
-    """gitlab refdifss¿ÉÄÜ»áÓÃµ½"""
+    """gitlab refdifsså¯èƒ½ä¼šç”¨åˆ°"""
     STR_KEY_BASE_SHA = 'base_sha'
     STR_KEY_HEAD_SHA = 'head_sha'
     STR_KEY_START_SHA = 'start_sha'
@@ -130,15 +129,15 @@ class StringKeyUtils:
     STR_KEY_HEAD_SHA_V4 = 'headSha'
     STR_KEY_START_SHA_V4 = 'startSha'
 
-    """gitlab pipeline¿ÉÄÜ»áÓÃµ½"""
+    """gitlab pipelineå¯èƒ½ä¼šç”¨åˆ°"""
     STR_KEY_MERGE_REQUEST_ID = 'merge_request_id'
     STR_KEY_PIPELINES_V4 = 'pipelines'
 
-    """gitlab notes¿ÉÄÜ»áÓÃµ½"""
+    """gitlab noteså¯èƒ½ä¼šç”¨åˆ°"""
     STR_KEY_SYSTEM = 'system'
     STR_KEY_IS_SYSTEM = 'isSystem'
 
-    """gitlab position¿ÉÄÜ»áÓÃµ½"""
+    """gitlab positionå¯èƒ½ä¼šç”¨åˆ°"""
     STR_KEY_NOTES_ID = 'notes_id'
     STR_KEY_NOTES_V4 = 'notes'
     STR_KEY_OLD_PATH = 'old_path'
@@ -151,14 +150,14 @@ class StringKeyUtils:
     STR_KEY_OLD_LINE_V4 = 'oldLine'
     STR_KEY_NEW_LINE_V4 = 'newLine'
 
-    """gitlab diff¿ÉÄÜ»áÓÃµ½"""
+    """gitlab diffå¯èƒ½ä¼šç”¨åˆ°"""
     STR_KEY_NEW_FILE = 'new_file'
     STR_KEY_RENAMED_FILE = 'renamed_file'
     STR_KEY_DELETED_FILE = 'deleted_file'
     STR_KEY_DIFF = 'diff'
     STR_KEY_DIFFS = 'diffs'
 
-    """gitlab discussion¿ÉÄÜ»áÓÃµ½"""
+    """gitlab discussionå¯èƒ½ä¼šç”¨åˆ°"""
     STR_KEY_NOTES = 'notes'
     STR_KEY_DISCUSSIONS_V4 = 'discussions'
     STR_KEY_DISCUSSION_V4 = 'discussion'
@@ -179,7 +178,7 @@ class StringKeyUtils:
     STR_KEY_STATUS = 'status'
     STR_KEY_PARENT_IDS = 'parent_ids'
 
-    '''Branch ¿ÉÄÜ»áÊ¹ÓÃµÄÊı¾İ'''
+    '''Branch å¯èƒ½ä¼šä½¿ç”¨çš„æ•°æ®'''
     STR_KEY_LABEL = 'label'
     STR_KEY_REF = 'ref'
     STR_KEY_REPO = 'repo'
@@ -194,13 +193,13 @@ class StringKeyUtils:
     STR_KEY_HEAD_REF_OID = 'headRefOid'
     STR_KEY_BASE_REF_OID = 'baseRefOid'
 
-    '''review¿ÉÄÜ»áÊ¹ÓÃ·ÅÈÕÊı¾İ'''
+    '''reviewå¯èƒ½ä¼šä½¿ç”¨æ”¾æ—¥æ•°æ®'''
     STR_KEY_PULL_NUMBER = 'pull_number'
     STR_KEY_SUBMITTED_AT = 'submitted_at'
     STR_KEY_COMMIT_ID = 'commit_id'
     STR_KEY_SUBMITTED_AT_V4 = 'submittedAt'
 
-    '''review comment ¿ÉÄÜ»áÓÃµ½µÄÊı¾İ'''
+    '''review comment å¯èƒ½ä¼šç”¨åˆ°çš„æ•°æ®'''
     STR_KEY_PULL_REQUEST_REVIEW_ID = 'pull_request_review_id'
     STR_KEY_DIFF_HUNK = 'diff_hunk'
     STR_KEY_PATH = 'path'
@@ -221,10 +220,10 @@ class StringKeyUtils:
     STR_KEY_IN_REPLY_TO_ID_V4 = 'replyTo'
     STR_KEY_PULL_REQUEST_REVIEW_NODE_ID = 'pull_request_review_node_id'
 
-    '''issue comment ¿ÉÄÜ»áÊ¹ÓÃµÄÊı¾İ'''
+    '''issue comment å¯èƒ½ä¼šä½¿ç”¨çš„æ•°æ®'''
     STR_KEY_BODY_V4 = 'bodyText'
 
-    '''commit ¿ÉÄÜ»áÊ¹ÓÃµÄÊı¾İ'''
+    '''commit å¯èƒ½ä¼šä½¿ç”¨çš„æ•°æ®'''
     STR_KEY_COMMIT = 'commit'
     STR_KEY_AUTHOR = 'author'
     STR_KEY_DATE = 'date'
@@ -238,7 +237,7 @@ class StringKeyUtils:
     STR_KEY_COMMENT_COUNT = 'comment_count'
     STR_KEY_COMMIT_COMMENT_COUNT = 'commit_comment_count'
     STR_KEY_STATS = 'stats'
-    STR_KEY_STATUS = 'status'  # Ò»¸öÊ¹ÓÃÔÚcommitÒ»¸öÊ¹ÓÃÔÚfile
+    STR_KEY_STATUS = 'status'  # ä¸€ä¸ªä½¿ç”¨åœ¨commitä¸€ä¸ªä½¿ç”¨åœ¨file
     STR_KEY_TOTAL = 'total'
     STR_KEY_STATUS_TOTAL = 'status_total'
     STR_KEY_STATUS_ADDITIONS = 'status_additions'
@@ -253,23 +252,23 @@ class StringKeyUtils:
     STR_KEY_TREE = 'tree'
     STR_KEY_BLOB = 'blob'
 
-    '''file ¿ÉÄÜ»áÊ¹ÓÃµÄÊı¾İ'''
+    '''file å¯èƒ½ä¼šä½¿ç”¨çš„æ•°æ®'''
     STR_KEY_COMMIT_SHA = 'commit_sha'
     STR_KEY_CHANGES = 'changes'
     STR_KEY_FILENAME = 'filename'
     STR_KEY_PATCH = 'patch'
 
-    '''commit relation ¿ÉÄÜÊ¹ÓÃµÄÊı¾İ'''
+    '''commit relation å¯èƒ½ä½¿ç”¨çš„æ•°æ®'''
     STR_KEY_CHILD = 'child'
 
-    '''ÉèÖÃ´úÀí¿ÉÄÜ»áÊ¹ÓÃµ½µÄkey'''
+    '''è®¾ç½®ä»£ç†å¯èƒ½ä¼šä½¿ç”¨åˆ°çš„key'''
     STR_PROXY_HTTP = 'http'
     STR_PROXY_HTTP_FORMAT = 'http://{}'
 
-    '''column×öÆÁ±Î¿ÉÄÜ»áÊ¹ÓÃµ½µÄkey'''
+    '''columnåšå±è”½å¯èƒ½ä¼šä½¿ç”¨åˆ°çš„key'''
     STR_KEY_NOP = ''
 
-    '''pr timelineItem ¿ÉÄÜ»áÊ¹ÓÃµ½µÄ'''
+    '''pr timelineItem å¯èƒ½ä¼šä½¿ç”¨åˆ°çš„'''
     STR_KEY_PULL_REQUEST_NODE = 'pullrequest_node'
     STR_KEY_TIME_LINE_ITEM_NODE = 'timelineitem_node'
     STR_KEY_TIME_LINE_ITEMS = 'timelineItems'
@@ -279,14 +278,14 @@ class StringKeyUtils:
     STR_FAILED_FETCH = 'Failed to fetch'
     STR_KEY_PULL_REQUEST_REVIEW_THREAD = 'PullRequestReviewThread'
 
-    '''review change relation ¿ÉÄÜ»áÓÃµ½µÄ'''
+    '''review change relation å¯èƒ½ä¼šç”¨åˆ°çš„'''
     STR_KEY_PULL_REQUEST_NODE_ID = 'pull_request_node_id'
     STR_KEY_REVIEW_NODE_ID = 'review_node_id'
     STR_KEY_CHANGE_NODE_ID = 'change_node_id'
     STR_KEY_REVIEW_POSITION = 'review_position'
     STR_KEY_CHANGE_POSITION = 'change_position'
 
-    '''blob ¿ÉÄÜ»áÓÃµ½'''
+    '''blob å¯èƒ½ä¼šç”¨åˆ°'''
     STR_KEY_BYTE_SIZE = 'byte_size'
     STR_KEY_BYTE_SIZE_V4 = 'byteSize'
     STR_KEY_IS_BINARY = 'is_binary'
@@ -296,7 +295,7 @@ class StringKeyUtils:
     STR_KEY_TEXT = 'text'
     STR_KEY_OBJECT = 'object'
 
-    '''TreeEntry ¿ÉÄÜ»áÓÃµ½'''
+    '''TreeEntry å¯èƒ½ä¼šç”¨åˆ°'''
     STR_KEY_PARENT_OID = 'parent_oid'
     STR_KEY_CHILD_OID = 'child_oid'
     STR_KEY_PARENT_PATH = 'parent_path'
@@ -307,11 +306,11 @@ class StringKeyUtils:
     STR_KEY_PARENT_NODE_ID = 'parent_node_id'
     STR_KEY_CHILD_NODE_ID = 'child_node_id'
 
-    '''UserFollowRelation ¿ÉÄÜ»áÓÃµ½'''
+    '''UserFollowRelation å¯èƒ½ä¼šç”¨åˆ°'''
     STR_KEY_FOLLOWING_LOGIN = 'following_login'
     STR_KEY_TOTAL_COUNT_V4 = 'totalCount'
 
-    '''v4 ½Ó¿Ú¿ÉÄÜ»áÓÃµ½µÄ'''
+    '''v4 æ¥å£å¯èƒ½ä¼šç”¨åˆ°çš„'''
     STR_KEY_ERRORS = 'errors'
     STR_KEY_TYPE_NAME_JSON = '__typename'
     STR_KEY_EDGE = 'edge'
@@ -324,23 +323,23 @@ class StringKeyUtils:
 
     STR_KEY_ERRORS_PR_NOT_FOUND = 'Could not resolve to an issue or pull request with the number of'
 
-    '''HeadRefForcePushedEvent ¿ÉÄÜ»áÊ¹ÓÃµ½µÄ'''
+    '''HeadRefForcePushedEvent å¯èƒ½ä¼šä½¿ç”¨åˆ°çš„'''
     STR_KEY_AFTER_COMMIT = 'afterCommit'
     STR_KEY_BEFORE_COMMIT = 'beforeCommit'
     STR_KEY_HEAD_REF_PUSHED_EVENT = 'HeadRefForcePushedEvent'
 
-    '''PullRequestCommit ¿ÉÄÜ»áÊ¹ÓÃµ½µÄ'''
+    '''PullRequestCommit å¯èƒ½ä¼šä½¿ç”¨åˆ°çš„'''
     STR_KEY_PULL_REQUEST_COMMIT = 'PullRequestCommit'
 
-    '''time line item ¿ÉÄÜ»áÅöµ½µÄÆäËûÀàĞÍ'''
+    '''time line item å¯èƒ½ä¼šç¢°åˆ°çš„å…¶ä»–ç±»å‹'''
     STR_KEY_ISSUE_COMMENT = 'IssueComment'
-    STR_KEY_MENTIONED_EVENT = 'MentionedEvent'  # ±»Ìá¼°
-    STR_KEY_SUBSCRIBED_EVENT = 'SubscribedEvent'  # ¶©ÔÄÊÂ¼ş
+    STR_KEY_MENTIONED_EVENT = 'MentionedEvent'  # è¢«æåŠ
+    STR_KEY_SUBSCRIBED_EVENT = 'SubscribedEvent'  # è®¢é˜…äº‹ä»¶
     STR_KEY_PULL_REQUEST_REVIEW = 'PullRequestReview'
-    STR_KEY_PULL_REQUEST_REVIEW_THREAD = 'PullRequestReviewThread'  # Ïàµ±ÓÚreview
+    STR_KEY_PULL_REQUEST_REVIEW_THREAD = 'PullRequestReviewThread'  # ç›¸å½“äºreview
     STR_KEY_PULL_REQUEST_REVISION_MARKER = 'PullRequestRevisionMarker'
     STR_KEY_MERGED_EVENT = 'MergedEvent'
-    STR_KEY_REFERENCED_EVENT = 'ReferencedEvent'  # commitÒıÓÃ£¬Ò»°ãÔÚ×îºómergeµ½Ö÷¸ÉÇ°×öÕâ¸ö¶¯×÷
+    STR_KEY_REFERENCED_EVENT = 'ReferencedEvent'  # commitå¼•ç”¨ï¼Œä¸€èˆ¬åœ¨æœ€åmergeåˆ°ä¸»å¹²å‰åšè¿™ä¸ªåŠ¨ä½œ
 
     API_GITHUB = 'https://api.github.com'
     API_REVIEWS_FOR_PULL_REQUEST = '/repos/:owner/:repo/pulls/:pull_number/reviews'
@@ -358,7 +357,7 @@ class StringKeyUtils:
     API_COMMENT_FOR_REVIEW_SINGLE = '/repos/:owner/:repo/pulls/comments/:comment_id'
     API_GRAPHQL = '/graphql'
 
-    """gitlabµÄapi½Ó¿Ú"""
+    """gitlabçš„apiæ¥å£"""
     API_GITLAB = 'https://gitlab.com/api/v4'
     API_GITLAB_GRAPHQL = 'https://gitlab.com/api/graphql'
     API_GITLAB_MERGE_PULL_REQUEST = '/projects/:id/merge_requests/:merge_request_iid'
@@ -366,11 +365,11 @@ class StringKeyUtils:
     API_GITLAB_COMMITS = '/projects/:id/merge_requests/:merge_request_iid/commits'
     API_GITLAB_COMMITS_COMPARE = '/projects/:id/repository/compare'
 
-    # ÓÃÓÚÌæ»»µÄ×Ö·û´®
+    # ç”¨äºæ›¿æ¢çš„å­—ç¬¦ä¸²
     STR_HEADER_PRIVATE_TOKEN = 'PRIVATE-TOKEN'
     STR_HEADER_AUTHORIZAITON = 'Authorization'
-    STR_HEADER_TOKEN = 'token '  # ÓĞ¿Õ¸ñ
-    STR_HEADER_BEARER = 'Bearer '  # ÓĞ¿Õ¸ñ
+    STR_HEADER_TOKEN = 'token '  # æœ‰ç©ºæ ¼
+    STR_HEADER_BEARER = 'Bearer '  # æœ‰ç©ºæ ¼
     STR_HEADER_ACCEPT = 'Accept'
     STR_HEADER_CONTENT_TYPE = 'content-type'
     STR_HEADER_MEDIA_TYPE = 'application/vnd.github.comfort-fade-preview+json'
@@ -411,28 +410,28 @@ class StringKeyUtils:
     API_VERSION_RESET = 3
     API_VERSION_GRAPHQL = 4
 
-    """json 404´¦ÀíÓÃµ½µÄ"""
+    """json 404å¤„ç†ç”¨åˆ°çš„"""
     STR_NOT_FIND = 'Not Found'
 
-    """ÈÕÆÚ×ª»»ÓÃµ½µÄ"""
+    """æ—¥æœŸè½¬æ¢ç”¨åˆ°çš„"""
     STR_STYLE_DATA_DATE = '%Y-%m-%dT%H:%M:%SZ'
 
-    """tsv ÎÄ¼şÊ¹ÓÃµ½µÄ"""
+    """tsv æ–‡ä»¶ä½¿ç”¨åˆ°çš„"""
     STR_SPLIT_SEP_TSV = '\t'
 
-    """csv ÎÄ¼şÊ¹ÓÃµ½µÄ"""
+    """csv æ–‡ä»¶ä½¿ç”¨åˆ°çš„"""
     STR_SPLIT_SEP_CSV = ','
 
-    """×öÂ·¾¶·Ö¸î¿ÉÄÜĞèÒªµÄ"""
+    """åšè·¯å¾„åˆ†å‰²å¯èƒ½éœ€è¦çš„"""
     STR_SPLIT_SEP_ONE = '\\'
     STR_SPLIT_SEP_TWO = '/'
 
-    """graphql ¿ÉÄÜÓÃµ½µÄ"""
+    """graphql å¯èƒ½ç”¨åˆ°çš„"""
     STR_KEY_QUERY = 'query'
     STR_KEY_OPERATIONAME = 'operationName'
     STR_KEY_VARIABLES = 'variables'
 
-    """»úÆ÷Ñ§Ï°×ö±êÊ¶Ê¹ÓÃµÄ"""
+    """æœºå™¨å­¦ä¹ åšæ ‡è¯†ä½¿ç”¨çš„"""
     STR_ALGORITHM_FPS = 'fps'
     STR_ALGORITHM_NB = 'naiveBayes'
     STR_ALGORITHM_SVM = 'svm'
@@ -442,7 +441,7 @@ class StringKeyUtils:
     STR_ALGORITHM_CN = 'cn'
     STR_ALGORITHM_CF = 'cf'
 
-    """¶à±êÇ©"""
+    """å¤šæ ‡ç­¾"""
     STR_ALGORITHM_DT_M = 'decisionTree_m'
     STR_ALGORITHM_RF_M = 'randomForest_m'
     STR_ALGORITHM_ET_M = 'extraTree_m'
@@ -450,21 +449,21 @@ class StringKeyUtils:
     STR_ALGORITHM_TC = 'tc'
     STR_ALGORITHM_PB = 'pb'
 
-    """issue comment ºÍ review comment ±êÇ©µÄÇø·Ö"""
+    """issue comment å’Œ review comment æ ‡ç­¾çš„åŒºåˆ†"""
     STR_LABEL_ISSUE_COMMENT = 'label_issue_comment'
     STR_LABEL_REVIEW_COMMENT = 'label_review_comment'
     STR_LABEL_ALL_COMMENT = 'label_all_comment'
 
-    """»úÆ÷ÈËÊ¶±ğ¿ÉÄÜÓÃÉÏ"""
+    """æœºå™¨äººè¯†åˆ«å¯èƒ½ç”¨ä¸Š"""
     STR_NAME_BOT = '[bot]'
 
-    """±êÊ¶²»Í¬µÄÑµÁ··½Ê½"""
+    """æ ‡è¯†ä¸åŒçš„è®­ç»ƒæ–¹å¼"""
     STR_TEST_TYPE_SLIDE = 'test_type_slide'
     STR_TEST_TYPE_INCREMENT = 'test_type_increment'
 
-    """ÈËÔ±Ëæ»úÌî³ä"""
+    """äººå‘˜éšæœºå¡«å……"""
     STR_USER_NONE = 'user_for_none'
 
-    """¹Ø¼ü´ÊÌáÈ¡·½·¨"""
+    """å…³é”®è¯æå–æ–¹æ³•"""
     STR_ALGORITHM_HYPER_GRAPH = 'hyper_graph'
     STR_ALGORITHM_ATF_PDF = 'atf_pdf'

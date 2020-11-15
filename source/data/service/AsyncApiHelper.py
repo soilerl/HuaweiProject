@@ -1,7 +1,8 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 import asyncio
 import difflib
 import json
+import os
 import random
 import time
 import traceback
@@ -11,6 +12,7 @@ import aiohttp
 from pandas import DataFrame
 
 from source.config.configPraser import configPraser
+from source.config.projectConfig import projectConfig
 
 from source.data.bean.Commits import Commits
 from source.data.bean.Diff import Diff
@@ -19,36 +21,33 @@ from source.data.bean.MergeRequest import MergeRequest
 from source.data.bean.Notes import Notes
 from source.data.bean.Pipelines import Pipelines
 from source.data.bean.Position import Position
-from source.data.service.AsyncSqlHelper import AsyncSqlHelper
 from source.data.service.BeanStoreHelper import BeanStoreHelper
 from source.data.service.GraphqlHelper import GraphqlHelper
 from source.data.service.NoteAnalyser import NoteAnalyser
 from source.data.service.ProxyHelper import ProxyHelper
 from source.data.service.TextCompareUtils import TextCompareUtils
-from source.utils.Logger import Logger
 from source.utils.StringKeyUtils import StringKeyUtils
-from source.utils.pandas.pandasHelper import pandasHelper
 
 
 class AsyncApiHelper:
-    """Ê¹ÓÃaiohttpÒì²½Í¨Ñ¶"""
+    """ä½¿ç”¨aiohttpå¼‚æ­¥é€šè®¯"""
 
     owner = None
     repo = None
     repo_id = None
 
     @staticmethod
-    def setRepo(owner, repo):  # Ê¹ÓÃÖ®Ç°ÉèÖÃÏîÄ¿ÃûºÍËùÓĞÕß
+    def setRepo(owner, repo):  # ä½¿ç”¨ä¹‹å‰è®¾ç½®é¡¹ç›®åå’Œæ‰€æœ‰è€…
         AsyncApiHelper.owner = owner
         AsyncApiHelper.repo = repo
 
     @staticmethod
-    def setRepoId(repo_id):  # GitLabĞèÒªÔÚÊ¹ÓÃÇ°ÉèÖÃÏîÄ¿µÄid
+    def setRepoId(repo_id):  # GitLabéœ€è¦åœ¨ä½¿ç”¨å‰è®¾ç½®é¡¹ç›®çš„id
         AsyncApiHelper.repo_id = repo_id
 
     @staticmethod
     def getAuthorizationHeaders(header):
-        """ÉèÖÃGitlub µÄTokenÓÃÓÚÑéÖ¤"""
+        """è®¾ç½®Gitlub çš„Tokenç”¨äºéªŒè¯"""
         if header is not None and isinstance(header, dict):
             if configPraser.getPrivateToken():
                 header[StringKeyUtils.STR_HEADER_AUTHORIZAITON] = (StringKeyUtils.STR_HEADER_BEARER
@@ -57,7 +56,7 @@ class AsyncApiHelper:
 
     @staticmethod
     def getPrivateTokensHeaders(header):
-        """ÉèÖÃGitlab µÄTokenÓÃÓÚÑéÖ¤"""
+        """è®¾ç½®Gitlab çš„Tokenç”¨äºéªŒè¯"""
         if header is not None and isinstance(header, dict):
             if configPraser.getAuthorizationToken():
                 header[StringKeyUtils.STR_HEADER_PRIVATE_TOKEN] = (configPraser.getPrivateToken())
@@ -65,7 +64,7 @@ class AsyncApiHelper:
 
     @staticmethod
     def getUserAgentHeaders(header):
-        """ÅÀ³æ²ßÂÔ£º Ëæ»úÇëÇóµÄagent"""
+        """çˆ¬è™«ç­–ç•¥ï¼š éšæœºè¯·æ±‚çš„agent"""
         if header is not None and isinstance(header, dict):
             # header[self.STR_HEADER_USER_AGENT] = self.STR_HEADER_USER_AGENT_SET
             header[StringKeyUtils.STR_HEADER_USER_AGENT] = random.choice(StringKeyUtils.USER_AGENTS)
@@ -85,7 +84,7 @@ class AsyncApiHelper:
 
     @staticmethod
     async def getProxy():
-        """»ñÈ¡´úÀíip³ØÖĞµÄip  ÏêÏ¸¿´ ProxyHelper"""
+        """è·å–ä»£ç†ipæ± ä¸­çš„ip  è¯¦ç»†çœ‹ ProxyHelper"""
         if configPraser.getProxy():
             proxy = await ProxyHelper.getAsyncSingleProxy()
             if configPraser.getPrintMode():
@@ -103,7 +102,7 @@ class AsyncApiHelper:
                     res = MergeRequest.parser.parser(resultJson)
             elif configPraser.getApiVersion() == StringKeyUtils.API_VERSION_GRAPHQL:
                 pass
-                # GraphQL½Ó¿Ú½âÎö¿ÉÄÜ»á²»´óÒ»Ñù
+                # GraphQLæ¥å£è§£æå¯èƒ½ä¼šä¸å¤§ä¸€æ ·
             if res is not None:
                 res.repository = AsyncApiHelper.owner + '/' + AsyncApiHelper.repo
                 return res
@@ -123,7 +122,7 @@ class AsyncApiHelper:
                                 resList.append(notes)
             elif configPraser.getApiVersion() == StringKeyUtils.API_VERSION_GRAPHQL:
                 pass
-                # GraphQL½Ó¿Ú½âÎö¿ÉÄÜ»á²»´óÒ»Ñù
+                # GraphQLæ¥å£è§£æå¯èƒ½ä¼šä¸å¤§ä¸€æ ·
             return resList
         except Exception as e:
             print(e)
@@ -141,7 +140,7 @@ class AsyncApiHelper:
                                 resList.append(commit)
             elif configPraser.getApiVersion() == StringKeyUtils.API_VERSION_GRAPHQL:
                 pass
-                # GraphQL½Ó¿Ú½âÎö¿ÉÄÜ»á²»´óÒ»Ñù
+                # GraphQLæ¥å£è§£æå¯èƒ½ä¼šä¸å¤§ä¸€æ ·
             return resList
         except Exception as e:
             print(e)
@@ -157,7 +156,7 @@ class AsyncApiHelper:
 
     @staticmethod
     def judgeNotFindV4(resultJson):
-        """v4 ½Ó¿ÚµÄnot findÅĞ¶ÏºÍv3µÄ²»´óÏàÍ¬"""
+        """v4 æ¥å£çš„not findåˆ¤æ–­å’Œv3çš„ä¸å¤§ç›¸åŒ"""
         if resultJson is not None and isinstance(json, dict):
             if resultJson.get(StringKeyUtils.STR_KEY_ERRORS) is not None:
                 return True
@@ -170,10 +169,10 @@ class AsyncApiHelper:
             head_sha = position.head_sha
             username = notes.author_user_name
             if username == pr_author:
-                notes.change_trigger = -2  # -2 ´ú±í×÷Õß×Ô¼º·¢ÑÔ
+                notes.change_trigger = -2  # -2 ä»£è¡¨ä½œè€…è‡ªå·±å‘è¨€
                 return
 
-            """ÔİÊ±×öÒ»¸ö½üËÆ"""
+            """æš‚æ—¶åšä¸€ä¸ªè¿‘ä¼¼"""
             if position.new_line is None and position.old_line is not None:
                 position.new_line = position.old_line
 
@@ -186,15 +185,15 @@ class AsyncApiHelper:
                     if diff is not None:
                         if diff.new_path == notes.position.new_path or diff.old_path == notes.position.old_path:
                             print(diff.diff)
-                            """½âÎödiff hunk"""
+                            """è§£ædiff hunk"""
                             textChanges = TextCompareUtils.patchParser(diff.diff)
 
                             dis = 10000000
-                            """ÒÀ´Î±éÀúÃ¿¸öpatch ÕÒµ½Ã¿¸öpatch ÖĞ¾àÀë original_line ×î½øµÄ¸Ä¶¯¾àÀë"""
+                            """ä¾æ¬¡éå†æ¯ä¸ªpatch æ‰¾åˆ°æ¯ä¸ªpatch ä¸­è·ç¦» original_line æœ€è¿›çš„æ”¹åŠ¨è·ç¦»"""
                             for textChange in textChanges:
                                 start_left, _, start_right, _ = textChange[0]
                                 status = textChange[1]
-                                """curPos Ñ¡È¡ left£¬ ÒòÎª¶ÔÓÚ±ä¶¯£¬comment µÄĞĞÊıÊôÓÚÀÏ°æ±¾"""
+                                """curPos é€‰å– leftï¼Œ å› ä¸ºå¯¹äºå˜åŠ¨ï¼Œcomment çš„è¡Œæ•°å±äºè€ç‰ˆæœ¬"""
                                 curPos = start_left - 1
                                 for s in status:
                                     if s != '+':
@@ -231,16 +230,16 @@ class AsyncApiHelper:
 
     @staticmethod
     async def downloadInformation(merge_request_iid, semaphore, statistic):
-        """»ñÈ¡Ò»¸öÏîÄ¿ µ¥¸ömerge-request Ïà¹ØµÄĞÅÏ¢"""
+        """è·å–ä¸€ä¸ªé¡¹ç›® å•ä¸ªmerge-request ç›¸å…³çš„ä¿¡æ¯"""
 
-        """Ôö¼Óissue  ĞèÒª·ÂĞ´downloadInformationº¯Êı 
-           Ö»ÊÇpull-requestµÄ»ñÈ¡×ª»»Îªissue
+        """å¢åŠ issue  éœ€è¦ä»¿å†™downloadInformationå‡½æ•° 
+           åªæ˜¯pull-requestçš„è·å–è½¬æ¢ä¸ºissue
         """
         async with semaphore:
             async with aiohttp.ClientSession() as session:
                 try:
-                    beanList = []  # ÓÃÀ´ÊÕ¼¯ĞèÒª´æ´¢µÄbeanÀà
-                    """ÏÈ»ñÈ¡pull requestĞÅÏ¢"""
+                    beanList = []  # ç”¨æ¥æ”¶é›†éœ€è¦å­˜å‚¨çš„beanç±»
+                    """å…ˆè·å–pull requestä¿¡æ¯"""
                     api = AsyncApiHelper.getMergeRequestApi(merge_request_iid)
                     json = await AsyncApiHelper.fetchBeanData(session, api)
                     print(json)
@@ -250,7 +249,7 @@ class AsyncApiHelper:
 
                     if merge_request is not None:
                         usefulMergeRequestsCount = 1
-                        """ĞèÒªÅä±£´æÊı¾İ¿âµÄ¶ÔÏó·ÅÈëbeanList¼´¿É"""
+                        """éœ€è¦é…ä¿å­˜æ•°æ®åº“çš„å¯¹è±¡æ”¾å…¥beanListå³å¯"""
                         beanList.append(merge_request)
 
                         if merge_request.diff_refs is not None:
@@ -264,7 +263,7 @@ class AsyncApiHelper:
 
                         pr_author = merge_request.author_user_name
 
-                        # """»ñÈ¡commits"""
+                        # """è·å–commits"""
                         # api = AsyncApiHelper.getCommitApi(merge_request_iid)
                         # json = await AsyncApiHelper.fetchBeanData(session, api)
                         # print(json)
@@ -272,15 +271,16 @@ class AsyncApiHelper:
                         # if json is not None and isinstance(json, list):
                         #     commitList = await AsyncApiHelper.parserCommit(json)
 
-                        """Í¨¹ıGraghql ½Ó¿Ú»ñµÃËùÓĞnotesµÄÄÚÈİ"""
-                        args = {"project": AsyncApiHelper.owner + '/' + AsyncApiHelper.repo, "mr": str(merge_request_iid)}
+                        """é€šè¿‡Graghql æ¥å£è·å¾—æ‰€æœ‰notesçš„å†…å®¹"""
+                        args = {"project": AsyncApiHelper.owner + '/' + AsyncApiHelper.repo,
+                                "mr": str(merge_request_iid)}
                         api = AsyncApiHelper.getGraphQLApi()
                         query = GraphqlHelper.getMrInformationByIID()
                         resultJson = await AsyncApiHelper.postGraphqlData(session, api, query, args)
                         print(resultJson)
 
                         mergeRequestData = None
-                        """ÏÈ½âÎöµ½mergeRequestData½×¶Î"""
+                        """å…ˆè§£æåˆ°mergeRequestDataé˜¶æ®µ"""
                         if isinstance(resultJson, dict):
                             data = resultJson.get(StringKeyUtils.STR_KEY_DATA, None)
                             if isinstance(data, dict):
@@ -289,8 +289,8 @@ class AsyncApiHelper:
                                     mergeRequestData = projectData.get(StringKeyUtils.STR_KEY_MERGE_REQUEST_V4, None)
 
                         if isinstance(mergeRequestData, dict):
-                            """mergeRequestÌí¼ÓÒ»Ğ©ĞèÒª´ÓGrphQL½Ó¿ÚÄÃµ½µÄĞÅÏ¢  
-                               Õâ´Î¿ÉÒÔÖØ¹¹  ÔİÊ±ÀÁµÃ¸ÄÁË
+                            """mergeRequestæ·»åŠ ä¸€äº›éœ€è¦ä»GrphQLæ¥å£æ‹¿åˆ°çš„ä¿¡æ¯  
+                               è¿™æ¬¡å¯ä»¥é‡æ„  æš‚æ—¶æ‡’å¾—æ”¹äº†
                             """
                             statsData = mergeRequestData.get(StringKeyUtils.STR_KEY_DIFF_STATUS_SUMMARY, None)
                             if statsData is not None and isinstance(statsData, dict):
@@ -299,7 +299,7 @@ class AsyncApiHelper:
                                 merge_request.deletions = statsData.get(StringKeyUtils.STR_KEY_DELETIONS, None)
                                 merge_request.file_count = statsData.get(StringKeyUtils.STR_KEY_FILE_COUNT_V4, None)
 
-                            """½âÎönotes"""
+                            """è§£ænotes"""
                             notesList = []
                             notesData = mergeRequestData.get(StringKeyUtils.STR_KEY_NOTES_V4, None)
                             if notesData is not None and isinstance(notesData, dict):
@@ -308,12 +308,12 @@ class AsyncApiHelper:
                                     for noteData in notesListData:
                                         note = Notes.parserV4.parser(noteData)
                                         if note is not None:
-                                            """²¹Ò»Ğ©ĞÅÏ¢"""
+                                            """è¡¥ä¸€äº›ä¿¡æ¯"""
                                             note.merge_request_id = merge_request.iid
                                             note.repo = merge_request.repository
                                             notesList.append(note)
 
-                            """½âÎödiscussion"""
+                            """è§£ædiscussion"""
                             discussionsList = []
                             discussionsData = mergeRequestData.get(StringKeyUtils.STR_KEY_DISCUSSIONS_V4, None)
                             if discussionsData is not None and isinstance(discussionsData, dict):
@@ -324,7 +324,7 @@ class AsyncApiHelper:
                                         if discussion is not None:
                                             discussionsList.append(discussion)
 
-                            """½âÎöpipelines"""
+                            """è§£æpipelines"""
                             pipelinesList = []
                             pipelinesData = mergeRequestData.get(StringKeyUtils.STR_KEY_PIPELINES_V4, None)
                             if pipelinesData is not None and isinstance(pipelinesData, dict):
@@ -337,10 +337,10 @@ class AsyncApiHelper:
 
                         print(beanList)
                         comments = await AsyncApiHelper.analysisChangeTrigger(session, notesList, discussionsList,
-                                                                   pipelinesList, pr_author)
+                                                                              pipelinesList, pr_author)
 
                         # if comments is not None and isinstance(comments, list):
-                        #     """×ª»¯Îª CVSÎÄ¼ş"""
+                        #     """è½¬åŒ–ä¸º CVSæ–‡ä»¶"""
                         #     df = DataFrame(columns=["merge_request_id", "reviewer", "reviewer_full_name",
                         #                             "id", "change_trigger", "body", "created_at"])
                         #     for comment in comments:
@@ -354,22 +354,25 @@ class AsyncApiHelper:
                         #     pandasHelper.writeTSVFile(f"{AsyncApiHelper.repo}_comment.cvs", df,
                         #                               header=pandasHelper.INT_WRITE_WITHOUT_HEADER,
                         #                               writeStyle=pandasHelper.STR_WRITE_STYLE_APPEND_NEW)
-                        """´æ´¢notes ÕâÀï´æ´¢µÄnotesĞèÒª±£Ö¤Ö»ÓĞ´úÂëÆÀÉó"""
+                        """å­˜å‚¨notes è¿™é‡Œå­˜å‚¨çš„noteséœ€è¦ä¿è¯åªæœ‰ä»£ç è¯„å®¡"""
                         if comments is not None and isinstance(comments, list):
-                            BeanStoreHelper.storeBeansToTSV(comments, f"notes.tsv")
+                            notesFileName = projectConfig.getNotesDataPath() + os.sep + \
+                                            f"notes_{AsyncApiHelper.repo}.tsv"
+                            BeanStoreHelper.storeBeansToTSV(comments, notesFileName)
 
-                        BeanStoreHelper.storeBeansToTSV([merge_request], f"mergeRequest.tsv")
+                        mergeRequestFileName = projectConfig.getMergeRequestDataPath() + os.sep + \
+                                               f"mergeRequest_{AsyncApiHelper.repo}.tsv"
+                        BeanStoreHelper.storeBeansToTSV([merge_request], mergeRequestFileName)
 
-                    # """Êı¾İ¿â´æ´¢"""
+                    # """æ•°æ®åº“å­˜å‚¨"""
                     # await AsyncSqlHelper.storeBeanDateList(beanList, mysql)
 
-                    """²»ÓÃÊı¾İ¿â Ê¹ÓÃ±¾µØÎÄ±¾´æ´¢"""
+                    """ä¸ç”¨æ•°æ®åº“ ä½¿ç”¨æœ¬åœ°æ–‡æœ¬å­˜å‚¨"""
 
-
-                    # ×öÁËÍ¬²½´¦Àí
+                    # åšäº†åŒæ­¥å¤„ç†
                     statistic.lock.acquire()
                     statistic.usefulRequestNumber += usefulMergeRequestsCount
-                    """ÓĞÁËÆäËûÊı¾İÍ¬Ñù¿ÉÒÔ×öÍ³¼Æ"""
+                    """æœ‰äº†å…¶ä»–æ•°æ®åŒæ ·å¯ä»¥åšç»Ÿè®¡"""
 
                     print("useful pull request:", statistic.usefulRequestNumber,
                           " useful review:", statistic.usefulReviewNumber,
@@ -383,31 +386,31 @@ class AsyncApiHelper:
 
     @staticmethod
     async def analysisChangeTrigger(session, notes, discussions, pipelines, author):
-        """Í¨¹ınotes
-           À´·ÖÎö´úÂëÆÀÉóµÄÆÀÂÛÊÇ·ñ´¥·¢±ä¸ü
+        """é€šè¿‡notes
+           æ¥åˆ†æä»£ç è¯„å®¡çš„è¯„è®ºæ˜¯å¦è§¦å‘å˜æ›´
         """
-        """ÏÈ±éÀúnotes ×öÉî²ã·ÖÎö"""
+        """å…ˆéå†notes åšæ·±å±‚åˆ†æ"""
         tempList = []
         for note in notes:
-            """¶ÔnotesÀàĞÍÊ¶±ğ"""
+            """å¯¹notesç±»å‹è¯†åˆ«"""
             NoteAnalyser.analysisSingleNote(note)
         for index, note in enumerate(notes):
             print("index", index, "  type:", note.notesType, "  ", note.commit_sha)
 
-        """notesµ¹Ğò ÇĞ·Ö³É²»Í¬commit ºÍ  discussion Æ¬¶Î"""
+        """noteså€’åº åˆ‡åˆ†æˆä¸åŒcommit å’Œ  discussion ç‰‡æ®µ"""
         notes.reverse()
 
-        timeLineList = []  # ÓÃÓÚ´æ·Å²»Í¬µÄ discussionºÍ commit
+        timeLineList = []  # ç”¨äºå­˜æ”¾ä¸åŒçš„ discussionå’Œ commit
 
         for note in notes:
             if isinstance(note, Notes):
                 if note.notesType == Notes.STR_KEY_OTHER:
-                    """²»¸ĞĞËÈ¤¶ÔÏóÖ±½Ó¹ıÂË"""
+                    """ä¸æ„Ÿå…´è¶£å¯¹è±¡ç›´æ¥è¿‡æ»¤"""
                     continue
                 elif note.notesType == Notes.STR_KEY_INLINE_COMMENT:
-                    """ÓÃ»§ÆÀÂÛ"""
+                    """ç”¨æˆ·è¯„è®º"""
                     note.change_trigger = -1
-                    """ÏÈÑ°ÕÒdiscussion"""
+                    """å…ˆå¯»æ‰¾discussion"""
                     for discussion in discussions:
                         if note.discussion_id == discussion.id:
                             if discussion.analysisNodesList is None:
@@ -415,28 +418,28 @@ class AsyncApiHelper:
                                 timeLineList.append(discussion)
                             discussion.analysisNodesList.append(note)
                 elif note.notesType == Notes.STR_KEY_COMMIT:
-                    """commit Ö±½Ó·ÅÈë"""
+                    """commit ç›´æ¥æ”¾å…¥"""
 
-                    """ÏÖÔÚcommitÖ»ÓĞ8Î»µÄsha£¬ Í¨¹ıpipeline×÷Îª¸¨Öú£¬²¹È«sha"""
+                    """ç°åœ¨commitåªæœ‰8ä½çš„shaï¼Œ é€šè¿‡pipelineä½œä¸ºè¾…åŠ©ï¼Œè¡¥å…¨sha"""
                     for pipeline in pipelines:
                         if note.commit_sha == pipeline.sha[:8]:
                             note.commit_sha = pipeline.sha
                             break
                     timeLineList.append(note)
                 elif note.notesType == Notes.STR_KEY_SYSTEM_CHANGE_NOTICE:
-                    """ÏµÍ³ÌáÊ¾¸Ã±í±êÊ¶  ²»·ÅÈëdiscussion, µ«ÊÇÈÏÎªdiscussion ·¢Éú±ä»¯"""
+                    """ç³»ç»Ÿæç¤ºè¯¥è¡¨æ ‡è¯†  ä¸æ”¾å…¥discussion, ä½†æ˜¯è®¤ä¸ºdiscussion å‘ç”Ÿå˜åŒ–"""
                     for discussion in discussions:
                         if note.discussion_id == discussion.id:
                             discussion.change_trigger_system = True
 
         print(timeLineList)
-        """°Ñ discussion ºÍ commit ÇĞ·Ö³É²»Í¬µÄĞ¡×é"""
+        """æŠŠ discussion å’Œ commit åˆ‡åˆ†æˆä¸åŒçš„å°ç»„"""
         review_change_pair = []
-        temp_discussions = []  # ÓÃÓÚ¼ÇÂ¼Í¬Ò»´ó×éµÄ discussion
+        temp_discussions = []  # ç”¨äºè®°å½•åŒä¸€å¤§ç»„çš„ discussion
         temp_commits = []
         for event in timeLineList:
             if isinstance(event, Notes) and event.notesType == Notes.STR_KEY_COMMIT:
-                if temp_discussions.__len__() > 0:  # ĞèÒª±£Ö¤commitÊÇÔÚ discussion ºóÃæ
+                if temp_discussions.__len__() > 0:  # éœ€è¦ä¿è¯commitæ˜¯åœ¨ discussion åé¢
                     temp_commits.append(event)
             if isinstance(event, Discussions):
                 if temp_commits.__len__() > 0:
@@ -444,14 +447,14 @@ class AsyncApiHelper:
                     temp_discussions = []
                     temp_commits = []
                 temp_discussions.append(event)
-        """ÊÕÎ²"""
+        """æ”¶å°¾"""
         if temp_discussions.__len__() > 0 and temp_commits.__len__() > 0:
             review_change_pair.append([temp_discussions, temp_commits])
 
         print(review_change_pair)
-        """¶ÔÃ¿Ò»¶Ô review_change_pair ·ÖÎöchange_trigger"""
+        """å¯¹æ¯ä¸€å¯¹ review_change_pair åˆ†æchange_trigger"""
 
-        """ÓÃÓÚ´æ´¢¼ÆËã½áÊøµÄcomment"""
+        """ç”¨äºå­˜å‚¨è®¡ç®—ç»“æŸçš„comment"""
         resultCommentList = []
 
         for discussions, changes in review_change_pair:
@@ -468,24 +471,24 @@ class AsyncApiHelper:
     async def analysisReviewChangePair(session, discussions, changes, author):
 
         for discussion in discussions:
-            """Ö»ÄÜÈ·±£Ã¿¸ödiscussionµÄµÚÒ»¸öcomment°æ±¾ÊÇ¶ÔµÄ
-               Èç¹ûµÚÒ»¸ö´¥·¢ÁË´úÂëµÄ±ä¸ü£¬ºóÃæµÄ×÷ÎªÁ¬´øµÄ¹ØÏµ£¬
-               Í³Í³ÈÏÎª´¥·¢ÁË´úÂëµÄ±ä¸ü
+            """åªèƒ½ç¡®ä¿æ¯ä¸ªdiscussionçš„ç¬¬ä¸€ä¸ªcommentç‰ˆæœ¬æ˜¯å¯¹çš„
+               å¦‚æœç¬¬ä¸€ä¸ªè§¦å‘äº†ä»£ç çš„å˜æ›´ï¼Œåé¢çš„ä½œä¸ºè¿å¸¦çš„å…³ç³»ï¼Œ
+               ç»Ÿç»Ÿè®¤ä¸ºè§¦å‘äº†ä»£ç çš„å˜æ›´
             """
             comment = discussion.analysisNodesList[0]
-            review_sha = comment.position.head_sha  # ÎÒÃÇÈÏÎª´úÂëÆÀÉó×îĞÂµÄ°æ±¾£¬Ò²¾ÍÊÇhead_shaµÄ°æ±¾
+            review_sha = comment.position.head_sha  # æˆ‘ä»¬è®¤ä¸ºä»£ç è¯„å®¡æœ€æ–°çš„ç‰ˆæœ¬ï¼Œä¹Ÿå°±æ˜¯head_shaçš„ç‰ˆæœ¬
             review_line = comment.position.new_line
-            review_file = comment.position.new_path  # Ò»°ãÀ´Ëµ´úÂëÆÀÉó¶¼ÊÇ¿´Ìí¼ÓµÄ²¿·Ö£¬¼´newµÄ²¿·Ö
+            review_file = comment.position.new_path  # ä¸€èˆ¬æ¥è¯´ä»£ç è¯„å®¡éƒ½æ˜¯çœ‹æ·»åŠ çš„éƒ¨åˆ†ï¼Œå³newçš„éƒ¨åˆ†
 
             if review_line is None:
-                review_line = comment.position.old_path  # ·ñÔòÖ¸ÏòÔ­À´µÄµÄĞĞÊı
+                review_line = comment.position.old_path  # å¦åˆ™æŒ‡å‘åŸæ¥çš„çš„è¡Œæ•°
 
-            change_trigger = -1  # ÏÈÈÏÎªÃ»´¥·¢
+            change_trigger = -1  # å…ˆè®¤ä¸ºæ²¡è§¦å‘
             INT_MAX_LINE = 10000000
             for change in changes:
                 change_sha = change.commit_sha
 
-                """ÇëÇó½Ó¿Ú»ñµÃÁ½¸ö°æ±¾µÄ²îÒì"""
+                """è¯·æ±‚æ¥å£è·å¾—ä¸¤ä¸ªç‰ˆæœ¬çš„å·®å¼‚"""
                 diffs = await AsyncApiHelper.getDiffBetweenCommits(session, review_sha, change_sha)
                 if diffs is not None and isinstance(diffs, list):
                     for diffData in diffs:
@@ -493,15 +496,15 @@ class AsyncApiHelper:
                         if diff is not None:
                             if diff.new_path == review_file or diff.old_path == review_file:
                                 print(diff.diff)
-                                """½âÎödiff hunk"""
+                                """è§£ædiff hunk"""
                                 textChanges = TextCompareUtils.patchParser(diff.diff)
 
                                 dis = INT_MAX_LINE
-                                """ÒÀ´Î±éÀúÃ¿¸öpatch ÕÒµ½Ã¿¸öpatch ÖĞ¾àÀë original_line ×î½øµÄ¸Ä¶¯¾àÀë"""
+                                """ä¾æ¬¡éå†æ¯ä¸ªpatch æ‰¾åˆ°æ¯ä¸ªpatch ä¸­è·ç¦» original_line æœ€è¿›çš„æ”¹åŠ¨è·ç¦»"""
                                 for textChange in textChanges:
                                     start_left, _, start_right, _ = textChange[0]
                                     status = textChange[1]
-                                    """curPos Ñ¡È¡ left£¬ ÒòÎª¶ÔÓÚ±ä¶¯£¬comment µÄĞĞÊıÊôÓÚÀÏ°æ±¾"""
+                                    """curPos é€‰å– leftï¼Œ å› ä¸ºå¯¹äºå˜åŠ¨ï¼Œcomment çš„è¡Œæ•°å±äºè€ç‰ˆæœ¬"""
                                     curPos = start_left - 1
                                     for s in status:
                                         if s != '+':
@@ -519,16 +522,13 @@ class AsyncApiHelper:
                 if change_trigger == 0:
                     break
 
-            """¶ÔÃ¿¸ödiscussionµÄnotes×ö½áËã"""
+            """å¯¹æ¯ä¸ªdiscussionçš„notesåšç»“ç®—"""
             for note in discussion.analysisNodesList:
                 if note.notesType == Notes.STR_KEY_INLINE_COMMENT:
                     if note.author_user_name == author:
                         note.change_trigger = -2
                     else:
                         note.change_trigger = change_trigger
-
-
-
 
     @staticmethod
     def getGraphQLApi():
@@ -564,19 +564,19 @@ class AsyncApiHelper:
 
     @staticmethod
     async def fetchBeanData(session, api, isMediaType=False):
-        """Òì²½»ñÈ¡Êı¾İÍ¨ÓÃ½Ó¿Ú£¨ÖØÒª£©"""
+        """å¼‚æ­¥è·å–æ•°æ®é€šç”¨æ¥å£ï¼ˆé‡è¦ï¼‰"""
 
-        """³õÊ¼»¯ÇëÇóÍ·"""
+        """åˆå§‹åŒ–è¯·æ±‚å¤´"""
         headers = {}
         headers = AsyncApiHelper.getUserAgentHeaders(headers)
-        headers = AsyncApiHelper.getPrivateTokensHeaders(headers)  # ÏÖÔÚÓÃtokenºÃËÆÓĞµãÎÊÌâ ÏÈ×¢ÊÍµô 2020.10.7
+        headers = AsyncApiHelper.getPrivateTokensHeaders(headers)  # ç°åœ¨ç”¨tokenå¥½ä¼¼æœ‰ç‚¹é—®é¢˜ å…ˆæ³¨é‡Šæ‰ 2020.10.7
 
         while True:
-            """¶Ôµ¥¸öÇëÇóÑ­»·ÅĞ¶Ï Ö±µ½ÇëÇó³É¹¦»òÕß´íÎó"""
+            """å¯¹å•ä¸ªè¯·æ±‚å¾ªç¯åˆ¤æ–­ ç›´åˆ°è¯·æ±‚æˆåŠŸæˆ–è€…é”™è¯¯"""
 
-            """»ñÈ¡´úÀíip  ip»ñÈ¡ĞèÒªÔËĞĞ´úÀí³Ø"""
+            """è·å–ä»£ç†ip  ipè·å–éœ€è¦è¿è¡Œä»£ç†æ± """
             proxy = await AsyncApiHelper.getProxy()
-            if configPraser.getProxy() and proxy is None:  # ¶Ô´úÀí³ØÃ»ÓĞipµÄÇé¿ö×ö¿¼ÂÇ
+            if configPraser.getProxy() and proxy is None:  # å¯¹ä»£ç†æ± æ²¡æœ‰ipçš„æƒ…å†µåšè€ƒè™‘
                 print('no proxy and sleep!')
                 await asyncio.sleep(20)
             else:
@@ -594,18 +594,18 @@ class AsyncApiHelper:
                     await ProxyHelper.judgeProxy(proxy.split('//')[1], ProxyHelper.INT_POSITIVE_POINT)
                 return await response.json()
         except Exception as e:
-            """·Ç 403µÄÍøÂçÇëÇó³ö´í  Ñ­»·ÖØÊÔ"""
+            """é 403çš„ç½‘ç»œè¯·æ±‚å‡ºé”™  å¾ªç¯é‡è¯•"""
             print(e)
             if proxy is not None:
                 proxy = proxy.split('//')[1]
                 await ProxyHelper.judgeProxy(proxy, ProxyHelper.INT_NEGATIVE_POINT)
             # print("judge end")
-            """Ñ­»·ÖØÊÔ"""
+            """å¾ªç¯é‡è¯•"""
             return await AsyncApiHelper.fetchBeanData(session, api, isMediaType=isMediaType)
 
     @staticmethod
     async def postGraphqlData(session, api, query=None, args=None):
-        """Í¨¹ı github graphhql½Ó¿Ú Í¨¹ıpostÇëÇó"""
+        """é€šè¿‡ github graphhqlæ¥å£ é€šè¿‡postè¯·æ±‚"""
         headers = {}
         headers = AsyncApiHelper.getUserAgentHeaders(headers)
         headers = AsyncApiHelper.getAuthorizationHeaders(headers)
@@ -619,7 +619,7 @@ class AsyncApiHelper:
 
         while True:
             proxy = await AsyncApiHelper.getProxy()
-            if configPraser.getProxy() and proxy is None:  # ¶Ô´úÀí³ØÃ»ÓĞipµÄÇé¿ö×ö¿¼ÂÇ
+            if configPraser.getProxy() and proxy is None:  # å¯¹ä»£ç†æ± æ²¡æœ‰ipçš„æƒ…å†µåšè€ƒè™‘
                 print('no proxy and sleep!')
                 await asyncio.sleep(20)
             else:

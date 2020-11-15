@@ -1,27 +1,27 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 from source.utils.StringKeyUtils import StringKeyUtils
 import json
 
 
 class GraphqlHelper:
-    """·µ»Øgraphql ĞèÒªµÄqueryÓï¾ä"""
+    """è¿”å›graphql éœ€è¦çš„queryè¯­å¥"""
 
     # @staticmethod
     # def getTimeLineQueryByNodes(body):
-    #     """·µ»Ø²éÑ¯timelineĞèÒªµÄÓï¾ä"""
+    #     """è¿”å›æŸ¥è¯¢timelineéœ€è¦çš„è¯­å¥"""
     #     body[StringKeyUtils.STR_KEY_QUERY] = GraphqlHelper.STR_KEY_QUERY_PR_TIMELINE
     #     return body
 
     @staticmethod
     def getGraphlQuery(body, query):
-        """body ¼ÓÈëqueryÓï¾ä"""
+        """body åŠ å…¥queryè¯­å¥"""
         if query is not None:
             body[StringKeyUtils.STR_KEY_QUERY] = query
         return body
 
     @staticmethod
     def getTimeLineQueryByNodes():
-        """·µ»Ø²éÑ¯timelineĞèÒªµÄÓï¾ä"""
+        """è¿”å›æŸ¥è¯¢timelineéœ€è¦çš„è¯­å¥"""
         return GraphqlHelper.STR_KEY_QUERY_PR_TIMELINE
 
     @staticmethod
@@ -42,7 +42,7 @@ class GraphqlHelper:
 
     @staticmethod
     def getGraphqlVariables(body, args=None):
-        """·µ»Ø´«µİ²ÎÊıĞèÒªµÄjson"""
+        """è¿”å›ä¼ é€’å‚æ•°éœ€è¦çš„json"""
         if args is None or isinstance(body, dict) is False:
             body[StringKeyUtils.STR_KEY_VARIABLES] = GraphqlHelper.STR_KEY_NONE
         else:
@@ -51,7 +51,7 @@ class GraphqlHelper:
 
     # @staticmethod
     # def getGraphqlArg(args=None):
-    #     """·µ»Ø´«µİ²ÎÊıĞèÒªµÄjson"""
+    #     """è¿”å›ä¼ é€’å‚æ•°éœ€è¦çš„json"""
     #     pass
 
     STR_KEY_QUERY_VIEWER = "{viewer{name}}"
@@ -201,15 +201,15 @@ query($ids:[ID!]!) {
 			
 			
            ... on PullRequest {
-             # pull requestµÄĞÅÏ¢  23
-             # ÉÙ repo_full_name, comments
-             # ÉÙ review_comments, commits
-             # ÉÙ head, base
+             # pull requestçš„ä¿¡æ¯  23
+             # å°‘ repo_full_name, comments
+             # å°‘ review_comments, commits
+             # å°‘ head, base
              
              number 
              databaseId
              id
-             # id ÊÇnode id
+             # id æ˜¯node id
              state
              title
              author {
@@ -233,7 +233,7 @@ query($ids:[ID!]!) {
              #issue comment
              comments(first:50) {
               nodes {
-               # 9Ïî ÉÙ repo_full_name,pull_number
+               # 9é¡¹ å°‘ repo_full_name,pull_number
                 databaseId
                 id
                 author {
@@ -250,7 +250,7 @@ query($ids:[ID!]!) {
             # review
             reviews(first:50) {
               nodes{
-               # 11Ïî ÉÙ repo_full_name,pull_number,user_login
+               # 11é¡¹ å°‘ repo_full_name,pull_number,user_login
                databaseId
                author{
                  login
@@ -264,10 +264,10 @@ query($ids:[ID!]!) {
                }
                id
 			  
-			  # review comment ÄÚÇ¶
+			  # review comment å†…åµŒ
               comments(first:50) {
                 nodes {
-                 # 21Ïî ÉÙpull_request_review_id,
+                 # 21é¡¹ å°‘pull_request_review_id,
                  # startline,orignal_start_line,start_side,line,origin_line
                  # side
                  databaseId
@@ -296,9 +296,9 @@ query($ids:[ID!]!) {
               }
 			  
 			  
-              # review Éæ¼°µÄcommit
+              # review æ¶‰åŠçš„commit
               commit {
-                # 15¸öÊôĞÔ ÉÙstatus_total,commit_comment_count
+                # 15ä¸ªå±æ€§ å°‘status_total,commit_comment_count
                 # commit_author_date, commit_committer_date
                 oid
                 id
@@ -333,7 +333,7 @@ query($ids:[ID!]!) {
             # user 
             participants(first:50){
             nodes {
-               #¹²¼Æ26Ïî ÉÙ type,followers_url,
+               #å…±è®¡26é¡¹ å°‘ type,followers_url,
                #following_url, starred_url, subscriptions_url,
                #organizations_url, repos_url, events_url
                #received_events_url, blog, public_repos,
@@ -357,7 +357,7 @@ query($ids:[ID!]!) {
             #files
             files(first:50) {
                nodes {
-               # ĞÂÔöÏî prÖ±½Ó¹ØÁªµÄÎÄ¼ş±ä»¯
+               # æ–°å¢é¡¹ prç›´æ¥å…³è”çš„æ–‡ä»¶å˜åŒ–
                path
                additions
                deletions
@@ -365,11 +365,11 @@ query($ids:[ID!]!) {
             }
 			
 			
-            # pr Ö±½ÓÏà¹ØµÄcommit
+            # pr ç›´æ¥ç›¸å…³çš„commit
             commits(first:50) {
              nodes{
               commit {
-              # 15¸öÊôĞÔ ÉÙstatus_total,commit_comment_count
+              # 15ä¸ªå±æ€§ å°‘status_total,commit_comment_count
               # commit_author_date, commit_committer_date
                oid
                id

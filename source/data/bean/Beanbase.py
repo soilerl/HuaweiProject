@@ -1,32 +1,32 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 
 class BeanBase:
-    """ËùÓĞÊı¾İÀàµÄ»ùÀà"""
+    """æ‰€æœ‰æ•°æ®ç±»çš„åŸºç±»"""
 
     @staticmethod
     def getItemKeyList():
         pass
 
-    '''Ìá¹©Êı¾İÏîÃûÃû×ÖÁĞ±í'''
+    '''æä¾›æ•°æ®é¡¹ååå­—åˆ—è¡¨'''
 
     @staticmethod
     def getItemKeyListWithType():
         pass
 
-    '''Ìá¹©Êı¾İÏîÃû×ÖºÍÖÖÀàÔª×éÁĞ±í'''
+    '''æä¾›æ•°æ®é¡¹åå­—å’Œç§ç±»å…ƒç»„åˆ—è¡¨'''
 
     def getValueDict(self):
         pass
 
-    '''Ìá¹©¸ÃÀàËùÓĞÊı¾İ×Öµä'''
+    '''æä¾›è¯¥ç±»æ‰€æœ‰æ•°æ®å­—å…¸'''
 
     @staticmethod
     def getIdentifyKeys():
         pass
 
-    '''Ìá¹©Êı¾İÀàµÄÎ¨Ò»±êÊ¶'''
+    '''æä¾›æ•°æ®ç±»çš„å”¯ä¸€æ ‡è¯†'''
 
-    '''Êı¾İÏîÖĞÉæ¼°µÄÖÖÀà'''
+    '''æ•°æ®é¡¹ä¸­æ¶‰åŠçš„ç§ç±»'''
     DATA_TYPE_INT = 0
     DATA_TYPE_DATE_TIME = 1
     DATA_TYPE_STRING = 2
@@ -35,10 +35,10 @@ class BeanBase:
     DATA_TYPE_LONG_TEXT = 5
 
     class parser:
-        '''ÓÃÓÚ½âÎöjsonµÄÊı¾İÀà'''
+        '''ç”¨äºè§£æjsonçš„æ•°æ®ç±»'''
 
         @staticmethod
         def parser(src):
             pass
 
-        '''½âÎöjson ·µ»ØÊı¾İÀà'''
+        '''è§£æjson è¿”å›æ•°æ®ç±»'''

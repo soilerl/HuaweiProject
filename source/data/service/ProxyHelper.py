@@ -1,12 +1,12 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 import aiohttp
 import requests
 
 
 class ProxyHelper:
-    """ÓÃÓÚÊ¹ÓÃ ip´úÀí³Ø proxy_poolµÄapi½Ó¿ÚÀà
-    ĞèÒªÅäºÏ¿ªÔ´ÏîÄ¿proxy_poolÊ¹ÓÃ
-    ¿ªÔ´ÏîÄ¿proxy_poolµØÖ·£ºhttps://github.com/jhao104/proxy_pool
+    """ç”¨äºä½¿ç”¨ ipä»£ç†æ±  proxy_poolçš„apiæ¥å£ç±»
+    éœ€è¦é…åˆå¼€æºé¡¹ç›®proxy_poolä½¿ç”¨
+    å¼€æºé¡¹ç›®proxy_poolåœ°å€ï¼šhttps://github.com/jhao104/proxy_pool
     """
 
     STR_PROXY_GET_API = "http://127.0.0.1:5010/get/"
@@ -15,17 +15,17 @@ class ProxyHelper:
 
     STR_KEY_PROXY = 'proxy'
 
-    ip_pool = {}  # ip»º³å³Ø
+    ip_pool = {}  # ipç¼“å†²æ± 
 
     INT_INITIAL_POINT = 5
-    INT_POSITIVE_POINT = 1  # Õı·´À¡·ÖÊı
-    INT_NEGATIVE_POINT = -1  # ¸º·´À¡·ÖÊı
-    INT_DELETE_POINT = 0  # É¾³ı·ÖÊı
-    INT_KILL_POINT = -1000  # Ö±½Ó¸Éµô
+    INT_POSITIVE_POINT = 1  # æ­£åé¦ˆåˆ†æ•°
+    INT_NEGATIVE_POINT = -1  # è´Ÿåé¦ˆåˆ†æ•°
+    INT_DELETE_POINT = 0  # åˆ é™¤åˆ†æ•°
+    INT_KILL_POINT = -1000  # ç›´æ¥å¹²æ‰
 
     @staticmethod
     async def getAsyncSingleProxy():
-        """´Ó±¾µØ´úÀí³Ø»ñµÃ´úÀíip ĞèÒª´úÀíip³ØÔËĞĞ"""
+        """ä»æœ¬åœ°ä»£ç†æ± è·å¾—ä»£ç†ip éœ€è¦ä»£ç†ipæ± è¿è¡Œ"""
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.get(ProxyHelper.STR_PROXY_GET_API) as response:

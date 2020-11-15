@@ -1,4 +1,4 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 import random
 
 import requests
@@ -23,10 +23,10 @@ from math import ceil
 class ApiHelper:
 
     """
-    Í¬²½·½Ê½ÇëÇó api½Ó¿ÚÀà
+    åŒæ­¥æ–¹å¼è¯·æ±‚ apiæ¥å£ç±»
     """
 
-    def __init__(self, owner, repo):  # ÉèÖÃ¶ÔÓ¦µÄ²Ö¿âºÍËùÊô
+    def __init__(self, owner, repo):  # è®¾ç½®å¯¹åº”çš„ä»“åº“å’Œæ‰€å±
         self.owner = owner
         self.repo = repo
         self.isUseAuthorization = False

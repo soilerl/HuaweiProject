@@ -1,4 +1,4 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 import asyncio
 import json
 import os
@@ -16,13 +16,13 @@ from source.utils.statisticsHelper import statisticsHelper
 
 
 class AsyncProjectAllDataFetcher:
-    # »ñÈ¡ÏîÄ¿µÄËùÓĞĞÅÏ¢ Ö÷ÌâĞÅÏ¢²ÉÓÃÒì²½»ñÈ¡
+    # è·å–é¡¹ç›®çš„æ‰€æœ‰ä¿¡æ¯ ä¸»é¢˜ä¿¡æ¯é‡‡ç”¨å¼‚æ­¥è·å–
 
     @staticmethod
     def getDataForRepository(repo_id, owner, repo, limit, start):
-        """Ö¸¶¨Ä¿±êowner/repo »ñÈ¡startµ½  start - limit±àºÅµÄpull-requestÏà¹ØÆÀÉóĞÅÏ¢"""
+        """æŒ‡å®šç›®æ ‡owner/repo è·å–startåˆ°  start - limitç¼–å·çš„pull-requestç›¸å…³è¯„å®¡ä¿¡æ¯"""
 
-        """»ñÈ¡repoĞÅÏ¢  ÕâÀïµÄowner¾ÍÊÇgitlabÖĞµÄnamespace"""
+        """è·å–repoä¿¡æ¯  è¿™é‡Œçš„ownerå°±æ˜¯gitlabä¸­çš„namespace"""
         AsyncApiHelper.setRepo(owner, repo)
         AsyncApiHelper.setRepoId(repo_id)
         t1 = datetime.now()
@@ -30,7 +30,7 @@ class AsyncProjectAllDataFetcher:
         statistic = statisticsHelper()
         statistic.startTime = t1
 
-        """Òì²½¶àĞ­³ÌÅÀ³æÅÀÈ¡pull-requestĞÅÏ¢"""
+        """å¼‚æ­¥å¤šåç¨‹çˆ¬è™«çˆ¬å–pull-requestä¿¡æ¯"""
         loop = asyncio.get_event_loop()
         task = [asyncio.ensure_future(AsyncProjectAllDataFetcher.preProcess(loop, limit, start, statistic))]
         tasks = asyncio.gather(*task)
@@ -45,18 +45,18 @@ class AsyncProjectAllDataFetcher:
 
     @staticmethod
     async def preProcess(loop, limit, start, statistic):
-        """×¼±¸¹¤×÷"""
-        semaphore = asyncio.Semaphore(configPraser.getSemaphore())  # ¶ÔËÙ¶È×ö³öÏŞÖÆ
-        """¶àĞ­³Ì"""
+        """å‡†å¤‡å·¥ä½œ"""
+        semaphore = asyncio.Semaphore(configPraser.getSemaphore())  # å¯¹é€Ÿåº¦åšå‡ºé™åˆ¶
+        """å¤šåç¨‹"""
         tasks = [asyncio.ensure_future(AsyncApiHelper.downloadInformation(pull_number, semaphore, statistic))
                  for pull_number in range(start, max(start - limit, 0), -1)]
         await asyncio.wait(tasks)
 
 
 if __name__ == '__main__':
-    """1. »ñÈ¡»ù´¡Êı¾İ"""
-    # ¸ñÊ½ËµÃ÷: ÏîÄ¿±àºÅrepo_id, namespace, name, ĞèÒªÅÀÈ¡µÄprÊıÁ¿, prµÄ½áÊø±àºÅ
-    projects = [(3836952, "tezos", "tezos", 300, 2000)]
+    """1. è·å–åŸºç¡€æ•°æ®"""
+    # æ ¼å¼è¯´æ˜: é¡¹ç›®ç¼–å·repo_id, namespace, name, éœ€è¦çˆ¬å–çš„præ•°é‡, prçš„ç»“æŸç¼–å·
+    projects = [(3836952, "tezos", "tezos", 100, 2093)]
     for p in projects:
         AsyncProjectAllDataFetcher.getDataForRepository(p[0], p[1], p[2], p[3], p[4])
 

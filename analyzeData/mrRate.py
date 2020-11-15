@@ -1,48 +1,49 @@
+# _*_ coding: utf-8 _*_
 class MergeRequestRate:
     """
-    ÊäÈë£ºÒ»¸öÏîÄ¿µÄmrÁĞ±í
-    Êä³ö£ºÈıÖÖrate
+    è¾“å…¥ï¼šä¸€ä¸ªé¡¹ç›®çš„mråˆ—è¡¨
+    è¾“å‡ºï¼šä¸‰ç§rate
 
-    ÀàÊ¹ÓÃËµÃ÷£º
-    1.Ìá¹©³õÊ¼»¯ËùÓÃµÄmrÁĞ±í²¢½øĞĞ³õÊ¼»¯
-    2.µ÷ÓÃgetº¯Êı¶ÔÈıÖÖrate½øĞĞ»ñÈ¡
+    ç±»ä½¿ç”¨è¯´æ˜ï¼š
+    1.æä¾›åˆå§‹åŒ–æ‰€ç”¨çš„mråˆ—è¡¨å¹¶è¿›è¡Œåˆå§‹åŒ–
+    2.è°ƒç”¨getå‡½æ•°å¯¹ä¸‰ç§rateè¿›è¡Œè·å–
 
-    ps£º
-    ½ö¶ÔÒ»¸öÏîÄ¿½øĞĞrate¼ÆËãÓë·µ»Ø
-    ÈôÒª¼ÆËã¶à¸ö£¬ÇëÔÚÍâ²ã½øĞĞÑ­»·
+    psï¼š
+    ä»…å¯¹ä¸€ä¸ªé¡¹ç›®è¿›è¡Œrateè®¡ç®—ä¸è¿”å›
+    è‹¥è¦è®¡ç®—å¤šä¸ªï¼Œè¯·åœ¨å¤–å±‚è¿›è¡Œå¾ªç¯
     """
-    merge_request = []  # ´æ·ÅÒ»¸öÏîÄ¿µÄmrÁĞ±í
+    merge_request = []  # å­˜æ”¾ä¸€ä¸ªé¡¹ç›®çš„mråˆ—è¡¨
 
-    merge_request_num = 0  # mr×Ü¸öÊı
-    merged_mr_num = 0  # mergedµÄmr¸öÊı
-    closed_mr_num = 0  # closed¸öÊı
-    opened_mr_num = 0  # opened¸öÊı
+    merge_request_num = 0  # mræ€»ä¸ªæ•°
+    merged_mr_num = 0  # mergedçš„mrä¸ªæ•°
+    closed_mr_num = 0  # closedä¸ªæ•°
+    opened_mr_num = 0  # openedä¸ªæ•°
 
-    merged_rate = 0.0  # mergedµÄmr±ÈÀı
-    closed_rate = 0.0  # closedµÄ±ÈÀı
-    opened_rate = 0.0  # openedµÄ±ÈÀı
+    merged_rate = 0.0  # mergedçš„mræ¯”ä¾‹
+    closed_rate = 0.0  # closedçš„æ¯”ä¾‹
+    opened_rate = 0.0  # openedçš„æ¯”ä¾‹
 
     def __init__(self, merge_request):
-        """ ³õÊ¼»¯¹¹Ôìº¯Êı """
+        """ åˆå§‹åŒ–æ„é€ å‡½æ•° """
 
-        """ ³õÊ¼»¯mrÁĞ±í """
+        """ åˆå§‹åŒ–mråˆ—è¡¨ """
         self.set_mr(merge_request)
 
-        """ ¼ÆËãÈıÖÖ±ÈÀı """
+        """ è®¡ç®—ä¸‰ç§æ¯”ä¾‹ """
         self.rate_calculate()
 
     def set_mr(self, merge_request):
-        """ ÉèÖÃmrÁĞ±íÓëÍ³¼Æmr×ÜÊı """
+        """ è®¾ç½®mråˆ—è¡¨ä¸ç»Ÿè®¡mræ€»æ•° """
 
-        """ ÅĞ¶ÏÊÇ·ñÎªÁĞ±í£¬ÊÇµÄ»°£¬½øĞĞ³õÊ¼»¯ """
+        """ åˆ¤æ–­æ˜¯å¦ä¸ºåˆ—è¡¨ï¼Œæ˜¯çš„è¯ï¼Œè¿›è¡Œåˆå§‹åŒ– """
         if isinstance(merge_request, list):
             self.merge_request = merge_request
             self.merge_request_num = len(merge_request)
 
     def rate_calculate(self):
-        """ ¼ÆËãÈıÖÖ±ÈÀı """
+        """ è®¡ç®—ä¸‰ç§æ¯”ä¾‹ """
 
-        """ ¶ÔÈıÖÖ×´Ì¬ÏÂµÄmrÊıÁ¿½øĞĞÍ³¼Æ """
+        """ å¯¹ä¸‰ç§çŠ¶æ€ä¸‹çš„mræ•°é‡è¿›è¡Œç»Ÿè®¡ """
         for mr in self.merge_request:
             if mr.state == 'merged':
                 self.merged_mr_num += 1
@@ -51,19 +52,19 @@ class MergeRequestRate:
             else:
                 self.opened_rate += 1
 
-        """ ¶ÔÈıÖÖ×´Ì¬ÏÂµÄmr±ÈÀı½øĞĞÍ³¼Æ """
+        """ å¯¹ä¸‰ç§çŠ¶æ€ä¸‹çš„mræ¯”ä¾‹è¿›è¡Œç»Ÿè®¡ """
         self.merged_rate = self.merged_mr_num / self.merge_request_num
         self.closed_rate = self.closed_mr_num / self.merge_request_num
         self.opened_rate = self.opened_mr_num / self.merge_request_num
 
     def get_merged_rate(self):
-        """ ·µ»Ømerged×´Ì¬µÄmrµÄ±ÈÀı """
+        """ è¿”å›mergedçŠ¶æ€çš„mrçš„æ¯”ä¾‹ """
         return self.merged_rate
 
     def get_closed_rate(self):
-        """ ·µ»Øclosed×´Ì¬µÄmrµÄ±ÈÀı """
+        """ è¿”å›closedçŠ¶æ€çš„mrçš„æ¯”ä¾‹ """
         return self.closed_rate
 
     def get_opened_rate(self):
-        """ ·µ»Øopened×´Ì¬µÄmrµÄ±ÈÀı """
+        """ è¿”å›openedçŠ¶æ€çš„mrçš„æ¯”ä¾‹ """
         return self.opened_rate

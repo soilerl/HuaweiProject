@@ -1,10 +1,10 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 from source.config.configPraser import configPraser
 from source.data.bean.Beanbase import BeanBase
 
 
 class BeanParserHelper:
-    """bean ÀàµÄÒ»Ğ©ÆäËûparser·½Ê½"""
+    """bean ç±»çš„ä¸€äº›å…¶ä»–parseræ–¹å¼"""
 
     @staticmethod
     def getBeansFromTuple(beanClass, columns, dataTuple):
@@ -12,7 +12,7 @@ class BeanParserHelper:
         if configPraser.getPrintMode():
             print(columns)
         if isinstance(beanClass, BeanBase):
-            """²ÉÓÃ·´Éä»úÖÆÊµÀı»¯¶ÔÏó"""
+            """é‡‡ç”¨åå°„æœºåˆ¶å®ä¾‹åŒ–å¯¹è±¡"""
             obj = beanClass.__class__()
             itemList = obj.getItemKeyList()
             for index, item in enumerate(itemList):

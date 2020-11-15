@@ -1,25 +1,25 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 import threading
 
 
 class statisticsHelper:
-    """github Êı¾İµÄÍ³¼Æ°ïÖúÀà"""
+    """github æ•°æ®çš„ç»Ÿè®¡å¸®åŠ©ç±»"""
 
     def __init__(self):
-        self.usefulRequestNumber = 0  # ÓĞÓÃµÄpull requestµÄÌáÈ¡ÊıÁ¿
+        self.usefulRequestNumber = 0  # æœ‰ç”¨çš„pull requestçš„æå–æ•°é‡
         self.commentNumber = 0
-        self.usefulReviewNumber = 0  # reviewµÄÌáÈ¡ÊıÁ¿
-        self.usefulReviewCommentNumber = 0  # review commentµÄÌáÈ¡ÊıÁ¿
-        self.usefulIssueCommentNumber = 0  # issue comment µÄÌáÈ¡ÊıÁ¿
-        self.usefulCommitNumber = 0  # commitµÄÌáÈ¡ÊıÁ¿
-        self.usefulCommitCommentNumber = 0  # commit commentµÄÌáÈ¡ÊıÁ¿
-        self.startTime = None  # ¿ªÊ¼Ê±¼ä
-        self.endTime = None  # ½áÊøÊ±¼ä
-        self.usefulTimeLineCount = 0  # pull requestµÄtimelineÏßÊıÁ¿
-        self.usefulChangeTrigger = 0  # ÓĞÓÃµÄcommentµÄchange triggerÊıÁ¿
-        self.twoParentsNodeCase = 0  # ÉáÆúµÄË«µãµÄcaseÊıÁ¿
-        self.outOfLoopCase = 0  # µü´ú³¬³öÔ¤ËãµÄcaseÊıÁ¿
-        self.needFetchCommentForLineCount = 0  # ĞèÒª¸üĞÂline¶øÈ¥»ñÈ¡commentµÄ´ÎÊı
+        self.usefulReviewNumber = 0  # reviewçš„æå–æ•°é‡
+        self.usefulReviewCommentNumber = 0  # review commentçš„æå–æ•°é‡
+        self.usefulIssueCommentNumber = 0  # issue comment çš„æå–æ•°é‡
+        self.usefulCommitNumber = 0  # commitçš„æå–æ•°é‡
+        self.usefulCommitCommentNumber = 0  # commit commentçš„æå–æ•°é‡
+        self.startTime = None  # å¼€å§‹æ—¶é—´
+        self.endTime = None  # ç»“æŸæ—¶é—´
+        self.usefulTimeLineCount = 0  # pull requestçš„timelineçº¿æ•°é‡
+        self.usefulChangeTrigger = 0  # æœ‰ç”¨çš„commentçš„change triggeræ•°é‡
+        self.twoParentsNodeCase = 0  # èˆå¼ƒçš„åŒç‚¹çš„caseæ•°é‡
+        self.outOfLoopCase = 0  # è¿­ä»£è¶…å‡ºé¢„ç®—çš„caseæ•°é‡
+        self.needFetchCommentForLineCount = 0  # éœ€è¦æ›´æ–°lineè€Œå»è·å–commentçš„æ¬¡æ•°
         self.notNeedFetchCommentForLineCount = 0
         self.commitNotFoundErrorCount = 0
         self.lock = threading.RLock()

@@ -1,4 +1,4 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 from source.config.configPraser import configPraser
 from source.data.bean.Beanbase import BeanBase
 from source.data.bean.DiffRefs import DiffRefs
@@ -10,11 +10,11 @@ from source.database.SqlUtils import SqlUtils
 
 class AsyncSqlHelper:
 
-    """Òì²½Êı¾İ¿â²Ù×÷¸¨ÖúÀà"""
+    """å¼‚æ­¥æ•°æ®åº“æ“ä½œè¾…åŠ©ç±»"""
 
     @staticmethod
     def getInsertTableName(bean):
-        """ÓÃÓÚ»ñµÃ²»Í¬beanÀàµÄ²åÈë±íÃû×Ö"""
+        """ç”¨äºè·å¾—ä¸åŒbeanç±»çš„æ’å…¥è¡¨åå­—"""
         if isinstance(bean, User):
             return SqlUtils.STR_TABLE_NAME_USER
         elif isinstance(bean, MergeRequest):
@@ -38,7 +38,7 @@ class AsyncSqlHelper:
 
     @staticmethod
     async def storeBeanDateList(beans, mysql):
-        """Ò»´ÎĞÔ´æ´¢¶à¸öbean¶ÔÏó ½²µÀÀí½á¹¹ÊÇ±»ÆÆ»µµÄ£¬µ«ÊÇ¿ÉÒÔ°ÉËùÓĞÊı¾İ¿âÇëÇóÑ¹ËõÎªÒ»´Î"""
+        """ä¸€æ¬¡æ€§å­˜å‚¨å¤šä¸ªbeanå¯¹è±¡ è®²é“ç†ç»“æ„æ˜¯è¢«ç ´åçš„ï¼Œä½†æ˜¯å¯ä»¥å§æ‰€æœ‰æ•°æ®åº“è¯·æ±‚å‹ç¼©ä¸ºä¸€æ¬¡"""
 
         conn, cur = await  mysql.getDatabaseConnected()
 
@@ -58,7 +58,7 @@ class AsyncSqlHelper:
 
                     values = ()
                     for item in items:
-                        values = values + (valueDict.get(item, None),)  # Ôª×éÏà¼Ó
+                        values = values + (valueDict.get(item, None),)  # å…ƒç»„ç›¸åŠ 
                     try:
                         await cur.execute(sql, values)
                     except Exception as e:
@@ -72,8 +72,8 @@ class AsyncSqlHelper:
 
     @staticmethod
     async def queryBeanData(beans, mysql, defineItems=None):
-        """Ò»´ÎĞÔ²éÑ¯¶à¸öbean¶ÔÏó  define Îª[[key1,key2], [key3,key4] ...]
-        ·µ»Ø¶à¸öÔª×é  [((),),((),())...]"""
+        """ä¸€æ¬¡æ€§æŸ¥è¯¢å¤šä¸ªbeanå¯¹è±¡  define ä¸º[[key1,key2], [key3,key4] ...]
+        è¿”å›å¤šä¸ªå…ƒç»„  [((),),((),())...]"""
 
         conn, cur = await  mysql.getDatabaseConnected()
 
@@ -98,7 +98,7 @@ class AsyncSqlHelper:
 
                     values = ()
                     for item in items:
-                        values = values + (valueDict.get(item, None),)  # Ôª×éÏà¼Ó
+                        values = values + (valueDict.get(item, None),)  # å…ƒç»„ç›¸åŠ 
                     try:
                         await cur.execute(sql, values)
                         r = await cur.fetchall()
@@ -117,7 +117,7 @@ class AsyncSqlHelper:
 
     @staticmethod
     async def updateBeanDateList(beans, mysql):
-        """Ò»´ÎĞÔ¸üĞÂ¶à¸öbean¶ÔÏó ½²µÀÀí½á¹¹ÊÇ±»ÆÆ»µµÄ£¬µ«ÊÇ¿ÉÒÔ°ÉËùÓĞÊı¾İ¿âÇëÇóÑ¹ËõÎªÒ»´Î"""
+        """ä¸€æ¬¡æ€§æ›´æ–°å¤šä¸ªbeanå¯¹è±¡ è®²é“ç†ç»“æ„æ˜¯è¢«ç ´åçš„ï¼Œä½†æ˜¯å¯ä»¥å§æ‰€æœ‰æ•°æ®åº“è¯·æ±‚å‹ç¼©ä¸ºä¸€æ¬¡"""
 
         conn, cur = await  mysql.getDatabaseConnected()
 
@@ -138,7 +138,7 @@ class AsyncSqlHelper:
                         values = values + (valueDict.get(item, None),)
 
                     for item in bean.getIdentifyKeys():
-                        values = values + (valueDict.get(item, None),)  # Ôª×éÏà¼Ó
+                        values = values + (valueDict.get(item, None),)  # å…ƒç»„ç›¸åŠ 
                     try:
                         await cur.execute(sql, values)
                     except Exception as e:
@@ -151,7 +151,7 @@ class AsyncSqlHelper:
             await mysql.pool.release(conn)
 
     @staticmethod
-    async def query(mysql, sql, values):  # ´¿´âÍ¨¹ısqlÓï¾äÖ´ĞĞ·µ»Ø½á¹û
+    async def query(mysql, sql, values):  # çº¯ç²¹é€šè¿‡sqlè¯­å¥æ‰§è¡Œè¿”å›ç»“æœ
         conn, cur = await  mysql.getDatabaseConnected()
         r = None
         try:

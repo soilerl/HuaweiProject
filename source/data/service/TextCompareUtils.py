@@ -1,16 +1,16 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 from source.utils.pandas.pandasHelper import pandasHelper
 import re
 
 
 class TextCompareUtils:
-    """patchµÄÎÄ±¾±È½ÏÀà"""
+    """patchçš„æ–‡æœ¬æ¯”è¾ƒç±»"""
 
     @staticmethod
     def patchParser(text):
-        """patchµÄÎÄ±¾½âÎö"""
+        """patchçš„æ–‡æœ¬è§£æ"""
 
-        """ patch ÎÄ±¾¸ñÊ½Ê¾ÀıËµÃ÷
+        """ patch æ–‡æœ¬æ ¼å¼ç¤ºä¾‹è¯´æ˜
         
          @@ -35,9 +36,8 @@ ruby <%= \"'#{RUBY_VERSION}'\" -%>
          # gem 'rack-cors'
@@ -25,16 +25,16 @@ class TextCompareUtils:
          gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
          
          
-         ËµÃ÷£º  -35,9,+36,8  ËµÃ÷Õâ¸ö¸Ä¶¯ÔÚÉÏ¸ö°æ±¾ÊÇ35ĞĞ¿ªÊ¼£¬ÏÂÃæÓĞ9ĞĞÊÇÔ­À´°æ±¾µÄÄÚÈİ
-                                           ÏÂ¸ö°æ±¾36ĞĞ¿ªÊ¼£¬ÏÂÃæ8ĞĞÊÇĞÂ°æ±¾µÄÄÚÈİ
-                                           "+" ĞĞÊÇĞÂ°æ±¾¶ÀÓĞµÄÄÚÈİ
-                                           "-" ĞĞÊÇÀÏ°æ±¾¶ÀÓĞµÄÄÚÈİ
+         è¯´æ˜ï¼š  -35,9,+36,8  è¯´æ˜è¿™ä¸ªæ”¹åŠ¨åœ¨ä¸Šä¸ªç‰ˆæœ¬æ˜¯35è¡Œå¼€å§‹ï¼Œä¸‹é¢æœ‰9è¡Œæ˜¯åŸæ¥ç‰ˆæœ¬çš„å†…å®¹
+                                           ä¸‹ä¸ªç‰ˆæœ¬36è¡Œå¼€å§‹ï¼Œä¸‹é¢8è¡Œæ˜¯æ–°ç‰ˆæœ¬çš„å†…å®¹
+                                           "+" è¡Œæ˜¯æ–°ç‰ˆæœ¬ç‹¬æœ‰çš„å†…å®¹
+                                           "-" è¡Œæ˜¯è€ç‰ˆæœ¬ç‹¬æœ‰çš„å†…å®¹
                                            
-                patch µÄµÚÒ»ĞĞ²»¼ÇÄÚÈİ
-        ×¢£º ÕâÊÇÎÒ×Ô¼ºÃşË÷µÄÀí½â @ÕÅÒİ·²
+                patch çš„ç¬¬ä¸€è¡Œä¸è®°å†…å®¹
+        æ³¨ï¼š è¿™æ˜¯æˆ‘è‡ªå·±æ‘¸ç´¢çš„ç†è§£ @å¼ é€¸å‡¡
         """
 
-        changes = []  # Ò»¸öpatch¿ÉÄÜ»áÓĞ¶à¸ö¸Ä¶¯    [(¿ªÊ¼ĞĞ,¹²,°æ±¾¶ş¿ªÊ¼,¹²) -> [+, ,-,....]]
+        changes = []  # ä¸€ä¸ªpatchå¯èƒ½ä¼šæœ‰å¤šä¸ªæ”¹åŠ¨    [(å¼€å§‹è¡Œ,å…±,ç‰ˆæœ¬äºŒå¼€å§‹,å…±) -> [+, ,-,....]]
         # print(text)
         # print('-' * 50)
 
@@ -44,7 +44,7 @@ class TextCompareUtils:
         status = None
         lines = []
         for t in text.split('\n'):
-            """°´ĞĞ²ğ·Ö  ÒÀ´Î½âÎö"""
+            """æŒ‰è¡Œæ‹†åˆ†  ä¾æ¬¡è§£æ"""
             head = headMatch.search(t)
             if head:
                 if status is not None:
@@ -58,11 +58,11 @@ class TextCompareUtils:
                 if numbers.__len__() == 4:
                     status = tuple(numbers)
                 elif numbers.__len__() == 2:
-                    """¿ÉÄÜÓĞÖ»ÓĞÁ½¸öµÄÌØÊâÇé¿ö"""
+                    """å¯èƒ½æœ‰åªæœ‰ä¸¤ä¸ªçš„ç‰¹æ®Šæƒ…å†µ"""
                     numbers = (numbers[0], 1, numbers[1], 1)
                     status = numbers
             else:
-                """ÊÕ¼¯Õı¸º·ûºÅ ¼´Ã¿Ò»ĞĞĞŞ¸Ä×´Ì¬"""
+                """æ”¶é›†æ­£è´Ÿç¬¦å· å³æ¯ä¸€è¡Œä¿®æ”¹çŠ¶æ€"""
                 if t.__len__() > 0:
                     lines.append(t[0])
         if status is not None:
@@ -72,9 +72,9 @@ class TextCompareUtils:
 
     @staticmethod
     def simulateTextChanges(patches1, patches2, targetLine):
-        """Í¨¹ı¶Ôpatch×öÎÄ±¾Ä£ÄâÀ´»ñµÃ±ä»¯×îºó½á¹û
-          ¶ÔPatch1 µÄ¸Ä¶¯×ö¸ºÄ£Äâ
-          ¶ÔPatch2 µÄ¸Ä¶¯×öÕıÄ£Äâ
+        """é€šè¿‡å¯¹patchåšæ–‡æœ¬æ¨¡æ‹Ÿæ¥è·å¾—å˜åŒ–æœ€åç»“æœ
+          å¯¹Patch1 çš„æ”¹åŠ¨åšè´Ÿæ¨¡æ‹Ÿ
+          å¯¹Patch2 çš„æ”¹åŠ¨åšæ­£æ¨¡æ‹Ÿ
 
         """
 
@@ -82,14 +82,14 @@ class TextCompareUtils:
         changes2 = []
 
         # minLine = float('inf')
-        maxLine = 0  # ½ÚÊ¡¿Õ¼ä²éÑ¯Éæ¼°±ä»¯µÄÉÏ½çÏŞ
+        maxLine = 0  # èŠ‚çœç©ºé—´æŸ¥è¯¢æ¶‰åŠå˜åŒ–çš„ä¸Šç•Œé™
         for patch in patches1:
-            change = TextCompareUtils.patchParser(patch)  # Ã¿Ò»¸öpatch¿ÉÄÜÓĞ¼¸¸ö±ä»¯£¬ÊÇÆ½ĞĞ¹ØÏµ
+            change = TextCompareUtils.patchParser(patch)  # æ¯ä¸€ä¸ªpatchå¯èƒ½æœ‰å‡ ä¸ªå˜åŒ–ï¼Œæ˜¯å¹³è¡Œå…³ç³»
             changes1.insert(0, change)
 
             for c in change:
                 # minLine = min(minLine, c[0])
-                """ÕÒĞŞ¸Ä±¾ÎÄ¿ÉÄÜ»áÉæ¼°µÄ×î´óĞĞÊı ¼õÉÙÎÄ±¾Ä£ÄâµÄ¸ºµ£"""
+                """æ‰¾ä¿®æ”¹æœ¬æ–‡å¯èƒ½ä¼šæ¶‰åŠçš„æœ€å¤§è¡Œæ•° å‡å°‘æ–‡æœ¬æ¨¡æ‹Ÿçš„è´Ÿæ‹…"""
                 maxLine = max(maxLine, c[0][0] + c[1].__len__(), c[0][2] + c[1].__len__())
         for patch in patches2:
             change = TextCompareUtils.patchParser(patch)
@@ -101,15 +101,15 @@ class TextCompareUtils:
         maxLine = max(maxLine + 20, targetLine + 20)
         print(maxLine)
 
-        """Í¨¹ıÒ»¸öÊı×éÀ´Ä£ÄâÎÄ±¾µÄ±ä»¯"""
-        text = [x for x in range(1, maxLine)]  # Éú³ÉÄ£ÄâÎÄ±¾
+        """é€šè¿‡ä¸€ä¸ªæ•°ç»„æ¥æ¨¡æ‹Ÿæ–‡æœ¬çš„å˜åŒ–"""
+        text = [x for x in range(1, maxLine)]  # ç”Ÿæˆæ¨¡æ‹Ÿæ–‡æœ¬
         print(text)
 
-        """±¾ÎÄÄ£Äâ¾ÍÊÇ Ò»¸öÊı¾İ Êı×éÖĞµÄÊı×Ö´ú±íĞĞºÅ  ¶ÔÕâ¸öÊı×éÊ¹ÓÃPatch×öÔö¸Ä"""
+        """æœ¬æ–‡æ¨¡æ‹Ÿå°±æ˜¯ ä¸€ä¸ªæ•°æ® æ•°ç»„ä¸­çš„æ•°å­—ä»£è¡¨è¡Œå·  å¯¹è¿™ä¸ªæ•°ç»„ä½¿ç”¨Patchåšå¢æ”¹"""
 
-        """¶ÔÓÚ·µ»ØÂ·¾¶·´×ÅÀ´  ¼´¸Ä¶¯ÖĞ¼ÓÄÚÈİÎª¼õÄÚÈİ   ¼õÄÚÈİÎª¼ÓÄÚÈİ"""
+        """å¯¹äºè¿”å›è·¯å¾„åç€æ¥  å³æ”¹åŠ¨ä¸­åŠ å†…å®¹ä¸ºå‡å†…å®¹   å‡å†…å®¹ä¸ºåŠ å†…å®¹"""
         for changes in changes1:
-            """¼ÆËãÄ£ÄâÊ±ºò´øÀ´µÄÆ«ÒÆ"""
+            """è®¡ç®—æ¨¡æ‹Ÿæ—¶å€™å¸¦æ¥çš„åç§»"""
             offset = 0
             for change in changes:
                 cur = change[0][2] - offset
@@ -122,12 +122,12 @@ class TextCompareUtils:
                         cur += 1
                     elif c == '+':
                         text.pop(cur - 1)
-                """É¾¼õĞĞµ¼ÖÂÔ­À´µÄÆğÊ¼ĞĞÊı´íÎ»  ĞèÒª¼ÆËãÆ«ÒÆ²¹Õı"""
+                """åˆ å‡è¡Œå¯¼è‡´åŸæ¥çš„èµ·å§‹è¡Œæ•°é”™ä½  éœ€è¦è®¡ç®—åç§»è¡¥æ­£"""
 
-                """ĞŞÕıÆ«ÒÆÎ´ÀÛ¼Óµ¼ÖÂµÄbug"""
+                """ä¿®æ­£åç§»æœªç´¯åŠ å¯¼è‡´çš„bug"""
                 offset += change[1].count('+') - change[1].count('-')
 
-        """Ç°½øÂ·¾¶ÎªÕı"""
+        """å‰è¿›è·¯å¾„ä¸ºæ­£"""
         for changes in changes2:
             offset = 0
             for change in changes:
@@ -147,24 +147,24 @@ class TextCompareUtils:
 
     @staticmethod
     def getClosedFileChange(patches1, patches2, commentLine):
-        """»ñµÃÄ³¸öÆÀÂÛ×î½üµÄline   Èç¹û³¬¹ıÊ®Ôò·µ»Ø-1  patchµÄË³ĞòÊÇ´Ó¸ùµ½×îĞÂ"""
+        """è·å¾—æŸä¸ªè¯„è®ºæœ€è¿‘çš„line   å¦‚æœè¶…è¿‡ååˆ™è¿”å›-1  patchçš„é¡ºåºæ˜¯ä»æ ¹åˆ°æœ€æ–°"""
 
         text = TextCompareUtils.simulateTextChanges(patches1, patches2, commentLine)
 
-        """textÊÇÄ£Äâcommit²Ù×÷Ö®ºóµÄÎÄ±¾"""
+        """textæ˜¯æ¨¡æ‹Ÿcommitæ“ä½œä¹‹åçš„æ–‡æœ¬"""
 
         if commentLine not in text:
-            """ÆÀÂÛĞĞ²»ÔÚ ±ä»¯Ö®ºóµÄÎÄ±¾µ±ÖĞ£¬ËµÃ÷±¾ĞĞ±ä»¯£¬·µ»Ø0"""
+            """è¯„è®ºè¡Œä¸åœ¨ å˜åŒ–ä¹‹åçš„æ–‡æœ¬å½“ä¸­ï¼Œè¯´æ˜æœ¬è¡Œå˜åŒ–ï¼Œè¿”å›0"""
             return 0
         else:
-            """Ñ°ÕÒ¾àÀëÆ·ÂÛ×î½üµÄ¸Ä¶¯¾àÀë"""
+            """å¯»æ‰¾è·ç¦»å“è®ºæœ€è¿‘çš„æ”¹åŠ¨è·ç¦»"""
             curLine = text.index(commentLine)
 
-            """·ÖÁ½¸ö·½Ïò²éÕÒ ÏÈÏò0·½Ïò²éÕÒ"""
+            """åˆ†ä¸¤ä¸ªæ–¹å‘æŸ¥æ‰¾ å…ˆå‘0æ–¹å‘æŸ¥æ‰¾"""
             upChange = None
             downChange = None
             for i in range(1, min(11, curLine)):
-                """·¢ÏÖ´íÎ»»òÕßÄÚÈİÎª0µÄÎÄ±¾ÎªÖ¹"""
+                """å‘ç°é”™ä½æˆ–è€…å†…å®¹ä¸º0çš„æ–‡æœ¬ä¸ºæ­¢"""
                 if text[curLine - i] != commentLine - i:
                     upChange = i
                     break
@@ -173,7 +173,7 @@ class TextCompareUtils:
                     downChange = i
                     break
 
-            """-1±íÊ¾¸½½üÃ»ÓĞ¸Ä¶¯"""
+            """-1è¡¨ç¤ºé™„è¿‘æ²¡æœ‰æ”¹åŠ¨"""
             if upChange is None and downChange is None:
                 return -1
 
@@ -186,22 +186,22 @@ class TextCompareUtils:
 
     @staticmethod
     def getStartLine(text, originalPosition):
-        """Í¨¹ıÎÄ±¾originalPositionÀ´ÍÆ¶Ï³ö
-           review commentµÄoriginal_StartLine ºÍ side
+        """é€šè¿‡æ–‡æœ¬originalPositionæ¥æ¨æ–­å‡º
+           review commentçš„original_StartLine å’Œ side
 
-           ×¢£º 2020.7.9 ·¢ÏÖ position ÊÇ´úÖ¸×îĞÂcommitÉÏÃæÎ»ÖÃ£¬
+           æ³¨ï¼š 2020.7.9 å‘ç° position æ˜¯ä»£æŒ‡æœ€æ–°commitä¸Šé¢ä½ç½®ï¼Œ
         """
 
-        """patch ½âÎö"""
-        """ËäÈ» patch ¿ÉÄÜ»á½âÎö¶à¸ö µ«ÊÇÊı¾İ¿â14Íòcomment Ö»ÓĞ37¸öÒÉËÆÇé¿ö
-           ¼ÓÉÏtry catchºöÂÔÌØÊâÇé¿ö
+        """patch è§£æ"""
+        """è™½ç„¶ patch å¯èƒ½ä¼šè§£æå¤šä¸ª ä½†æ˜¯æ•°æ®åº“14ä¸‡comment åªæœ‰37ä¸ªç–‘ä¼¼æƒ…å†µ
+           åŠ ä¸Štry catchå¿½ç•¥ç‰¹æ®Šæƒ…å†µ
         """
         side = None
         original_startLine = None
         try:
             changes = TextCompareUtils.patchParser(text)
-            """ÕÒµ½¶ÔÓ¦µÄ¸Ä¶¯"""
-            """µÚÒ»ĞĞ²»ËãĞĞ"""
+            """æ‰¾åˆ°å¯¹åº”çš„æ”¹åŠ¨"""
+            """ç¬¬ä¸€è¡Œä¸ç®—è¡Œ"""
             originalPosition += 1
             pos = 0
             posLine = 0
@@ -237,20 +237,20 @@ class TextCompareUtils:
 
     @staticmethod
     def ConvertLeftToRight(text, originalPosition):
-        """ÓÉÓÚ comment ¿ÉÄÜ»á¼ÓÔÚ  ÀÏ°æ±¾(LEFT) ºÍĞÂ°æ±¾ (RIGHT)Á½¸ö
-        ÉÏÃæ£¬ÀÏ°æ±¾µÄĞĞÊıºÍĞÂ°æ±¾µÄĞĞÊı²¢²»ÏàÍ¬¡£ ¶ÔÓÚcommentºÍchnageµÄ
-        °æ±¾±È½Ï¶øÑÔ   ÊÇĞÂ°æ±¾£¨RIGHT£© ºÍ  change °æ±¾µÄ±È½Ï£¬ĞèÒª°Ñ
-        LEFTµÄĞĞÊı ×ª»¯Îª ×î½üµÄRIGHT ĞĞÊı
+        """ç”±äº comment å¯èƒ½ä¼šåŠ åœ¨  è€ç‰ˆæœ¬(LEFT) å’Œæ–°ç‰ˆæœ¬ (RIGHT)ä¸¤ä¸ª
+        ä¸Šé¢ï¼Œè€ç‰ˆæœ¬çš„è¡Œæ•°å’Œæ–°ç‰ˆæœ¬çš„è¡Œæ•°å¹¶ä¸ç›¸åŒã€‚ å¯¹äºcommentå’Œchnageçš„
+        ç‰ˆæœ¬æ¯”è¾ƒè€Œè¨€   æ˜¯æ–°ç‰ˆæœ¬ï¼ˆRIGHTï¼‰ å’Œ  change ç‰ˆæœ¬çš„æ¯”è¾ƒï¼Œéœ€è¦æŠŠ
+        LEFTçš„è¡Œæ•° è½¬åŒ–ä¸º æœ€è¿‘çš„RIGHT è¡Œæ•°
 
-           ×¢£º 2020.7.9 Í¬Ö®Ç°ÏàÍ¬£¬µ±PatchÓÉ¶à¸öĞ¡patch×é³ÉµÄÊ±ºò£¬
-           ÏÖÔÚÆ´½Ó³öÀ´¿ÉÄÜ»áÓĞ1ĞĞ×óÓÒµÄÎó²î  Îó²îÔ­Òò²»Ã÷
-           ÓÉÓÚLEFT µÄ comment Ïà¶Ô±È½ÏÉÙ £¨LEFT:RIGHT = 1 £º 10£©
-           ÏÈ×ª»¯²é¿´Ğ§¹û
+           æ³¨ï¼š 2020.7.9 åŒä¹‹å‰ç›¸åŒï¼Œå½“Patchç”±å¤šä¸ªå°patchç»„æˆçš„æ—¶å€™ï¼Œ
+           ç°åœ¨æ‹¼æ¥å‡ºæ¥å¯èƒ½ä¼šæœ‰1è¡Œå·¦å³çš„è¯¯å·®  è¯¯å·®åŸå› ä¸æ˜
+           ç”±äºLEFT çš„ comment ç›¸å¯¹æ¯”è¾ƒå°‘ ï¼ˆLEFT:RIGHT = 1 ï¼š 10ï¼‰
+           å…ˆè½¬åŒ–æŸ¥çœ‹æ•ˆæœ
         """
         try:
             changes = TextCompareUtils.patchParser(text)
-            """ÕÒµ½¶ÔÓ¦µÄ¸Ä¶¯"""
-            """µÚÒ»ĞĞ²»ËãĞĞ"""
+            """æ‰¾åˆ°å¯¹åº”çš„æ”¹åŠ¨"""
+            """ç¬¬ä¸€è¡Œä¸ç®—è¡Œ"""
             originalPosition += 1
             pos = 0
             posLine = 0
@@ -261,10 +261,10 @@ class TextCompareUtils:
             left_start, _, right_start, _ = changes[pos][0]
             status = changes[pos][1]
             if originalPosition is not None:
-                """ÈÏ¶¨µ÷ÓÃµÄcomment¶¼ÊÇLEFT"""
+                """è®¤å®šè°ƒç”¨çš„commentéƒ½æ˜¯LEFT"""
                 offset = 0
                 for i in range(0, max(originalPosition - posLine - 1, 0)):
-                    """Í³¼Æ RIGHT °æ±¾ÓĞµÄĞĞÊı"""
+                    """ç»Ÿè®¡ RIGHT ç‰ˆæœ¬æœ‰çš„è¡Œæ•°"""
                     if status[i] != '-':
                         offset += 1
 

@@ -1,57 +1,57 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 
 class SqlUtils:
-    """ÓÃÓÚ´æ´¢¸÷SQLÓï¾ä"""
+    """ç”¨äºŽå­˜å‚¨å„SQLè¯­å¥"""
 
     STR_SQL_CREATE_TABLE = 'create table %s'
 
-    '''Ô¤¼Æ´æ´¢µÄ±íÃû×Ö'''
+    '''é¢„è®¡å­˜å‚¨çš„è¡¨åå­—'''
     STR_TABLE_NAME_USER = 'userList'
     STR_TABLE_NAME_MERGE_REQUEST = 'mergeRequest'
     STR_TABLE_NAME_DIFF_REFS = 'diffRefs'
     STR_TABLE_NAME_NOTES = 'notes'
 
-    '''´æ´¢µÄ±íÖÐµÄÀàÐÍ'''
+    '''å­˜å‚¨çš„è¡¨ä¸­çš„ç±»åž‹'''
     STR_KEY_INT = 'int'
     STR_KEY_VARCHAR_MAX = 'varchar(8000)'
     STR_KEY_VARCHAR_MIDDLE = 'varchar(5000)'
     STR_KEY_DATE_TIME = 'datatime'
     STR_KEY_TEXT = 'text'
 
-    '''²åÈë²Ù×÷'''
+    '''æ’å…¥æ“ä½œ'''
     STR_SQL_INSERT_TABLE_UTILS = 'insert into {0} values{1}'
 
-    '''²éÑ¯²Ù×÷'''
+    '''æŸ¥è¯¢æ“ä½œ'''
     STR_SQL_QUERY_TABLE_UTILS = 'select * from {0} {1}'
 
-    '''É¾³ý²Ù×÷'''
+    '''åˆ é™¤æ“ä½œ'''
     STR_SQL_DELETE_TABLE_UTILS = 'delete from {0} {1}'
 
-    '''ÐÞ¸Ä²Ù×÷'''
+    '''ä¿®æ”¹æ“ä½œ'''
     STR_SQL_UPDATE_TABLE_UTILS = 'update {0} {1} {2}'
 
-    '''²éÑ¯Êý¾Ý¿âÖÐÃ»ÓÐÆ¥ÅäµÄcommit'''
+    '''æŸ¥è¯¢æ•°æ®åº“ä¸­æ²¡æœ‰åŒ¹é…çš„commit'''
     STR_SQL_QUERY_UNMATCH_COMMITS = 'select distinct review.repo_full_name, review.commit_id from review ' + \
                                     'where  review.commit_id not in  (select sha from gitCommit) LIMIT 2000'
 
-    '''²éÑ¯Êý¾Ý¿âÖÐÃ»ÓÐÆ¥Åä gitfile µÄcommit'''
+    '''æŸ¥è¯¢æ•°æ®åº“ä¸­æ²¡æœ‰åŒ¹é… gitfile çš„commit'''
     STR_SQL_QUERY_UNMATCH_COMMIT_FILE = """select distinct commitPRRelation.repo_full_name, gitCommit.sha
                                         from gitCommit, commitPRRelation
                                         where gitCommit.sha not in (select gitFile.commit_sha from gitFile)
                                         and gitCommit.sha = commitPRRelation.sha LIMIT 2000"""
 
-    '''²éÑ¯Êý¾Ý¿âÖÐÃ»ÓÐÆ¥Åä gitfile µÄcommit Í¨¹ý has_file_fetchedÅÐ¶Ï'''
+    '''æŸ¥è¯¢æ•°æ®åº“ä¸­æ²¡æœ‰åŒ¹é… gitfile çš„commit é€šè¿‡ has_file_fetchedåˆ¤æ–­'''
     STR_SQL_QUERY_UNMATCH_COMMIT_FILE_BY_HAS_FETCHED_FILE = """select distinct commitPRRelation.repo_full_name, gitCommit.sha
                                         from gitCommit, commitPRRelation
                                         where gitCommit.has_file_fetched = False
                                         and gitCommit.sha = commitPRRelation.sha LIMIT %s, 2000"""
-    '''²éÑ¯Êý¾Ý¿âÖÐÃ»ÓÐÆ¥Åä gitfile µÄcommit ÊýÁ¿Í¨¹ý has_file_fetchedÅÐ¶Ï'''
+    '''æŸ¥è¯¢æ•°æ®åº“ä¸­æ²¡æœ‰åŒ¹é… gitfile çš„commit æ•°é‡é€šè¿‡ has_file_fetchedåˆ¤æ–­'''
     STR_SQL_QUERY_UNMATCH_COMMIT_FILE_COUNT_BY_HAS_FETCHED_FILE = """select count(distinct gitCommit.sha)
                                         from gitCommit, commitPRRelation
                                         where gitCommit.has_file_fetched = False
                                         and gitCommit.sha = commitPRRelation.sha"""
 
-    '''²éÑ¯Êý¾Ý¿âÖÐÃ»ÓÐoriginal_lineÖµµÄreview comment Ò»´Î2000¸ö'''
+    '''æŸ¥è¯¢æ•°æ®åº“ä¸­æ²¡æœ‰original_lineå€¼çš„review comment ä¸€æ¬¡2000ä¸ª'''
     STR_SQL_QUERY_NO_ORIGINAL_LINE_REVIEW_COMMENT = """select id
                                         from reviewComment
                                         where pull_request_review_id in (
@@ -66,7 +66,7 @@ class SqlUtils:
                                                     ) 
                                         )  and original_line is null LIMIT 2000"""
 
-    '''²éÑ¯Êý¾Ý¿âÖÐÃ»ÓÐoriginal_lineÖµµÄreview comment Ò»´Î2000¸ö'''
+    '''æŸ¥è¯¢æ•°æ®åº“ä¸­æ²¡æœ‰original_lineå€¼çš„review comment ä¸€æ¬¡2000ä¸ª'''
     STR_SQL_QUERY_NO_ORIGINAL_LINE_REVIEW_COMMENT_COUNT = """select count(id)
                                         from reviewComment
                                         where pull_request_review_id in (
@@ -90,7 +90,7 @@ class SqlUtils:
     @staticmethod
     def getInsertTableFormatString(tableName, items):
 
-        '''»ñÈ¡²åÈëÓï¾äµÄ±íµÄ¸ñÊ½'''
+        '''èŽ·å–æ’å…¥è¯­å¥çš„è¡¨çš„æ ¼å¼'''
 
         res = tableName
         if items.__len__() > 0:
@@ -108,7 +108,7 @@ class SqlUtils:
 
     @staticmethod
     def getInsertTableValuesString(number):
-        """»ñÈ¡²åÈëÓï¾äÖµµÄ¸ñÊ½"""
+        """èŽ·å–æ’å…¥è¯­å¥å€¼çš„æ ¼å¼"""
 
         res = '('
         pos = 0
@@ -125,7 +125,7 @@ class SqlUtils:
     @staticmethod
     def getQueryTableConditionString(items):
 
-        """»ñÈ¡²éÑ¯Óï¾äµÄ±ê×¼¸ñÊ½"""
+        """èŽ·å–æŸ¥è¯¢è¯­å¥çš„æ ‡å‡†æ ¼å¼"""
         res = ''
         pos = 0
         if items is not None and items.__len__() > 0:
@@ -145,7 +145,7 @@ class SqlUtils:
     @staticmethod
     def getUpdateTableSetString(items):
 
-        """»ñÈ¡¸üÐÂ±íµÄÓï¾äµÄ±ê×¼¸ñÊ½"""
+        """èŽ·å–æ›´æ–°è¡¨çš„è¯­å¥çš„æ ‡å‡†æ ¼å¼"""
         res = ''
         pos = 0
         if items is not None and items.__len__() > 0:

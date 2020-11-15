@@ -1,10 +1,10 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 import pymssql
 from source.config.configPraser import configPraser
 
 
 class DataBaseOpenHelper:
-    '''用于连接数据库接口类'''
+    '''鐢ㄤ簬杩炴帴鏁版嵁搴撴帴鍙ｇ被'''
 
     @staticmethod
     def connect():
@@ -13,7 +13,7 @@ class DataBaseOpenHelper:
                                configPraser.getDataBasePassword())
         if conn:
             if configPraser.getPrintMode():
-                print('数据库连接成功，host:', configPraser.getDataBaseHost(), ' user:', configPraser.getDataBaseUserName())
+                print('鏁版嵁搴撹繛鎺ユ垚鍔燂紝host:', configPraser.getDataBaseHost(), ' user:', configPraser.getDataBaseUserName())
         return conn
 
 

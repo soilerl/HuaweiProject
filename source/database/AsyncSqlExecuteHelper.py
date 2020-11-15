@@ -1,4 +1,4 @@
-# coding=gbk
+# _*_ coding: utf-8 _*_
 import asyncio
 from datetime import datetime
 
@@ -16,7 +16,7 @@ async def getMysqlObj(loop=None):
 
 
 class AsyncSqlExecuteHelper:
-    """Ê¹ÓÃaiomysql¶ÔÊı¾İ¿âÒì²½²éÑ¯"""
+    """ä½¿ç”¨aiomysqlå¯¹æ•°æ®åº“å¼‚æ­¥æŸ¥è¯¢"""
 
     def __init__(self):
         self.conn = None
@@ -51,7 +51,7 @@ class AsyncSqlExecuteHelper:
     #         await self.pool.release(conn)
 
     async def insertValuesIntoTable(self, tableName, items, valueDict, primaryKeys=None):
-        """²åÈëÓï¾ä"""
+        """æ’å…¥è¯­å¥"""
 
         conn, cur = await self.getCursor()
 
@@ -68,7 +68,7 @@ class AsyncSqlExecuteHelper:
 
         values = ()
         for item in items:
-            values = values + (valueDict.get(item, None),)  # Ôª×éÏà¼Ó
+            values = values + (valueDict.get(item, None),)  # å…ƒç»„ç›¸åŠ 
 
         try:
             await cur.execute(sql, values)
@@ -80,7 +80,7 @@ class AsyncSqlExecuteHelper:
             await self.pool.release(conn)
 
     async def getDatabaseConnected(self):
-        """·µ»Ø cursor ºÍ conn"""
+        """è¿”å› cursor å’Œ conn"""
         conn, cur = await self.getCursor()
         return conn, cur
 

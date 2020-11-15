@@ -1,7 +1,7 @@
-#coding=gbk
+# _*_ coding: utf-8 _*_
 import uuid
 class DesensitizationHelper:
-    ''' ÓÃÓÚĞÅÏ¢µÄÍÑÃô
+    ''' ç”¨äºä¿¡æ¯çš„è„±æ•
     
     '''
     
