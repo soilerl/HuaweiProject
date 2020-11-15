@@ -11,10 +11,10 @@ notesTsv = "../data/file/notes.tsv"
 
 
 # 返回以iid为键的存放MergeRequest的字典
-def getMergeRequestMap() -> dict:
+def getMergeRequestMap(project) -> dict:
     # 键是iid，值是mergeRequest对象
     mergeRequestMap = {}
-    mergeRequestList = getMergeRequestInstances("data/file/mergeRequest/mergeRequest.tsv")
+    mergeRequestList = getMergeRequestInstances(project)
 
     for mergeRequest in mergeRequestList:
         iid = mergeRequest.iid
@@ -26,10 +26,10 @@ def getMergeRequestMap() -> dict:
 
 
 # 返回以merge_request_id为键，值为这个mergeRequest中所有notes的数组的字典
-def getNotesMap() -> dict:
+def getNotesMap(project) -> dict:
     # 字典的键是merge_request_id，值是一个存放这个mergeRequest的所有的notes的数组
     notesMap = {}
-    notesList = getNotesInstances("notes.tsv")
+    notesList = getNotesInstances(project)
     for notes in notesList:
         created_at = notes.created_at
         merge_request_id = notes.merge_request_id

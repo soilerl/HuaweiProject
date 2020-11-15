@@ -64,8 +64,9 @@ def tranformStrToTimestamp(timeStr='') -> float:
     return timeArray.timestamp()
 
 if __name__ == '__main__':
-    mergeRequestMap = common.getMergeRequestMap()
-    notesMap = common.getNotesMap()
+    project = "tezos"
+    mergeRequestMap = common.getMergeRequestMap(project)
+    notesMap = common.getNotesMap(project)
     res = calTime(mergeRequestMap, notesMap)
     for i in res:
         print(res)
