@@ -33,9 +33,11 @@ def getNotesMap(project) -> dict:
     for notes in notesList:
         created_at = notes.created_at
         merge_request_id = notes.merge_request_id
-        if created_at == '' or merge_request_id == '':
+        change_trigger = notes.change_trigger
+        """新增  去除作者自己的评论  change_trigger == -2  @张逸凡  2020.11.16"""
+        if created_at == '' or merge_request_id == '' or change_trigger == -2:
             continue
-        if merge_request_id in notesMap:
+        if merge_request_id in notesMap.keys():  # 容易造成歧义
             notesList = notesMap[merge_request_id]
             notesList.append(notes)
         else:

@@ -34,7 +34,7 @@ class commentAcceptRate:
             if m == 0:
                 m = 12
                 y = y - 1
-            columns.append(str(f"{y}年{m}月"))
+            columns.append(str(f"{y}/{m}"))
 
         result_df = DataFrame(columns=columns)  # 用于存储最后结果的 dataframe
 
