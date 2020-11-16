@@ -96,3 +96,21 @@ def getTimeListFromTuple(date):
             y = y - 1
         timeList.append((y, m))
     return timeList
+
+
+def getTimeLableFromTime(time_list):
+    """
+    输入一个时间列表，输出时间字符串列表
+    如输入：[(2020,9),(2020,10)]
+    输出：[2020-09,2020-10]
+    """
+
+    time_label = []
+
+    for time in time_list:
+        if time[1] < 10:
+            time_label.append(str(time[0]) + "-0" + str(time[1]))
+        else:
+            time_label.append(str(time[0]) + "-" + str(time[1]))
+
+    return time_label
