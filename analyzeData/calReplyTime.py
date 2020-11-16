@@ -8,8 +8,8 @@ from pandas import DataFrame
 
 
 
-#提取时间
-def calTime(mergeRequestMap={}, notesMap={}) -> []:
+#提取时间, 返回计算每个notes的回应时间的列表和计算后的间隔时间的列表
+def calTime(mergeRequestMap={}, notesMap={}) -> ([], []):
     data = []
     for iid, mergeRequest in mergeRequestMap.items():
         # mergeRequest的有些iid不能在notes文件中找到
@@ -31,10 +31,11 @@ def calTime(mergeRequestMap={}, notesMap={}) -> []:
     res = []
     for mr in data:
         timeDistances = []
-        for replyTime in range(len(mr)):
-            pass
-
-    return data
+        for index in range(len(mr)):
+            if index != len(mr)-1:
+                timeDistances.append(mr[index+1] - mr[index])
+        res.append(timeDistances)
+    return data, res
 
 
 
@@ -68,27 +69,47 @@ def tranformStrToTimestamp(timeStr='') -> float:
         print(timeStr)
     return timeArray.timestamp()
 
-def classifyByTimeByProject(date, data=[]):
+def classifyByTimeByProject(date, data=[], res = [], projects=[]):
     columns = ["project"]
     columns.extend([str(f"{y}/{m}") for y, m in common.getTimeListFromTuple(date)])
-    replyTimeDf = DataFrame(columns=columns)
-    replyTimeDict = {"project": "tezos"}
-    for y, m in common.getTimeListFromTuple(date):
-        for mr in data:
-            #第一个数据是
-            timeArray = time.localtime(mr[0])
-            if timeArray.tm_year == y and timeArray.tm_mon == m:
-                replyTimeDict[f"{y}/{m}"] = mr
-
+    for project in projects:
+        replyTimeDf = DataFrame(columns=columns)
+        replyTimeDict = {}
+        for y, m in common.getTimeListFromTuple(date):
+            for index in range(len(data)):
+                #第一个数据是created_at，以created_at归入
+                timeArray = time.localtime(data[index][0])
+                if timeArray.tm_year == y and timeArray.tm_mon == m:
+                    key = f"{y}/{m}"
+                    if key in replyTimeDict.keys():
+                        replyTimeDict[key].append(res[index])
+                    else:
+                        replyTimeDict[key] = []
+                        replyTimeDict[key].append(res[index])
+        resDict = {}
+        for k, v in replyTimeDict.items():
+            sum = 0
+            avSum = 0
+            for d in v:
+                s = 0
+                for i in d:
+                    s += i
+                avSum += s/len(d)
+            av = avSum / len(v)
+            sum += av
+            avRes = sum / len(v)
+            resDict[k] = avRes
+        resDict["project"] = project
+        replyTimeDf = replyTimeDf.append(resDict, ignore_index=True)
+    return replyTimeDf
 
 
 if __name__ == '__main__':
     project = "tezos"
     mergeRequestMap = common.getMergeRequestMap(project)
     notesMap = common.getNotesMap(project)
-    res = calTime(mergeRequestMap, notesMap)
+    data, res = calTime(mergeRequestMap, notesMap)
 
-    classifyByTimeByProject((2020, 7, 2020, 9), res)
-
-    for i in res:
-        print(res)
+    classifyByTimeByProject((2020, 7, 2020, 9), data, res, ["tezos"])
+    # for i in res:
+    #     print(res)
