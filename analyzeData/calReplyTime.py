@@ -1,9 +1,8 @@
 import analyzeData.common as common
-import csv
-import datetime
+import datetime, time
 import source.data.service.BeanParserHelper as bp
 import source.data.bean.MergeRequest as mr
-
+from pandas import DataFrame
 """计算评审意见反馈时间"""
 
 
@@ -29,6 +28,12 @@ def calTime(mergeRequestMap={}, notesMap={}) -> []:
         else:
             time_list.extend(sortTime('', notesList))
         data.append(time_list)
+    res = []
+    for mr in data:
+        timeDistances = []
+        for replyTime in range(len(mr)):
+            pass
+
     return data
 
 
@@ -63,10 +68,27 @@ def tranformStrToTimestamp(timeStr='') -> float:
         print(timeStr)
     return timeArray.timestamp()
 
+def classifyByTimeByProject(date, data=[]):
+    columns = ["project"]
+    columns.extend([str(f"{y}/{m}") for y, m in common.getTimeListFromTuple(date)])
+    replyTimeDf = DataFrame(columns=columns)
+    replyTimeDict = {"project": "tezos"}
+    for y, m in common.getTimeListFromTuple(date):
+        for mr in data:
+            #第一个数据是
+            timeArray = time.localtime(mr[0])
+            if timeArray.tm_year == y and timeArray.tm_mon == m:
+                replyTimeDict[f"{y}/{m}"] = mr
+
+
+
 if __name__ == '__main__':
     project = "tezos"
     mergeRequestMap = common.getMergeRequestMap(project)
     notesMap = common.getNotesMap(project)
     res = calTime(mergeRequestMap, notesMap)
+
+    classifyByTimeByProject((2020, 7, 2020, 9), res)
+
     for i in res:
         print(res)
