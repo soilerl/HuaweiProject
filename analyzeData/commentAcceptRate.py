@@ -11,6 +11,7 @@ import time
 import pandas
 from pandas import DataFrame
 
+from analyzeData import common
 from source.config.projectConfig import projectConfig
 from source.utils.ExcelHelper import ExcelHelper
 from source.utils.pandas.pandasHelper import pandasHelper
@@ -28,13 +29,8 @@ class commentAcceptRate:
            如（2019,10,2020,11） 是闭区间
         """
         columns = ["project"]
-        for i in range(date[0] * 12 + date[1], date[2] * 12 + date[3] + 1):  # 拆分的数据做拼接
-            y = int((i - i % 12) / 12)
-            m = i % 12
-            if m == 0:
-                m = 12
-                y = y - 1
-            columns.append(str(f"{y}/{m}"))
+        timeList = common.getTimeListFromTuple(date)
+        columns.extend(common.getTimeLableFromTime(timeList))
 
         result_df = DataFrame(columns=columns)  # 用于存储最后结果的 dataframe
 
@@ -47,6 +43,8 @@ class commentAcceptRate:
 
             mrFileName = projectConfig.getMergeRequestDataPath() + os.sep + f"mergeRequest_{project}.tsv"
             df_mr = pandasHelper.readTSVFile(mrFileName, header=pandasHelper.INT_READ_FILE_WITH_HEAD)
+
+            df_mr.dropna(subset=["iid"], inplace=True)
 
             """日期修补"""
             for index, row in df_mr.iterrows():
@@ -101,13 +99,15 @@ class commentAcceptRate:
                     pass
                 else:
                     validCount = df.loc[df['change_trigger'] >= 0].shape[0]
-                    tempDict[f'{y}年{m}月'] = validCount / commentCount
+                    t = common.getTimeLableFromTime([(y, m)])[0]
+                    # tempDict[f'{y}年{m}月'] = validCount / commentCount
+                    tempDict[t] = validCount / commentCount
             result_df = result_df.append(tempDict, ignore_index=True)
 
             print(result_df.shape)
             # result_df.to_excel("q5_change_trigger_ratio.xls")
 
-            return result_df
+        return result_df
 
     @staticmethod
     def commentAcceptRatioByReviewer(project):

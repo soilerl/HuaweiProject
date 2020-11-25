@@ -16,7 +16,7 @@ def calTime(mergeRequestMap={}, notesMap={}) -> ([], []):
         if iid not in notesMap:
             continue
         time_list = []
-        if mergeRequest.created_at != None and mergeRequest.created_at != '':
+        if mergeRequest.created_at is not None and mergeRequest.created_at != '':
             time_list.append(tranformStrToTimestamp(mergeRequest.created_at))
         notesList = notesMap[iid]
         if mergeRequest.state == 'merged':
@@ -69,18 +69,21 @@ def tranformStrToTimestamp(timeStr='') -> float:
         print(timeStr)
     return timeArray.timestamp()
 
-def classifyByTimeByProject(date, data=[], res = [], projects=[]):
+def classifyByTimeByProject(date, projects=[]):
     columns = ["project"]
-    columns.extend([str(f"{y}/{m}") for y, m in common.getTimeListFromTuple(date)])
+    columns.extend(common.getTimeLableFromTime(common.getTimeListFromTuple(date)))
+    replyTimeDf = DataFrame(columns=columns)
     for project in projects:
-        replyTimeDf = DataFrame(columns=columns)
+        mergeRequestMap = common.getMergeRequestMap(project)
+        notesMap = common.getNotesMap(project)
+        data, res = calTime(mergeRequestMap, notesMap)
         replyTimeDict = {}
         for y, m in common.getTimeListFromTuple(date):
             for index in range(len(data)):
                 #第一个数据是created_at，以created_at归入
                 timeArray = time.localtime(data[index][0])
                 if timeArray.tm_year == y and timeArray.tm_mon == m:
-                    key = f"{y}/{m}"
+                    key = common.getTimeLableFromTime([(y, m)])[0]
                     if key in replyTimeDict.keys():
                         replyTimeDict[key].append(res[index])
                     else:
@@ -96,9 +99,10 @@ def classifyByTimeByProject(date, data=[], res = [], projects=[]):
                     s += i
                 avSum += s/len(d)
             av = avSum / len(v)
-            sum += av
-            avRes = sum / len(v)
-            resDict[k] = avRes
+            # sum += av
+            # avRes = sum / len(v)
+            # resDict[k] = avRes
+            resDict[k] = av
         resDict["project"] = project
         replyTimeDf = replyTimeDf.append(resDict, ignore_index=True)
     return replyTimeDf
