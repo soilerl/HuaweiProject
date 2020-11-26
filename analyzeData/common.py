@@ -68,6 +68,12 @@ def getMergeRequestInstances(project) -> []:
     df = df.loc[df['closed_error_label'] == 0].copy(deep=True)
     df.drop(['closed_error_label'], axis=1, inplace=True)
 
+    # 去除状态为merged并且mergedtime为空的异常数据
+    df['merged_error_label'] = df.apply(lambda x: x["state"] == "merged" and isinstance(x["merged_at"], float), axis=1)
+    df = df.loc[df['merged_error_label'] == 0].copy(deep=True)
+    df.drop(['merged_error_label'], axis=1, inplace=True)
+
+
     for index, row in df.iterrows():
         t = tuple(row)
         bean = BeanParserHelper.getBeansFromTuple(MergeRequest.MergeRequest(),
