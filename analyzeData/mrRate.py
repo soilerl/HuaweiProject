@@ -21,6 +21,7 @@ class MergeRequestRate:
     projects = []
     time_list = []
     time_label = []
+    head_label = []
 
     merge_request = []  # 存放一个项目的mr列表
 
@@ -74,13 +75,13 @@ class MergeRequestRate:
             self.has_note_num[project] = {}
             self.ended_mr_num[project] = {}
 
-            self.merged_rate.append([])
-            self.closed_rate.append([])
-            self.opened_rate.append([])
+            self.merged_rate.append([project])
+            self.closed_rate.append([project])
+            self.opened_rate.append([project])
 
-            self.no_note_rate.append([])
-            self.has_note_rate.append([])
-            self.ended_rate.append([])
+            self.no_note_rate.append([project])
+            self.has_note_rate.append([project])
+            self.ended_rate.append([project])
 
             self.set_pj_lists(project)
 
@@ -102,6 +103,8 @@ class MergeRequestRate:
 
         self.time_list = common.getTimeListFromTuple(date)
         self.time_label = common.getTimeLableFromTime(self.time_list)
+        self.head_label = common.getTimeLableFromTime(self.time_list)
+        self.head_label.insert(0, 'project')
 
     def set_pj(self, projects):
         """ 设置project列表 """
@@ -176,7 +179,6 @@ class MergeRequestRate:
                     self.has_note_rate[index].append(None)
                     self.ended_rate[index].append(None)
 
-
     def get_first_note_time(self, mr_iid):
         time = self.default_time
         for note in self.notes:
@@ -212,22 +214,22 @@ class MergeRequestRate:
         return self.opened_rate
 
     def get_df_merged_rate(self):
-        return pd.DataFrame(self.merged_rate, index=self.projects, columns=self.time_label)
+        return pd.DataFrame(self.merged_rate, columns=self.head_label)
 
     def get_df_closed_rate(self):
-        return pd.DataFrame(self.closed_rate, index=self.projects, columns=self.time_label)
+        return pd.DataFrame(self.closed_rate, columns=self.head_label)
 
     def get_df_opened_rate(self):
-        return pd.DataFrame(self.opened_rate, index=self.projects, columns=self.time_label)
+        return pd.DataFrame(self.opened_rate, columns=self.head_label)
 
     def get_df_no_note_rate(self):
-        return pd.DataFrame(self.no_note_rate, index=self.projects, columns=self.time_label)
+        return pd.DataFrame(self.no_note_rate, columns=self.head_label)
 
     def get_df_has_note_rate(self):
-        return pd.DataFrame(self.has_note_rate, index=self.projects, columns=self.time_label)
+        return pd.DataFrame(self.has_note_rate, columns=self.head_label)
 
     def get_df_ended_rate(self):
-        return pd.DataFrame(self.ended_rate, index=self.projects, columns=self.time_label)
+        return pd.DataFrame(self.ended_rate, columns=self.head_label)
 
 
 if __name__ == '__main__':
