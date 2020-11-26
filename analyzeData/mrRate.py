@@ -24,14 +24,26 @@ class MergeRequestRate:
 
     merge_request = []  # 存放一个项目的mr列表
 
+    notes = []
+
     merge_request_num = {}  # mr总个数
     merged_mr_num = {}  # merged的mr个数
     closed_mr_num = {}  # closed个数
     opened_mr_num = {}  # opened个数
 
+    no_note_num = {}
+    has_note_num = {}
+    ended_mr_num = {}
+
     merged_rate = []  # merged的mr比例
     closed_rate = []  # closed的比例
     opened_rate = []  # opened的比例
+
+    no_note_rate = []
+    has_note_rate = []
+    ended_rate = []
+
+    default_time = '9999-99'
 
     def __init__(self, projects, date):
         """ 初始化构造函数 """
@@ -58,9 +70,17 @@ class MergeRequestRate:
             self.closed_mr_num[project] = {}
             self.opened_mr_num[project] = {}
 
+            self.no_note_num[project] = {}
+            self.has_note_num[project] = {}
+            self.ended_mr_num[project] = {}
+
             self.merged_rate.append([])
             self.closed_rate.append([])
             self.opened_rate.append([])
+
+            self.no_note_rate.append([])
+            self.has_note_rate.append([])
+            self.ended_rate.append([])
 
             self.set_pj_lists(project)
 
@@ -72,6 +92,10 @@ class MergeRequestRate:
             self.merged_mr_num[project][time] = 0
             self.closed_mr_num[project][time] = 0
             self.opened_mr_num[project][time] = 0
+
+            self.no_note_num[project][time] = 0
+            self.has_note_num[project][time] = 0
+            self.ended_mr_num[project][time] = 0
 
     def set_tm(self, date):
         """ 设置时间列表 """
@@ -93,11 +117,18 @@ class MergeRequestRate:
             self.merge_request = merge_request
             # self.merge_request_num = len(merge_request)
 
+    def set_nt(self, notes):
+
+        if isinstance(notes, list):
+            self.notes = notes
+
     def rate_calculate(self):
         """ 计算三种比例 """
 
         for index, project in enumerate(self.projects):
             self.set_mr(common.getMergeRequestInstances(project))
+
+            self.set_nt(common.getNotesInstances(project))
 
             """ 对三种状态下的mr数量进行统计 """
             for mr in self.merge_request:
@@ -111,11 +142,51 @@ class MergeRequestRate:
                     else:
                         self.opened_mr_num[project][time] += 1
 
+                time_fir_nt = self.get_first_note_time(mr.iid)
+
+                time_ended = self.get_ended_time(mr)
+
+                if time_fir_nt == self.default_time:
+                    self.fill_data(time, time_ended, self.no_note_num[project])
+                else:
+                    self.fill_data(time, time_fir_nt, self.no_note_num[project])
+                    self.fill_data(time_fir_nt, time_ended, self.has_note_num[project])
+                    self.fill_data(time_ended, self.time_label[-1], self.ended_mr_num[project])
+
             """ 对三种状态下的mr比例进行统计 """
             for i in self.merge_request_num[project].keys():
-                self.merged_rate[index].append(self.merged_mr_num[project][i] / self.merge_request_num[project][i])
-                self.closed_rate[index].append(self.closed_mr_num[project][i] / self.merge_request_num[project][i])
-                self.opened_rate[index].append(self.opened_mr_num[project][i] / self.merge_request_num[project][i])
+                sum = self.merge_request_num[project][i]
+
+                self.merged_rate[index].append(self.merged_mr_num[project][i] / sum)
+                self.closed_rate[index].append(self.closed_mr_num[project][i] / sum)
+                self.opened_rate[index].append(self.opened_mr_num[project][i] / sum)
+
+                self.no_note_rate[index].append(self.no_note_num[project][i] / sum)
+                self.has_note_rate[index].append(self.has_note_num[project][i] / sum)
+                self.ended_rate[index].append(self.ended_mr_num[project][i] / sum)
+
+
+    def get_first_note_time(self, mr_iid):
+        time = self.default_time
+        for note in self.notes:
+            if note.merge_request_id == mr_iid:
+                time = min(note.created_at, time)
+        return time[0:7]
+
+    def get_ended_time(self, mr):
+        time = self.default_time
+        if mr.state == 'merged':
+            time = mr.merged_at[0:7]
+        elif mr.state == 'closed':
+            time = mr.closed_at[0:7]
+        return time
+
+    def fill_data(self, left, right, data_list):
+        start = max(left, self.time_label[0])
+        end = min(right, self.time_label[-1])
+        if start in self.time_label and end in self.time_label:
+            for i in range(self.time_label.index(start), self.time_label.index(end)):
+                data_list[self.time_label[i]] += 1
 
     def get_merged_rate(self):
         """ 返回merged状态的mr的比例 """
@@ -137,6 +208,15 @@ class MergeRequestRate:
 
     def get_df_opened_rate(self):
         return pd.DataFrame(self.opened_rate, index=self.projects, columns=self.time_label)
+
+    def get_df_no_note_rate(self):
+        return pd.DataFrame(self.no_note_rate, index=self.projects, columns=self.time_label)
+
+    def get_df_has_note_rate(self):
+        return pd.DataFrame(self.has_note_rate, index=self.projects, columns=self.time_label)
+
+    def get_df_ended_rate(self):
+        return pd.DataFrame(self.ended_rate, index=self.projects, columns=self.time_label)
 
 
 if __name__ == '__main__':
