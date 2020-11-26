@@ -1,4 +1,7 @@
 import csv
+
+import numpy
+
 from source.data.bean import MergeRequest, Notes
 import source.utils.pandas.pandasHelper as pandasHelper
 import os
@@ -19,7 +22,7 @@ def getMergeRequestMap(project) -> dict:
     for mergeRequest in mergeRequestList:
         iid = mergeRequest.iid
         created_at = mergeRequest.created_at
-        if iid == '' or created_at == '':
+        if iid == '' or created_at == '' or isinstance(created_at, float):
             continue
         mergeRequestMap[iid] = mergeRequest
     return mergeRequestMap
@@ -35,7 +38,7 @@ def getNotesMap(project) -> dict:
         merge_request_id = notes.merge_request_id
         change_trigger = notes.change_trigger
         """新增  去除作者自己的评论  change_trigger == -2  @张逸凡  2020.11.16"""
-        if created_at == '' or merge_request_id == '' or change_trigger == -2:
+        if created_at == '' or merge_request_id == '' or change_trigger == -2 or isinstance(created_at, float):
             continue
         if merge_request_id in notesMap.keys():  # 容易造成歧义
             notesList = notesMap[merge_request_id]
@@ -55,7 +58,21 @@ def getMergeRequestInstances(project) -> []:
         header=pandasHelper.pandasHelper.INT_READ_FILE_WITH_HEAD)
 
     # 处理空行
-    df.dropna(subset=["id"], inplace=True)
+    df.dropna(subset=["id", "created_at"], inplace=True)
+
+    # 需要注意重复数据的情况
+    df.drop_duplicates(subset=["iid"], inplace=True)
+
+    # 去除状态为closed并且closedtime为空的异常数据
+    df['closed_error_label'] = df.apply(lambda x: x["state"] == "closed" and isinstance(x["closed_at"], float), axis=1)
+    df = df.loc[df['closed_error_label'] == 0].copy(deep=True)
+    df.drop(['closed_error_label'], axis=1, inplace=True)
+
+    # 去除状态为merged并且mergedtime为空的异常数据
+    df['merged_error_label'] = df.apply(lambda x: x["state"] == "merged" and isinstance(x["merged_at"], float), axis=1)
+    df = df.loc[df['merged_error_label'] == 0].copy(deep=True)
+    df.drop(['merged_error_label'], axis=1, inplace=True)
+
 
     for index, row in df.iterrows():
         t = tuple(row)
@@ -74,6 +91,8 @@ def getNotesInstances(project) -> []:
 
     # 处理空行
     df.dropna(subset=["id"], inplace=True)
+    #处理重复
+    df.drop_duplicates(subset=["id"], inplace=True)
 
     for index, row in df.iterrows():
         t = tuple(row)
