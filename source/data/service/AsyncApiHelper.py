@@ -279,6 +279,7 @@ class AsyncApiHelper:
                             nodesList = await AsyncApiHelper.parserNotes(json)
 
                         for nodes in nodesList:
+                            nodes.merge_request_id = merge_request_iid
                             if nodes.position is not None:
                                 await AsyncApiHelper.judgeChangeTrigger(session, pr_author, change_sha, nodes)
                                 # beanList.append(nodes)
