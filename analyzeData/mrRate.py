@@ -156,14 +156,25 @@ class MergeRequestRate:
             """ 对三种状态下的mr比例进行统计 """
             for i in self.merge_request_num[project].keys():
                 sum = self.merge_request_num[project][i]
+                if sum != 0:
+                    self.merged_rate[index].append(self.merged_mr_num[project][i] / sum)
+                    self.closed_rate[index].append(self.closed_mr_num[project][i] / sum)
+                    self.opened_rate[index].append(self.opened_mr_num[project][i] / sum)
+                else:
+                    self.merged_rate[index].append(None)
+                    self.closed_rate[index].append(None)
+                    self.opened_rate[index].append(None)
 
-                self.merged_rate[index].append(self.merged_mr_num[project][i] / sum)
-                self.closed_rate[index].append(self.closed_mr_num[project][i] / sum)
-                self.opened_rate[index].append(self.opened_mr_num[project][i] / sum)
+                sum = len(self.merge_request)
 
-                self.no_note_rate[index].append(self.no_note_num[project][i] / sum)
-                self.has_note_rate[index].append(self.has_note_num[project][i] / sum)
-                self.ended_rate[index].append(self.ended_mr_num[project][i] / sum)
+                if sum != 0:
+                    self.no_note_rate[index].append(self.no_note_num[project][i] / sum)
+                    self.has_note_rate[index].append(self.has_note_num[project][i] / sum)
+                    self.ended_rate[index].append(self.ended_mr_num[project][i] / sum)
+                else:
+                    self.no_note_rate[index].append(None)
+                    self.has_note_rate[index].append(None)
+                    self.ended_rate[index].append(None)
 
 
     def get_first_note_time(self, mr_iid):
