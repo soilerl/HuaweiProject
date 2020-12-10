@@ -41,7 +41,9 @@ class commentDensity:
     def calculateCommentDensityByProject(self, projects, date):
         """提供项目名字列表和日期，保存dataframe到对象中"""
         columns = ["project"]
-        columns.extend([str(f"{y}/{m}") for y, m in common.getTimeListFromTuple(date)])
+        # columns.extend([str(f"{y}/{m}") for y, m in common.getTimeListFromTuple(date)])
+        timeList = common.getTimeListFromTuple(date)
+        columns.extend(common.getTimeLableFromTime(timeList))
         changes_density_df = DataFrame(columns=columns)  # 初始化两个dataframe
         files_density_df = DataFrame(columns=columns)
 
@@ -60,10 +62,12 @@ class commentDensity:
                         totalNotesCount += notesCount
                         totalChangesCount += changes
                         totalFilesCount += filesCount
-                changesDensityDict[f"{y}/{m}"] = totalChangesCount / totalNotesCount
-                filesDensityDict[f"{y}/{m}"] = totalFilesCount / totalNotesCount
+                key = common.getTimeLableFromTime([(y, m)])[0]
+                if totalNotesCount > 0:
+                    changesDensityDict[key] = totalChangesCount / totalNotesCount
+                    filesDensityDict[key] = totalFilesCount / totalNotesCount
             changes_density_df = changes_density_df.append(changesDensityDict, ignore_index=True)
-            files_density_df = files_density_df.append(changesDensityDict, ignore_index=True)
+            files_density_df = files_density_df.append(filesDensityDict, ignore_index=True)
 
         self.notesChangesDensityByProjectDf = changes_density_df
         self.notesFilesDensityByProjectDf = files_density_df

@@ -238,8 +238,7 @@ class AsyncApiHelper:
         async with semaphore:
             async with aiohttp.ClientSession() as session:
                 try:
-                    beanList = []  # 用来收集需要存储的bean类
-                    """先获取pull request信息"""
+                    beanList = []  # �����ռ���Ҫ�洢��bean��
                     api = AsyncApiHelper.getMergeRequestApi(merge_request_iid)
                     json = await AsyncApiHelper.fetchBeanData(session, api)
                     print(json)
@@ -249,7 +248,6 @@ class AsyncApiHelper:
 
                     if merge_request is not None:
                         usefulMergeRequestsCount = 1
-                        """需要配保存数据库的对象放入beanList即可"""
                         beanList.append(merge_request)
 
                         if merge_request.diff_refs is not None:
@@ -263,97 +261,32 @@ class AsyncApiHelper:
 
                         pr_author = merge_request.author_user_name
 
-                        # """获取commits"""
-                        # api = AsyncApiHelper.getCommitApi(merge_request_iid)
-                        # json = await AsyncApiHelper.fetchBeanData(session, api)
-                        # print(json)
-                        # commitList = []
-                        # if json is not None and isinstance(json, list):
-                        #     commitList = await AsyncApiHelper.parserCommit(json)
+                        api = AsyncApiHelper.getCommitApi(merge_request_iid)
+                        json = await AsyncApiHelper.fetchBeanData(session, api)
+                        print(json)
+                        commitList = []
+                        if json is not None and isinstance(json, list):
+                            commitList = await AsyncApiHelper.parserCommit(json)
 
-                        """通过Graghql 接口获得所有notes的内容"""
-                        args = {"project": AsyncApiHelper.owner + '/' + AsyncApiHelper.repo,
-                                "mr": str(merge_request_iid)}
-                        api = AsyncApiHelper.getGraphQLApi()
-                        query = GraphqlHelper.getMrInformationByIID()
-                        resultJson = await AsyncApiHelper.postGraphqlData(session, api, query, args)
-                        print(resultJson)
+                        change_sha = commitList[0].id
 
-                        mergeRequestData = None
-                        """先解析到mergeRequestData阶段"""
-                        if isinstance(resultJson, dict):
-                            data = resultJson.get(StringKeyUtils.STR_KEY_DATA, None)
-                            if isinstance(data, dict):
-                                projectData = data.get(StringKeyUtils.STR_KEY_PROJECT, None)
-                                if isinstance(projectData, dict):
-                                    mergeRequestData = projectData.get(StringKeyUtils.STR_KEY_MERGE_REQUEST_V4, None)
+                        api = AsyncApiHelper.getNotesApi(merge_request_iid)
+                        json = await AsyncApiHelper.fetchBeanData(session, api)
+                        print(json)
 
-                        if isinstance(mergeRequestData, dict):
-                            """mergeRequest添加一些需要从GrphQL接口拿到的信息  
-                               这次可以重构  暂时懒得改了
-                            """
-                            statsData = mergeRequestData.get(StringKeyUtils.STR_KEY_DIFF_STATUS_SUMMARY, None)
-                            if statsData is not None and isinstance(statsData, dict):
-                                merge_request.additions = statsData.get(StringKeyUtils.STR_KEY_ADDITIONS, None)
-                                merge_request.changes = statsData.get(StringKeyUtils.STR_KEY_CHANGES, None)
-                                merge_request.deletions = statsData.get(StringKeyUtils.STR_KEY_DELETIONS, None)
-                                merge_request.file_count = statsData.get(StringKeyUtils.STR_KEY_FILE_COUNT_V4, None)
+                        nodesList = []
+                        if json is not None and isinstance(json, list):
+                            nodesList = await AsyncApiHelper.parserNotes(json)
 
-                            """解析notes"""
-                            notesList = []
-                            notesData = mergeRequestData.get(StringKeyUtils.STR_KEY_NOTES_V4, None)
-                            if notesData is not None and isinstance(notesData, dict):
-                                notesListData = notesData.get(StringKeyUtils.STR_KEY_NODES, None)
-                                if isinstance(notesListData, list):
-                                    for noteData in notesListData:
-                                        note = Notes.parserV4.parser(noteData)
-                                        if note is not None:
-                                            """补一些信息"""
-                                            note.merge_request_id = merge_request.iid
-                                            note.repo = merge_request.repository
-                                            notesList.append(note)
-
-                            """解析discussion"""
-                            discussionsList = []
-                            discussionsData = mergeRequestData.get(StringKeyUtils.STR_KEY_DISCUSSIONS_V4, None)
-                            if discussionsData is not None and isinstance(discussionsData, dict):
-                                discussionsListData = discussionsData.get(StringKeyUtils.STR_KEY_NODES, None)
-                                if discussionsListData is not None and isinstance(discussionsListData, list):
-                                    for discussionData in discussionsListData:
-                                        discussion = Discussions.parserV4.parser(discussionData)
-                                        if discussion is not None:
-                                            discussionsList.append(discussion)
-
-                            """解析pipelines"""
-                            pipelinesList = []
-                            pipelinesData = mergeRequestData.get(StringKeyUtils.STR_KEY_PIPELINES_V4, None)
-                            if pipelinesData is not None and isinstance(pipelinesData, dict):
-                                pipelinesListData = pipelinesData.get(StringKeyUtils.STR_KEY_NODES, None)
-                                if pipelinesListData is not None and isinstance(pipelinesListData, list):
-                                    for pipelinesData in pipelinesListData:
-                                        pipeline = Pipelines.parserV4.parser(pipelinesData)
-                                        if pipeline is not None:
-                                            pipelinesList.append(pipeline)
+                        for nodes in nodesList:
+                            nodes.merge_request_id = merge_request_iid
+                            if nodes.position is not None:
+                                await AsyncApiHelper.judgeChangeTrigger(session, pr_author, change_sha, nodes)
+                                # beanList.append(nodes)
 
                         print(beanList)
-                        comments = await AsyncApiHelper.analysisChangeTrigger(session, notesList, discussionsList,
-                                                                              pipelinesList, pr_author)
 
-                        # if comments is not None and isinstance(comments, list):
-                        #     """转化为 CVS文件"""
-                        #     df = DataFrame(columns=["merge_request_id", "reviewer", "reviewer_full_name",
-                        #                             "id", "change_trigger", "body", "created_at"])
-                        #     for comment in comments:
-                        #         tempDict = {"merge_request_id": merge_request_iid, "id": comment.id,
-                        #                     "change_trigger": comment.change_trigger, "body": comment.body,
-                        #                     "reviewer": comment.author_user_name,
-                        #                     "reviewer_full_name": comment.author_user_full_name,
-                        #                     "created_at": merge_request.created_at}
-                        #         df = df.append(tempDict, ignore_index=True)
-                        #
-                        #     pandasHelper.writeTSVFile(f"{AsyncApiHelper.repo}_comment.cvs", df,
-                        #                               header=pandasHelper.INT_WRITE_WITHOUT_HEADER,
-                        #                               writeStyle=pandasHelper.STR_WRITE_STYLE_APPEND_NEW)
+                        comments = [notes for notes in nodesList if notes.position is not None]
                         """存储notes 这里存储的notes需要保证只有代码评审"""
                         if comments is not None and isinstance(comments, list):
                             notesFileName = projectConfig.getNotesDataPath() + os.sep + \
@@ -364,15 +297,9 @@ class AsyncApiHelper:
                                                f"mergeRequest_{AsyncApiHelper.repo}.tsv"
                         BeanStoreHelper.storeBeansToTSV([merge_request], mergeRequestFileName)
 
-                    # """数据库存储"""
-                    # await AsyncSqlHelper.storeBeanDateList(beanList, mysql)
-
-                    """不用数据库 使用本地文本存储"""
-
-                    # 做了同步处理
                     statistic.lock.acquire()
                     statistic.usefulRequestNumber += usefulMergeRequestsCount
-                    """有了其他数据同样可以做统计"""
+
 
                     print("useful pull request:", statistic.usefulRequestNumber,
                           " useful review:", statistic.usefulReviewNumber,

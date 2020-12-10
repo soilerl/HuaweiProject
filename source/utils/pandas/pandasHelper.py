@@ -20,7 +20,7 @@ class pandasHelper:
 
     @staticmethod
     def readTSVFile(fileName, header=INT_READ_FILE_WITHOUT_HEAD, sep=StringKeyUtils.STR_SPLIT_SEP_TSV, low_memory=True):  # 负一为无表头
-        train = pandas.read_csv(fileName, sep=sep, header=header, low_memory=low_memory, encoding='unicode_escape')
+        train = pandas.read_csv(fileName, sep=sep, header=header, low_memory=low_memory, encoding='utf-8')
         return train
 
     @staticmethod
