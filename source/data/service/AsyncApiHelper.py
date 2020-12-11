@@ -462,6 +462,7 @@ class AsyncApiHelper:
         api = StringKeyUtils.API_GITLAB_GRAPHQL
         return api
 
+
     @staticmethod
     def getMergeRequestApi(merge_request_iid):
         api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_MERGE_PULL_REQUEST
