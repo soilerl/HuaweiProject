@@ -32,8 +32,8 @@ def calTime(mergeRequestMap={}, notesMap={}) -> ([], []):
     for mr in data:
         timeDistances = []
         for index in range(len(mr)):
-            if index != len(mr)-1:
-                timeDistances.append(mr[index+1] - mr[index])
+            if index != len(mr) - 1:
+                timeDistances.append(mr[index + 1] - mr[index])
         res.append(timeDistances)
     return data, res
 
@@ -48,7 +48,7 @@ def sortTime(time='', notesList=[]) -> []:
         if item.created_at == None:
             continue
         stamp = tranformStrToTimestamp(item.created_at)
-        #超过比较时间的事件被排除
+        # 超过比较时间的事件被排除
         if time != '':
             if stamp > compareTimestamp:
                 continue
@@ -57,7 +57,8 @@ def sortTime(time='', notesList=[]) -> []:
     timeList.sort()
     return timeList
 
-#把字符串的时间转成时间戳
+
+# 把字符串的时间转成时间戳
 def tranformStrToTimestamp(timeStr='') -> float:
     try:
         if '.' in timeStr:
@@ -68,7 +69,6 @@ def tranformStrToTimestamp(timeStr='') -> float:
     except:
         print(timeStr)
     return timeArray.timestamp()
-
 
 def classifyByTimeByProject(date, projects=[]):
     columns = ["project"]
@@ -81,7 +81,7 @@ def classifyByTimeByProject(date, projects=[]):
         replyTimeDict = {}
         for y, m in common.getTimeListFromTuple(date):
             for index in range(len(data)):
-                #第一个数据是created_at，以created_at归入
+                # 第一个数据是created_at，以created_at归入
                 timeArray = time.localtime(data[index][0])
                 if timeArray.tm_year == y and timeArray.tm_mon == m:
                     key = common.getTimeLableFromTime([(y, m)])[0]
@@ -98,7 +98,7 @@ def classifyByTimeByProject(date, projects=[]):
                 s = 0
                 for i in d:
                     s += i
-                avSum += s/len(d)
+                avSum += s / len(d)
             av = avSum / len(v)
             resDict[k] = av
         resDict["project"] = project
@@ -108,10 +108,7 @@ def classifyByTimeByProject(date, projects=[]):
 
 if __name__ == '__main__':
     project = "tezos"
-    mergeRequestMap = common.getMergeRequestMap(project)
-    notesMap = common.getNotesMap(project)
-    data, res = calTime(mergeRequestMap, notesMap)
 
-    classifyByTimeByProject((2020, 7, 2020, 9), data, res, ["tezos"])
+    classifyByTimeByProject(["tezos"], (2020, 7, 2020, 9))
     # for i in res:
     #     print(res)
