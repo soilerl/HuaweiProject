@@ -1,6 +1,7 @@
 import csv
 
 import numpy
+from pandas import DataFrame
 
 from source.data.bean import MergeRequest, Notes
 import source.utils.pandas.pandasHelper as pandasHelper
@@ -11,6 +12,22 @@ from source.data.service.BeanParserHelper import BeanParserHelper
 # 文件路径
 mergeRequestTsv = "../data/file/mergeRequest.tsv"
 notesTsv = "../data/file/notes.tsv"
+
+
+def getMergeRequestDataFrameByProject(project) -> DataFrame:
+    # 通用的获取项目数据的接口，所有的指标都是从这个接口拿MergeRequest数据，便于后续服务化  2020.12.14
+    df = pandasHelper.pandasHelper.readTSVFile(
+        projectConfig.projectConfig.getMergeRequestDataPath() + os.sep + f"mergeRequest_{project}.tsv",
+        header=pandasHelper.pandasHelper.INT_READ_FILE_WITH_HEAD)
+    return df
+
+
+def getNotesDataFrameByProject(project) -> DataFrame:
+    # 通用的获取项目数据的接口，所有的指标都是从这个接口拿Notes数据，便于后续服务化  2020.12.14
+    df = pandasHelper.pandasHelper.readTSVFile(
+        projectConfig.projectConfig.getNotesDataPath() + os.sep + f"notes_{project}.tsv",
+        header=pandasHelper.pandasHelper.INT_READ_FILE_WITH_HEAD)
+    return df
 
 
 # 返回以iid为键的存放MergeRequest的字典
@@ -53,9 +70,7 @@ def getNotesMap(project) -> dict:
 # 传入文件名，返回实例化好的mergeRequest数组
 def getMergeRequestInstances(project) -> []:
     res = []
-    df = pandasHelper.pandasHelper.readTSVFile(
-        projectConfig.projectConfig.getMergeRequestDataPath() + os.sep + f"mergeRequest_{project}.tsv",
-        header=pandasHelper.pandasHelper.INT_READ_FILE_WITH_HEAD)
+    df = getMergeRequestDataFrameByProject(project)
 
     # 处理空行
     df.dropna(subset=["id", "created_at"], inplace=True)
@@ -73,7 +88,6 @@ def getMergeRequestInstances(project) -> []:
     df = df.loc[df['merged_error_label'] == 0].copy(deep=True)
     df.drop(['merged_error_label'], axis=1, inplace=True)
 
-
     for index, row in df.iterrows():
         t = tuple(row)
         bean = BeanParserHelper.getBeansFromTuple(MergeRequest.MergeRequest(),
@@ -85,13 +99,11 @@ def getMergeRequestInstances(project) -> []:
 # 传入要读取的文件名，返回实例化好的Notes数组
 def getNotesInstances(project) -> []:
     res = []
-    df = pandasHelper.pandasHelper.readTSVFile(
-        projectConfig.projectConfig.getNotesDataPath() + os.sep + f"notes_{project}.tsv",
-        header=pandasHelper.pandasHelper.INT_READ_FILE_WITH_HEAD)
+    df = getNotesDataFrameByProject(project)
 
     # 处理空行
     df.dropna(subset=["id"], inplace=True)
-    #处理重复
+    # 处理重复
     df.drop_duplicates(subset=["id"], inplace=True)
 
     for index, row in df.iterrows():
