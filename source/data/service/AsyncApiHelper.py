@@ -238,7 +238,7 @@ class AsyncApiHelper:
         async with semaphore:
             async with aiohttp.ClientSession() as session:
                 try:
-                    beanList = []  # �����ռ���Ҫ�洢��bean��
+                    beanList = []
                     api = AsyncApiHelper.getMergeRequestApi(merge_request_iid)
                     json = await AsyncApiHelper.fetchBeanData(session, api)
                     print(json)
@@ -462,7 +462,7 @@ class AsyncApiHelper:
         api = StringKeyUtils.API_GITLAB_GRAPHQL
         return api
 
-
+    #根据iid获取用于爬取的api
     @staticmethod
     def getMergeRequestApi(merge_request_iid):
         api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_MERGE_PULL_REQUEST
@@ -490,13 +490,17 @@ class AsyncApiHelper:
         api = api.replace(StringKeyUtils.STR_GITLAB_MR_NUMBER, str(merge_request_iid))
         return api
 
+
+
     @staticmethod
     async def fetchBeanData(session, api, isMediaType=False):
         """异步获取数据通用接口（重要）"""
 
         """初始化请求头"""
         headers = {}
+        #设置agent
         headers = AsyncApiHelper.getUserAgentHeaders(headers)
+        #设置Token
         headers = AsyncApiHelper.getPrivateTokensHeaders(headers)  # 现在用token好似有点问题 先注释掉 2020.10.7
 
         while True:
