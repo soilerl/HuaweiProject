@@ -35,14 +35,12 @@ class commentAcceptRate:
         result_df = DataFrame(columns=columns)  # 用于存储最后结果的 dataframe
 
         for project in projects:
-            notesFileName = projectConfig.getNotesDataPath() + os.sep + f"notes_{project}.tsv"
-            df_notes = pandasHelper.readTSVFile(notesFileName, header=pandasHelper.INT_READ_FILE_WITH_HEAD)
+            df_notes = common.getNotesDataFrameByProject(project)
             df_notes.drop_duplicates(subset=['id'], inplace=True, keep="last")
             df_notes.sort_values(by='merge_request_id', ascending=False, inplace=True)
             print(df_notes.shape)
 
-            mrFileName = projectConfig.getMergeRequestDataPath() + os.sep + f"mergeRequest_{project}.tsv"
-            df_mr = pandasHelper.readTSVFile(mrFileName, header=pandasHelper.INT_READ_FILE_WITH_HEAD)
+            df_mr = common.getMergeRequestDataFrameByProject(project)
 
             df_mr.dropna(subset=["iid"], inplace=True)
 
@@ -112,14 +110,12 @@ class commentAcceptRate:
     @staticmethod
     def commentAcceptRatioByReviewer(project):
         """计算以项目为粒度的评审意见认可度，通过时间来划分"""
-        notesFileName = projectConfig.getNotesDataPath() + os.sep + f"notes_{project}.tsv"
-        df_notes = pandasHelper.readTSVFile(notesFileName, header=pandasHelper.INT_READ_FILE_WITH_HEAD)
+        df_notes = common.getNotesDataFrameByProject(project)
         df_notes.drop_duplicates(subset=['id'], inplace=True, keep="last")
         df_notes.sort_values(by='merge_request_id', ascending=False, inplace=True)
         print(df_notes.shape)
 
-        mrFileName = projectConfig.getMergeRequestDataPath() + os.sep + f"mergeRequest_{project}.tsv"
-        df_mr = pandasHelper.readTSVFile(mrFileName, header=pandasHelper.INT_READ_FILE_WITH_HEAD)
+        df_mr = common.getMergeRequestDataFrameByProject(project)
 
         """日期修补"""
         for index, row in df_mr.iterrows():
