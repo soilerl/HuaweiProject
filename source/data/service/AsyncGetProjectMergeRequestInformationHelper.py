@@ -7,13 +7,14 @@ from datetime import datetime
 from source.utils.StringKeyUtils import StringKeyUtils
 from source.data.service.AsyncApiHelper import AsyncApiHelper
 from source.config.configPraser import configPraser
-
+from source.data.service.GetInformationOfParameter import GetInformationOfParameterHelper
 
 class AsyncGetProjectInformationHelper:
-    """获取项目的所有信息"""
 
+
+    #获取项目一页的MergeRequest的信息
     @staticmethod
-    def getDataOfProject(repo_id):
+    def getOnePageMergeRequestDataOfProject(repo_id, pageIndex):
         loop = asyncio.get_event_loop()
         task = [asyncio.ensure_future(AsyncGetProjectInformationHelper.preProcess(repo_id))]
         tasks = asyncio.gather(*task)
@@ -54,10 +55,14 @@ class AsyncGetProjectInformationHelper:
             return await AsyncGetProjectInformationHelper.fetchData(session, api)
 
     @staticmethod
-    def getProjectApi(repo_id):
-        api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_MERGE_REQUESTS + "?scope=all&state=all&page=1"
+    def getProjectApi(repo_id, pageIndex):
+        api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_MERGE_REQUESTS + \
+              "?scope=all&state=all&page=" + pageIndex
         api = api.replace(StringKeyUtils.STR_GITLAB_REPO_ID, repo_id)
         return api
 
 if __name__ == '__main__':
-    AsyncGetProjectInformationHelper.getDataOfProject('3836952')
+    getParameterHelper = GetInformationOfParameterHelper("https://gitlab.com/tezos/tezos")
+    projectID = getParameterHelper.getProjectID()
+    pages = getParameterHelper.getMergeRequestPages()
+    AsyncGetProjectInformationHelper.getOnePageMergeRequestDataOfProject(projectID, pageIndex)
