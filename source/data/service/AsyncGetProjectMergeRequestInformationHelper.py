@@ -5,11 +5,14 @@ import json
 from datetime import datetime
 
 import source.utils.ApiUtils as ApiUtils
+import source.database.mongoDB.StringMongoDBUtils as StringMongoDBUtils
 
 from source.utils.StringKeyUtils import StringKeyUtils
 from source.data.service.AsyncApiHelper import AsyncApiHelper
 from source.config.configPraser import configPraser
 from source.data.service.GetInformationOfParameter import GetInformationOfParameterHelper
+from source.database.mongoDB.MongoUtil import MongoDBHelper
+
 
 class AsyncGetProjectInformationHelper:
 
@@ -29,7 +32,7 @@ class AsyncGetProjectInformationHelper:
         tasks = [asyncio.ensure_future(AsyncGetProjectInformationHelper.downloadInformation(repo_id, semaphore))]
         await asyncio.wait(tasks)
 
-
+    #下载数据并写入数据库
     @staticmethod
     async def downloadInformation(repo_id, semaphore):
         async with semaphore:
@@ -37,8 +40,9 @@ class AsyncGetProjectInformationHelper:
                 api = AsyncGetProjectInformationHelper.getProjectApi(repo_id)
                 jsonList = await ApiUtils.fetchData(session, api)
                 print(len(jsonList))
-                for v in jsonList:
-                    print(v)
+                dbHelper = MongoDBHelper()
+                for mergeRequest in jsonList:
+                    dbHelper.writeIntoDatabase(StringMongoDBUtils.COLLECTION_NAME_MERGEREQUEST, mergeRequest)
 
 
     @staticmethod
