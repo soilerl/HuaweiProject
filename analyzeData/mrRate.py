@@ -1,5 +1,6 @@
 # _*_ coding: utf-8 _*_
 import pandas as pd
+import datetime
 
 
 from analyzeData import common
@@ -19,10 +20,14 @@ class MergeRequestRate:
     projects = []
     time_list = []
     time_label = []
+    head_label = []
 
     merge_request = []  # 存放一个项目的mr列表
 
     notes = []
+
+    ended_time_sum = {}
+
     merge_request_num = {}  # mr总个数
     merged_mr_num = {}  # merged的mr个数
     closed_mr_num = {}  # closed个数
@@ -31,6 +36,8 @@ class MergeRequestRate:
     no_note_num = {}
     has_note_num = {}
     ended_mr_num = {}
+
+    ended_time_avg = []
 
     merged_rate = []  # merged的mr比例
     closed_rate = []  # closed的比例
@@ -64,6 +71,8 @@ class MergeRequestRate:
         for project in self.projects:
             self.merge_request_num[project] = {}
 
+            self.ended_time_sum[project] = {}
+
             self.merged_mr_num[project] = {}
             self.closed_mr_num[project] = {}
             self.opened_mr_num[project] = {}
@@ -73,14 +82,15 @@ class MergeRequestRate:
             self.has_note_num[project] = {}
             self.ended_mr_num[project] = {}
 
-            self.merged_rate.append([])
-            self.closed_rate.append([])
-            self.opened_rate.append([])
+            self.ended_time_avg.append([project])
 
+            self.merged_rate.append([project])
+            self.closed_rate.append([project])
+            self.opened_rate.append([project])
 
-            self.no_note_rate.append([])
-            self.has_note_rate.append([])
-            self.ended_rate.append([])
+            self.no_note_rate.append([project])
+            self.has_note_rate.append([project])
+            self.ended_rate.append([project])
 
             self.set_pj_lists(project)
 
@@ -89,6 +99,9 @@ class MergeRequestRate:
 
         for time in self.time_label:
             self.merge_request_num[project][time] = 0
+
+            self.ended_time_sum[project][time] = 0.0
+
             self.merged_mr_num[project][time] = 0
             self.closed_mr_num[project][time] = 0
             self.opened_mr_num[project][time] = 0
@@ -103,6 +116,8 @@ class MergeRequestRate:
 
         self.time_list = common.getTimeListFromTuple(date)
         self.time_label = common.getTimeLableFromTime(self.time_list)
+        self.head_label = common.getTimeLableFromTime(self.time_list)
+        self.head_label.insert(0, 'project')
 
     def set_pj(self, projects):
         """ 设置project列表 """
@@ -136,12 +151,15 @@ class MergeRequestRate:
             """ 对三种状态下的mr数量进行统计 """
             for mr in self.merge_request:
                 time = mr.created_at[0:7]
+                head_time = self.get_datetime(mr.created_at)
                 if time in self.merge_request_num[project].keys():
                     self.merge_request_num[project][time] += 1
                     if mr.state == 'merged':
                         self.merged_mr_num[project][time] += 1
+                        self.fill_time_sum(project, time, mr.merged_at, head_time)
                     elif mr.state == 'closed':
                         self.closed_mr_num[project][time] += 1
+                        self.fill_time_sum(project, time, mr.closed_at, head_time)
                     else:
                         self.opened_mr_num[project][time] += 1
 
@@ -158,6 +176,9 @@ class MergeRequestRate:
 
             """ 对三种状态下的mr比例进行统计 """
             for i in self.merge_request_num[project].keys():
+                self.ended_time_avg[index].append(int(self.ended_time_sum[project][i] /
+                                                  (self.merged_mr_num[project][i] + self.closed_mr_num[project][i])))
+
                 sum = self.merge_request_num[project][i]
                 if sum != 0:
                     self.merged_rate[index].append(self.merged_mr_num[project][i] / sum)
@@ -179,6 +200,13 @@ class MergeRequestRate:
                     self.has_note_rate[index].append(None)
                     self.ended_rate[index].append(None)
 
+    def fill_time_sum(self, pj, time, time_lable, head_time):
+        tail_time = self.get_datetime(time_lable)
+        span_time = tail_time.__sub__(head_time)
+        self.ended_time_sum[pj][time] += span_time.days * 86400 + span_time.seconds
+
+    def get_datetime(self, time_lable):
+        return datetime.datetime.strptime(time_lable[0:19], '%Y-%m-%dT%H:%M:%S')
 
     def get_first_note_time(self, mr_iid):
         time = self.default_time
@@ -214,6 +242,9 @@ class MergeRequestRate:
         """ 返回opened状态的mr的比例 """
         return self.opened_rate
 
+    def get_df_ended_time_avg(self):
+        return pd.DataFrame(self.ended_time_avg, columns=self.head_label)
+
     def get_df_merged_rate(self):
         return pd.DataFrame(self.merged_rate, index=self.projects, columns=self.time_label)
 
@@ -235,7 +266,7 @@ class MergeRequestRate:
 
 
 if __name__ == '__main__':
-    mrRate = MergeRequestRate(['meltano'], (2020, 3, 2020, 12))
+    mrRate = MergeRequestRate(['tezos'], (2020, 7, 2020, 9))
     df1 = mrRate.get_df_merged_rate()
     print(df1)
     print('f')
