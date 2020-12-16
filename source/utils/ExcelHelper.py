@@ -109,6 +109,26 @@ class ExcelHelper:
         except Exception as e:
             print(e)
 
+    def appendExcelRowWithDataLists(self, fileName, sheetName, dataLists, style):
+        rbook = xlrd.open_workbook(fileName, formatting_info=True)
+        sheetIndex = rbook.sheet_names().index(sheetName)
+        if (sheetIndex == -1):  # sheet不存在就
+            return
+
+        wbook = copy.copy(rbook)
+        wsheet = wbook.get_sheet(sheetIndex)
+        row = rbook.sheet_by_name(sheetName).nrows
+        for dataList in dataLists:
+            pos = 0
+            for item in dataList:
+                wsheet.write(row, pos, item, style)
+                pos = pos + 1
+            row = row + 1
+        try:
+            wbook.save(fileName)
+        except Exception as e:
+            print(e)
+
     def appendExcelRowWithDiffStyle(self, fileName, sheetName, dataList, style):
         rbook = xlrd.open_workbook(fileName, formatting_info=True)
         sheetIndex = rbook.sheet_names().index(sheetName)
@@ -188,8 +208,10 @@ class ExcelHelper:
 
             """遍历dataframe依次加入"""
             self.appendExcelRow(fileName, sheetName, dataframe.columns, style=self.getNormalStyle())
+            rows = []
             for index, row in dataframe.iterrows():
-                self.appendExcelRow(fileName, sheetName, row, style=self.getNormalStyle())
+                rows.append(row)
+            self.appendExcelRowWithDataLists(fileName, sheetName, rows, style=self.getNormalStyle())
 
 if __name__ == "__main__":
     pass
