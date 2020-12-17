@@ -121,8 +121,7 @@ class TimeAvg:
 
             """ 计算每个月平均时长 """
             for i in self.merge_request_num[project].keys():
-                self.ended_time_avg[index].append(int(self.ended_time_sum[project][i] /
-                                                  (self.merged_mr_num[project][i] + self.closed_mr_num[project][i])))
+                self.ended_time_avg[index].append(int(self.ended_time_sum[project][i] / self.ended_mr_num[project][i]))
 
     def fill_time_sum(self, pj, time, time_lable, head_time):
         """将时间长度填充到对应的月份中去
