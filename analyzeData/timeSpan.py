@@ -26,15 +26,15 @@ class TimeSpan:
 
     merge_request = []  # 存放一个项目的mr列表
 
-    notes = []
+    notes = []  # 存放一个项目的notes
 
-    no_note_num = {}
-    has_note_num = {}
-    ended_mr_num = {}
+    no_note_num = {}  # 提交但未有note的数量
+    has_note_num = {}  # 有note但未完结的数量
+    ended_mr_num = {}  # 结束之后的数量
 
-    no_note_rate = []
-    has_note_rate = []
-    ended_rate = []
+    no_note_rate = []  # 提交但未有note的比例
+    has_note_rate = []  # 有note但未完结的比例
+    ended_rate = []  # 结束之后的比例
 
     default_time = '9999-99'
 
@@ -110,21 +110,28 @@ class TimeSpan:
 
             self.set_nt(common.getNotesInstances(project))
 
-            """ 对三种状态下的mr数量进行统计 """
+            """ 对三种时间戳进行获取 """
             for mr in self.merge_request:
+                """ 获取created """
                 time = mr.created_at[0:7]
+                """ 获取第一个note的时间 """
                 time_fir_nt = self.get_first_note_time(mr.iid)
+                """ 获取ended """
                 time_ended = self.get_ended_time(mr)
 
+                """ 对数量进行统计 """
                 if time_fir_nt == self.default_time:
+                    """ 不存在第一个note的情况；此时分为created到ended，ended到大时间边界 """
                     self.fill_data(time, time_ended, self.no_note_num[project])
                     self.fill_data(time_ended, self.time_label[-1], self.ended_mr_num[project])
+
                 else:
+                    """ 存在第一个note的情况；此时分为created到first note，first note到ended，ended到大时间边界 """
                     self.fill_data(time, time_fir_nt, self.no_note_num[project])
                     self.fill_data(time_fir_nt, time_ended, self.has_note_num[project])
                     self.fill_data(time_ended, self.time_label[-1], self.ended_mr_num[project])
 
-            """ 对三种状态下的mr比例进行统计 """
+            """ 对三种状态下的比例进行统计 """
             for i in self.merge_request_num[project].keys():
                 sum = len(self.merge_request)
 
@@ -138,6 +145,10 @@ class TimeSpan:
                     self.ended_rate[index].append(None)
 
     def get_first_note_time(self, mr_iid):
+        """获取此mr的第一个note的时间
+
+        mr_iid:要获取的那个mr
+        """
         time = self.default_time
         for note in self.notes:
             if note.merge_request_id == mr_iid:
@@ -145,6 +156,10 @@ class TimeSpan:
         return time[0:7]
 
     def get_ended_time(self, mr):
+        """获取此mr的ended时间
+
+        mr:要获取的那个mr
+        """
         time = self.default_time
         if mr.state == 'merged':
             time = mr.merged_at[0:7]
@@ -153,8 +168,17 @@ class TimeSpan:
         return time
 
     def fill_data(self, left, right, data_list):
+        """填充计数器
+
+        left:左边界
+        right:右边界
+        data_list:要填充的填充器
+        """
+        """ 与大时间范围的左边界比较得出真正的左边界 """
         start = max(left, self.time_label[0])
+        """ 与大时间范围的右边界比较得出真正的右边界 """
         end = min(right, self.time_label[-1])
+        """ 边界内月份遍历填充 """
         if start in self.time_label and end in self.time_label:
             for i in range(self.time_label.index(start), self.time_label.index(end)):
                 data_list[self.time_label[i]] += 1

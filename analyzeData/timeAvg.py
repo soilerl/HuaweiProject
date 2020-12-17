@@ -26,11 +26,11 @@ class TimeAvg:
 
     merge_request = []  # 存放一个项目的mr列表
 
-    ended_time_sum = {}
+    ended_time_sum = {}  # 各个月的时间总长
 
-    ended_mr_num = {}  # ended的mr个数
+    ended_mr_num = {}  # 各个月ended的mr个数
 
-    ended_time_avg = []
+    ended_time_avg = []  # 各个月的平均时长
 
     default_time = '9999-99'
 
@@ -101,29 +101,48 @@ class TimeAvg:
         for index, project in enumerate(self.projects):
             self.set_mr(common.getMergeRequestInstances(project))
 
-            """  """
+            """ 统计数量与时长 """
             for mr in self.merge_request:
                 time = mr.created_at[0:7]
                 head_time = self.get_datetime(mr.created_at)
                 if time in self.merge_request_num[project].keys():
                     if mr.state == 'merged':
+                        """ 统计数量 """
                         self.ended_mr_num[project][time] += 1
+                        """ 统计时长 """
                         self.fill_time_sum(project, time, mr.merged_at, head_time)
                     elif mr.state == 'closed':
+                        """ 统计数量 """
                         self.ended_mr_num[project][time] += 1
+                        """ 统计时长 """
                         self.fill_time_sum(project, time, mr.closed_at, head_time)
 
-            """  """
+            """ 计算每个月平均时长 """
             for i in self.merge_request_num[project].keys():
                 self.ended_time_avg[index].append(int(self.ended_time_sum[project][i] /
                                                   (self.merged_mr_num[project][i] + self.closed_mr_num[project][i])))
 
     def fill_time_sum(self, pj, time, time_lable, head_time):
+        """将时间长度填充到对应的月份中去
+
+        pj:项目
+        time:对应月份
+        time_lable:结束的时间戳,用于提取结束时间
+        head_time:开始时间
+        """
+
+        """ 计算结束时间 """
         tail_time = self.get_datetime(time_lable)
+        """ 计算时间跨度 """
         span_time = tail_time.__sub__(head_time)
+        """ 以秒结算填充至对应项目对应月份 """
         self.ended_time_sum[pj][time] += span_time.days * 86400 + span_time.seconds
 
     def get_datetime(self, time_lable):
+        """将时间戳转化为datetime对象
+
+        time_lable:用于转换的时间戳
+        """
         return datetime.datetime.strptime(time_lable[0:19], '%Y-%m-%dT%H:%M:%S')
 
     def get_df_ended_time_avg(self):
