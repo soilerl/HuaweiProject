@@ -28,6 +28,8 @@ class TimeSpan:
 
     notes = []  # 存放一个项目的notes
 
+    merge_request_num = {}  # mr总个数
+
     no_note_num = {}  # 提交但未有note的数量
     has_note_num = {}  # 有note但未完结的数量
     ended_mr_num = {}  # 结束之后的数量
@@ -57,6 +59,8 @@ class TimeSpan:
         """ 初始化列表们 """
 
         for project in self.projects:
+            self.merge_request_num[project] = {}
+
             self.no_note_num[project] = {}
             self.has_note_num[project] = {}
             self.ended_mr_num[project] = {}
@@ -71,6 +75,8 @@ class TimeSpan:
         """ 设置列表们 """
 
         for time in self.time_label:
+            self.merge_request_num[project][time] = 0
+
             self.no_note_num[project][time] = 0
             self.has_note_num[project][time] = 0
             self.ended_mr_num[project][time] = 0

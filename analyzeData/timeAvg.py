@@ -26,6 +26,8 @@ class TimeAvg:
 
     merge_request = []  # 存放一个项目的mr列表
 
+    merge_request_num = {}  # mr总个数
+
     ended_time_sum = {}  # 各个月的时间总长
 
     ended_mr_num = {}  # 各个月ended的mr个数
