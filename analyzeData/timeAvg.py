@@ -28,10 +28,16 @@ class TimeAvg:
 
     merge_request_num = {}  # mr总个数
 
+    opened_time_sum = {}
+    note_time_sum = {}
     ended_time_sum = {}  # 各个月的时间总长
 
+    opened_mr_num = {}
+    note_mr_num = {}
     ended_mr_num = {}  # 各个月ended的mr个数
 
+    opened_time_avg = []
+    note_time_avg = []
     ended_time_avg = []  # 各个月的平均时长
 
     default_time = '9999-99'
@@ -57,10 +63,16 @@ class TimeAvg:
         for project in self.projects:
             self.merge_request_num[project] = {}
 
+            self.opened_time_sum[project] = {}
+            self.note_time_sum[project] = {}
             self.ended_time_sum[project] = {}
 
+            self.opened_mr_num[project] = {}
+            self.note_mr_num[project] = {}
             self.ended_mr_num[project] = {}
 
+            self.opened_time_avg.append([project])
+            self.note_time_avg.append([project])
             self.ended_time_avg.append([project])
 
             self.set_pj_lists(project)
@@ -71,8 +83,12 @@ class TimeAvg:
         for time in self.time_label:
             self.merge_request_num[project][time] = 0
 
-            self.ended_time_sum[project][time] = 0.0
+            self.opened_time_sum[project][time] = 0
+            self.note_time_sum[project][time] = 0
+            self.ended_time_sum[project][time] = 0
 
+            self.opened_mr_num[project][time] = 0
+            self.note_mr_num[project][time] = 0
             self.ended_mr_num[project][time] = 0
 
     def set_tm(self, date):
@@ -108,20 +124,45 @@ class TimeAvg:
                 time = mr.created_at[0:7]
                 head_time = self.get_datetime(mr.created_at)
                 if time in self.merge_request_num[project].keys():
-                    if mr.state == 'merged':
-                        """ 统计数量 """
-                        self.ended_mr_num[project][time] += 1
-                        """ 统计时长 """
-                        self.fill_time_sum(project, time, mr.merged_at, head_time)
-                    elif mr.state == 'closed':
-                        """ 统计数量 """
-                        self.ended_mr_num[project][time] += 1
-                        """ 统计时长 """
-                        self.fill_time_sum(project, time, mr.closed_at, head_time)
+                    """ 获取第一个note的时间 """
+                    time_fir_nt = self.get_first_note_time(mr.iid)
+                    time_ended = self.get_ended_time(mr)
+                    if time_fir_nt == self.default_time:
+                        if time_ended != self.default_time:
+                            """ 统计数量 """
+                            self.ended_mr_num[project][time] += 1
+                            """ 统计时长 """
+                            self.fill_time_sum(project, time, time_ended, head_time)
+                    else:
+                        self.opened_mr_num[project][time] += 1
+                        self.fill_time_sum(project, time, time_fir_nt, head_time)
+                        if time_ended != self.default_time:
+                            self.note_mr_num[project][time] += 1
+                            self.fill_time_sum(project, time, time_ended, time_fir_nt)
 
             """ 计算每个月平均时长 """
             for i in self.merge_request_num[project].keys():
-                self.ended_time_avg[index].append(int(self.ended_time_sum[project][i] / self.ended_mr_num[project][i]))
+                self.cal_avg(self.opened_mr_num[index], self.opened_time_sum[project][i], self.opened_mr_num[project][i])
+                self.cal_avg(self.note_time_avg[index], self.note_time_sum[project][i], self.note_mr_num[project][i])
+                self.cal_avg(self.ended_time_avg[index], self.ended_time_sum[project][i], self.ended_mr_num[project][i])
+
+    def cal_avg(self, content, son, parent):
+        if parent != 0:
+            content.append(int(son / parent))
+        else:
+            content.append(None)
+
+    def get_ended_time(self, mr):
+        """获取此mr的ended时间
+
+        mr:要获取的那个mr
+        """
+        time = self.default_time
+        if mr.state == 'merged':
+            time = mr.merged_at
+        elif mr.state == 'closed':
+            time = mr.closed_at
+        return time
 
     def fill_time_sum(self, pj, time, time_lable, head_time):
         """将时间长度填充到对应的月份中去
@@ -145,6 +186,12 @@ class TimeAvg:
         time_lable:用于转换的时间戳
         """
         return datetime.datetime.strptime(time_lable[0:19], '%Y-%m-%dT%H:%M:%S')
+
+    def get_df_opened_time_avg(self):
+        return pd.DataFrame(self.opened_time_avg, columns=self.head_label)
+
+    def get_df_note_time_avg(self):
+        return pd.DataFrame(self.note_time_avg, columns=self.head_label)
 
     def get_df_ended_time_avg(self):
         return pd.DataFrame(self.ended_time_avg, columns=self.head_label)
