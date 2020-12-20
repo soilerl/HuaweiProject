@@ -4,8 +4,8 @@ import os
 
 class projectConfig:
     projectName = 'HuaweiProject'
-    # PATH_CONFIG = 'source' + os.sep + 'config' + os.sep + 'config.txt'
-    PATH_CONFIG = os.sep + 'config.txt'
+    PATH_CONFIG = 'source' + os.sep + 'config' + os.sep + 'config.txt'
+    # PATH_CONFIG = os.sep + 'config.txt'
     PATH_TEST_INPUT_EXCEL = 'data' + os.sep + 'Test200.xlsx'
     PATH_TEST_OUTPUT_EXCEL = 'data' + os.sep + 'output.xlsx'
     PATH_TEST_OUTPUT_PATH = 'data'
@@ -46,17 +46,17 @@ class projectConfig:
     @staticmethod
     def getRootPath():
         curPath = os.path.abspath(os.path.dirname(__file__))
-        print(curPath)
-        # projectName = projectConfig.projectName
-        # rootPath = os.path.join(curPath.split(projectName)[0], projectName)  # 获取myProject，也就是项目的根路径
-        return curPath
+        # print(curPath)
+        projectName = projectConfig.projectName
+        rootPath = os.path.join(curPath.split(projectName)[0], projectName)  # 获取myProject，也就是项目的根路径
+        return rootPath
 
     @staticmethod
     def getConfigPath():
         rootPath = projectConfig.getRootPath()
         filePath = projectConfig.PATH_CONFIG
-        path = rootPath + filePath
-        return path
+        # path = rootPath + filePath
+        return os.path.join(rootPath, filePath)
 
     @staticmethod
     def getDataPath():

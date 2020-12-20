@@ -89,8 +89,8 @@ class TimeSpan:
 
         """粒度换成了day"""
         self.time_list = common.getDayListFromTuple(date)
-        self.time_label = common.getTimeLableFromTime(self.time_list)
-        self.head_label = common.getTimeLableFromTime(self.time_list)
+        self.time_label = common.getDayLabelFromTime(self.time_list)
+        self.head_label = common.getDayLabelFromTime(self.time_list)
         self.head_label.insert(0, 'project')
 
     def set_pj(self, projects):
@@ -189,42 +189,42 @@ class TimeSpan:
             for i in range(self.time_label.index(start), self.time_label.index(end)):
                 data_list[self.time_label[i]] += 1
 
-    def get_df_no_note_rate(self):
+    def get_df_no_note_count(self):
         return pd.DataFrame(self.no_note_rate, columns=self.head_label)
 
-    def get_df_has_note_rate(self):
+    def get_df_has_note_count(self):
         return pd.DataFrame(self.has_note_rate, columns=self.head_label)
 
-    def get_df_ended_rate(self):
+    def get_df_ended_count(self):
         return pd.DataFrame(self.ended_rate, columns=self.head_label)
 
 
 if __name__ == '__main__':
     ts = TimeSpan(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
-    df = ts.get_df_no_note_rate()
+    df = ts.get_df_no_note_count()
     """计算的df写入xlsx"""
     fileName = "project_index1.xls"
-    sheetName = "df_no_note_ratio"
+    sheetName = "df_no_note_count"
     columns = list(df.columns)
     df = pandas.DataFrame(df.values.T, columns=df.index)
     df['date'] = columns
     df = df[["date", 0, 1]]
     ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
 
-    df = ts.get_df_has_note_rate()
+    df = ts.get_df_has_note_count()
     """计算的df写入xlsx"""
     fileName = "project_index1.xls"
-    sheetName = "df_has_note_ratio"
+    sheetName = "df_has_note_count"
     columns = list(df.columns)
     df = pandas.DataFrame(df.values.T, columns=df.index)
     df['date'] = columns
     df = df[["date", 0, 1]]
     ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
 
-    df = ts.get_df_ended_rate()
+    df = ts.get_df_ended_count()
     """计算的df写入xlsx"""
-    fileName = "project_index1.xls"
-    sheetName = "df_ended_rate"
+    fileName = "project_index.xls"
+    sheetName = "df_ended_count"
     columns = list(df.columns)
     df = pandas.DataFrame(df.values.T, columns=df.index)
     df['date'] = columns

@@ -162,6 +162,25 @@ def getTimeLableFromTime(time_list):
             timeStr = timeStr + "-0" + str(time[1])
         else:
             timeStr = timeStr + "-" + str(time[1])
+        time_label.append(timeStr)
+
+    return time_label
+
+
+def getDayLabelFromTime(time_list):
+    """
+    输入一个时间列表，输出时间字符串列表
+    如输入：[(2020,9),(2020,10)]
+    输出：[2020-09,2020-10]
+    """
+
+    time_label = []
+    for time in time_list:
+        timeStr = str(time[0])
+        if time[1] < 10:
+            timeStr = timeStr + "-0" + str(time[1])
+        else:
+            timeStr = timeStr + "-" + str(time[1])
         if time[2] < 10:
             timeStr = timeStr + "-0" + str(time[2])
         else:
@@ -172,4 +191,4 @@ def getTimeLableFromTime(time_list):
 
 
 if __name__ == "__main__":
-    print(getDayListFromTuple((2020, 1, 2020, 2)))
+    print(getTimeLableFromTime([(2020,9),(2020,10)]))

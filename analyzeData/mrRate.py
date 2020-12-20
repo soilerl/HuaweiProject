@@ -150,11 +150,11 @@ class MergeRequestRate:
 
 if __name__ == '__main__':
     mrRate = MergeRequestRate(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
-    # df = mrRate.get_df_closed_rate()
-    # """计算的df写入xlsx"""
-    # fileName = "project_index.xls"
-    # sheetName = "mrClosedRatio"
-    # ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
+    df = mrRate.get_df_closed_rate()
+    """计算的df写入xlsx"""
+    fileName = "project_index.xls"
+    sheetName = "mrClosedRatio"
+    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
 
     df = mrRate.get_df_opened_rate()
     """计算的df写入xlsx"""

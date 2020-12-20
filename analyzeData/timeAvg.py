@@ -4,6 +4,7 @@ import datetime
 
 
 from analyzeData import common
+from source.utils.ExcelHelper import ExcelHelper
 
 
 class TimeAvg:
@@ -113,11 +114,17 @@ class TimeAvg:
             self.merge_request = merge_request
             # self.merge_request_num = len(merge_request)
 
+    def set_nt(self, notes):
+
+        if isinstance(notes, list):
+            self.notes = notes
+
     def rate_calculate(self):
         """ 计算三种比例 """
 
         for index, project in enumerate(self.projects):
             self.set_mr(common.getMergeRequestInstances(project))
+            self.set_nt(common.getNotesInstances(project))
 
             """ 统计数量与时长 """
             for mr in self.merge_request:
@@ -126,23 +133,30 @@ class TimeAvg:
                 if time in self.merge_request_num[project].keys():
                     """ 获取第一个note的时间 """
                     time_fir_nt = self.get_first_note_time(mr.iid)
+                    # 我们忽略状态为open的pr
                     time_ended = self.get_ended_time(mr)
+                    if time_ended == self.default_time:
+                        continue
                     if time_fir_nt == self.default_time:
                         if time_ended != self.default_time:
                             """ 统计数量 """
                             self.ended_mr_num[project][time] += 1
+                            self.note_time_sum[project][time] += 1
                             """ 统计时长 """
-                            self.fill_time_sum(project, time, time_ended, head_time)
+                            self.fill_time_sum(project, time, time_ended, head_time, self.note_time_sum)
+                            self.fill_time_sum(project, time, time_ended, head_time, self.ended_time_sum)
                     else:
                         self.opened_mr_num[project][time] += 1
-                        self.fill_time_sum(project, time, time_fir_nt, head_time)
+                        self.fill_time_sum(project, time, time_fir_nt, head_time, self.note_time_sum)
+                        self.ended_time_sum[project][time] += 1
+                        self.fill_time_sum(project, time, time_ended, head_time, self.ended_time_sum)
                         if time_ended != self.default_time:
                             self.note_mr_num[project][time] += 1
-                            self.fill_time_sum(project, time, time_ended, time_fir_nt)
+                            self.fill_time_sum(project, time, time_ended, self.get_datetime(time_fir_nt), self.opened_time_sum)
 
             """ 计算每个月平均时长 """
             for i in self.merge_request_num[project].keys():
-                self.cal_avg(self.opened_mr_num[index], self.opened_time_sum[project][i], self.opened_mr_num[project][i])
+                self.cal_avg(self.opened_time_avg[index], self.opened_time_sum[project][i], self.opened_mr_num[project][i])
                 self.cal_avg(self.note_time_avg[index], self.note_time_sum[project][i], self.note_mr_num[project][i])
                 self.cal_avg(self.ended_time_avg[index], self.ended_time_sum[project][i], self.ended_mr_num[project][i])
 
@@ -164,7 +178,18 @@ class TimeAvg:
             time = mr.closed_at
         return time
 
-    def fill_time_sum(self, pj, time, time_lable, head_time):
+    def get_first_note_time(self, mr_iid):
+        """获取此mr的第一个note的时间
+
+        mr_iid:要获取的那个mr
+        """
+        time = self.default_time
+        for note in self.notes:
+            if note.merge_request_id == mr_iid:
+                time = min(note.created_at, time)
+        return time
+
+    def fill_time_sum(self, pj, time, time_lable, head_time, timelist):
         """将时间长度填充到对应的月份中去
 
         pj:项目
@@ -178,7 +203,10 @@ class TimeAvg:
         """ 计算时间跨度 """
         span_time = tail_time.__sub__(head_time)
         """ 以秒结算填充至对应项目对应月份 """
-        self.ended_time_sum[pj][time] += span_time.days * 86400 + span_time.seconds
+        try:
+            timelist[pj][time] += span_time.days * 86400 + span_time.seconds
+        except Exception as e:
+            print(e)
 
     def get_datetime(self, time_lable):
         """将时间戳转化为datetime对象
@@ -198,7 +226,24 @@ class TimeAvg:
 
 
 if __name__ == '__main__':
-    ta = TimeAvg(['tezos'], (2020, 7, 2020, 9))
+    ta = TimeAvg(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
     df1 = ta.get_df_ended_time_avg()
     print(df1)
     print('f')
+    fileName = "project_index.xls"
+    sheetName = "df_ended_time_avg"
+    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df1)
+
+    df1 = ta.get_df_opened_time_avg()
+    print(df1)
+    print('f')
+    fileName = "project_index.xls"
+    sheetName = "df_opened_time_avg"
+    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df1)
+
+    df1 = ta.get_df_note_time_avg()
+    print(df1)
+    print('f')
+    fileName = "project_index.xls"
+    sheetName = "df_note_time_avg"
+    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df1)
