@@ -1,9 +1,12 @@
 # _*_ coding: utf-8 _*_
+import pandas
 import pandas as pd
 import datetime
 
+from pandas import DataFrame
 
 from analyzeData import common
+from source.utils.ExcelHelper import ExcelHelper
 
 
 class TimeSpan:
@@ -38,7 +41,7 @@ class TimeSpan:
     has_note_rate = []  # 有note但未完结的比例
     ended_rate = []  # 结束之后的比例
 
-    default_time = '9999-99'
+    default_time = '9999-99-99'
 
     def __init__(self, projects, date):
         """ 初始化构造函数 """
@@ -84,7 +87,8 @@ class TimeSpan:
     def set_tm(self, date):
         """ 设置时间列表 """
 
-        self.time_list = common.getTimeListFromTuple(date)
+        """粒度换成了day"""
+        self.time_list = common.getDayListFromTuple(date)
         self.time_label = common.getTimeLableFromTime(self.time_list)
         self.head_label = common.getTimeLableFromTime(self.time_list)
         self.head_label.insert(0, 'project')
@@ -119,7 +123,7 @@ class TimeSpan:
             """ 对三种时间戳进行获取 """
             for mr in self.merge_request:
                 """ 获取created """
-                time = mr.created_at[0:7]
+                time = mr.created_at[0:10]
                 """ 获取第一个note的时间 """
                 time_fir_nt = self.get_first_note_time(mr.iid)
                 """ 获取ended """
@@ -141,14 +145,10 @@ class TimeSpan:
             for i in self.merge_request_num[project].keys():
                 sum = len(self.merge_request)
 
-                if sum != 0:
-                    self.no_note_rate[index].append(self.no_note_num[project][i] / sum)
-                    self.has_note_rate[index].append(self.has_note_num[project][i] / sum)
-                    self.ended_rate[index].append(self.ended_mr_num[project][i] / sum)
-                else:
-                    self.no_note_rate[index].append(None)
-                    self.has_note_rate[index].append(None)
-                    self.ended_rate[index].append(None)
+                self.no_note_rate[index].append(self.no_note_num[project][i])
+                self.has_note_rate[index].append(self.has_note_num[project][i])
+                self.ended_rate[index].append(self.ended_mr_num[project][i])
+
 
     def get_first_note_time(self, mr_iid):
         """获取此mr的第一个note的时间
@@ -159,7 +159,7 @@ class TimeSpan:
         for note in self.notes:
             if note.merge_request_id == mr_iid:
                 time = min(note.created_at, time)
-        return time[0:7]
+        return time[0:10]
 
     def get_ended_time(self, mr):
         """获取此mr的ended时间
@@ -168,9 +168,9 @@ class TimeSpan:
         """
         time = self.default_time
         if mr.state == 'merged':
-            time = mr.merged_at[0:7]
+            time = mr.merged_at[0:10]
         elif mr.state == 'closed':
-            time = mr.closed_at[0:7]
+            time = mr.closed_at[0:10]
         return time
 
     def fill_data(self, left, right, data_list):
@@ -200,7 +200,34 @@ class TimeSpan:
 
 
 if __name__ == '__main__':
-    ts = TimeSpan(['tezos'], (2020, 7, 2020, 9))
-    df1 = ts.get_df_no_note_rate()
-    print(df1)
-    print('f')
+    ts = TimeSpan(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
+    df = ts.get_df_no_note_rate()
+    """计算的df写入xlsx"""
+    fileName = "project_index1.xls"
+    sheetName = "df_no_note_ratio"
+    columns = list(df.columns)
+    df = pandas.DataFrame(df.values.T, columns=df.index)
+    df['date'] = columns
+    df = df[["date", 0, 1]]
+    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
+
+    df = ts.get_df_has_note_rate()
+    """计算的df写入xlsx"""
+    fileName = "project_index1.xls"
+    sheetName = "df_has_note_ratio"
+    columns = list(df.columns)
+    df = pandas.DataFrame(df.values.T, columns=df.index)
+    df['date'] = columns
+    df = df[["date", 0, 1]]
+    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
+
+    df = ts.get_df_ended_rate()
+    """计算的df写入xlsx"""
+    fileName = "project_index1.xls"
+    sheetName = "df_ended_rate"
+    columns = list(df.columns)
+    df = pandas.DataFrame(df.values.T, columns=df.index)
+    df['date'] = columns
+    df = df[["date", 0, 1]]
+    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
+

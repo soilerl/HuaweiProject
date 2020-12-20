@@ -71,8 +71,8 @@ class commentCount:
         return result_df
 
 if __name__ == "__main__":
-    df = commentCount.commentCountByProject(['meltano', 'tezos', 'veloren'], (2019, 9, 2020, 12))
+    df = commentCount.commentCountByProject(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
-    sheetName = "commentAcceptRatio"
+    sheetName = "commentCount"
     ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)

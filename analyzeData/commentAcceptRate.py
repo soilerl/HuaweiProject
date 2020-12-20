@@ -194,8 +194,8 @@ class commentAcceptRate:
 
 
 if __name__ == "__main__":
-    df = commentAcceptRate.commentAcceptRatioByProject(["tezos"], (2020, 7, 2020, 9))
+    df = commentAcceptRate.commentAcceptRatioByProject(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
     """计算的df写入xlsx"""
-    fileName = "project_index.xlsx"
+    fileName = "project_index.xls"
     sheetName = "commentAcceptRatio"
     ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)

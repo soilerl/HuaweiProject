@@ -1,3 +1,4 @@
+import calendar
 import csv
 
 import numpy
@@ -129,6 +130,24 @@ def getTimeListFromTuple(date):
     return timeList
 
 
+def getDayListFromTuple(date):
+    """输入一个时间的四元组，返回一个时间列表,粒度精确到日期
+       如输入: (2020, 1, 2020, 2)
+       输出：[(2020,1,1),(2020,1,2), ........(2020, 1, 31)]
+    """
+    timeList = []
+    for i in range(date[0] * 12 + date[1], date[2] * 12 + date[3] + 1):
+        y = int((i - i % 12) / 12)
+        m = i % 12
+        if m == 0:
+            m = 12
+            y = y - 1
+        weekDay, totalDay = calendar.monthrange(y, m)
+        for d in range(1, totalDay + 1):
+            timeList.append((y, m, d))
+    return timeList
+
+
 def getTimeLableFromTime(time_list):
     """
     输入一个时间列表，输出时间字符串列表
@@ -137,11 +156,20 @@ def getTimeLableFromTime(time_list):
     """
 
     time_label = []
-
     for time in time_list:
+        timeStr = str(time[0])
         if time[1] < 10:
-            time_label.append(str(time[0]) + "-0" + str(time[1]))
+            timeStr = timeStr + "-0" + str(time[1])
         else:
-            time_label.append(str(time[0]) + "-" + str(time[1]))
+            timeStr = timeStr + "-" + str(time[1])
+        if time[2] < 10:
+            timeStr = timeStr + "-0" + str(time[2])
+        else:
+            timeStr = timeStr + "-" + str(time[2])
+        time_label.append(timeStr)
 
     return time_label
+
+
+if __name__ == "__main__":
+    print(getDayListFromTuple((2020, 1, 2020, 2)))

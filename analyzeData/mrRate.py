@@ -4,6 +4,7 @@ import datetime
 
 
 from analyzeData import common
+from source.utils.ExcelHelper import ExcelHelper
 
 
 class MergeRequestRate:
@@ -148,7 +149,21 @@ class MergeRequestRate:
 
 
 if __name__ == '__main__':
-    mrRate = MergeRequestRate(['tezos'], (2020, 7, 2020, 9))
-    df1 = mrRate.get_df_closed_rate()
-    print(df1)
-    print('f')
+    mrRate = MergeRequestRate(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
+    # df = mrRate.get_df_closed_rate()
+    # """计算的df写入xlsx"""
+    # fileName = "project_index.xls"
+    # sheetName = "mrClosedRatio"
+    # ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
+
+    df = mrRate.get_df_opened_rate()
+    """计算的df写入xlsx"""
+    fileName = "project_index.xls"
+    sheetName = "mrOpenedRatio"
+    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
+
+    df = mrRate.get_df_merged_rate()
+    """计算的df写入xlsx"""
+    fileName = "project_index.xls"
+    sheetName = "mrMergedRatio"
+    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)

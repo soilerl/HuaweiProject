@@ -270,14 +270,21 @@ class AsyncApiHelper:
 
                         change_sha = commitList[0].id
 
-                        api = AsyncApiHelper.getNotesApi(merge_request_iid)
-                        json = await AsyncApiHelper.fetchBeanData(session, api)
-                        print(json)
-
+                        page_index = 1
                         nodesList = []
-                        if json is not None and isinstance(json, list):
-                            nodesList = await AsyncApiHelper.parserNotes(json)
-
+                        isMorePage = True
+                        while isMorePage:
+                            api = AsyncApiHelper.getNotesApi(merge_request_iid, page_index)
+                            json = await AsyncApiHelper.fetchBeanData(session, api)
+                            print(json)
+                            if json is not None and isinstance(json, list):
+                                nodesList.extend(await AsyncApiHelper.parserNotes(json))
+                                if(json.__len__()) < 20:
+                                    isMorePage = False
+                                else:
+                                    page_index += 1
+                            else:
+                                isMorePage = False
                         for nodes in nodesList:
                             nodes.merge_request_id = merge_request_iid
                             if nodes.position is not None:
@@ -477,10 +484,11 @@ class AsyncApiHelper:
         return api
 
     @staticmethod
-    def getNotesApi(merge_request_iid):
+    def getNotesApi(merge_request_iid, page_index):
         api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_NOTES
         api = api.replace(StringKeyUtils.STR_GITLAB_REPO_ID, str(AsyncApiHelper.repo_id))
         api = api.replace(StringKeyUtils.STR_GITLAB_MR_NUMBER, str(merge_request_iid))
+        api = api.replace(StringKeyUtils.STR_PAGE_INDEX, str(page_index))
         return api
 
     @staticmethod
