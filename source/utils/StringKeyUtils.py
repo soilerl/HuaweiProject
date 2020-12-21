@@ -361,6 +361,7 @@ class StringKeyUtils:
     API_GITLAB = 'https://gitlab.com/api/v4'
     API_GITLAB_GRAPHQL = 'https://gitlab.com/api/graphql'
     API_GITLAB_MERGE_PULL_REQUEST = '/projects/:id/merge_requests/:merge_request_iid'
+    API_GITLAB_MERGE_PULL_REQUEST_LIST = '/projects/:id/merge_requests'
     API_GITLAB_NOTES = '/projects/:id/merge_requests/:merge_request_iid/notes?page=:page_index'
     API_GITLAB_COMMITS = '/projects/:id/merge_requests/:merge_request_iid/commits'
     API_GITLAB_COMMITS_COMPARE = '/projects/:id/repository/compare'

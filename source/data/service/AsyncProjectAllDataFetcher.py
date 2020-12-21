@@ -54,6 +54,24 @@ class AsyncProjectAllDataFetcher:
                  for pull_number in range(start, max(start - limit, 0), -1)]
         await asyncio.wait(tasks)
 
+    @staticmethod
+    def getProjectAllMergeRequestNum(repo_id, owner, repo):
+        """获取某个项目的最大mr数量  需要项目id
+          这里的owner就是gitlab中的namespace
+          由于异步函数的原因，现在获取的数量保存在了AsuncApiHelper的mr_num里面 2020.12.21
+          @张逸凡
+        """
+        AsyncApiHelper.setRepo(owner, repo)
+        AsyncApiHelper.setRepoId(repo_id)
+
+        """准备工作"""
+        semaphore = asyncio.Semaphore(configPraser.getSemaphore())  # 对速度做出限制
+
+        """异步多协程爬虫爬取pull-request信息"""
+        loop = asyncio.get_event_loop()
+        task = [AsyncApiHelper.fetchMergeRequestNum(semaphore)]
+        loop.run_until_complete(asyncio.wait(task))
+
 
 if __name__ == '__main__':
     # print(sys.argv)
@@ -67,12 +85,15 @@ if __name__ == '__main__':
     #     AsyncProjectAllDataFetcher.getDataForRepository(p[0], p[1], p[2], p[3], p[4])
     # """1. 获取基础数据"""
     # # 格式说明: 项目编号repo_id, namespace, name, 需要爬取的pr数量, pr的结束编号
-    projects = [(3836952, "tezos", "tezos", 50, 2240)]
-    for p in projects:
-        AsyncProjectAllDataFetcher.getDataForRepository(p[0], p[1], p[2], p[3], p[4])
+    # projects = [(3836952, "tezos", "tezos", 50, 2240)]
+    # for p in projects:
+    #     AsyncProjectAllDataFetcher.getDataForRepository(p[0], p[1], p[2], p[3], p[4])
     # projects = [(8817162, "eyeo/adblockplus", "libadblockplus-android", 172, 2363)]
     # for p in projects:
     #     AsyncProjectAllDataFetcher.getDataForRepository(p[0], p[1], p[2], p[3], p[4])
+
+    AsyncProjectAllDataFetcher.getProjectAllMergeRequestNum(3836952, "tezos", "tezos")
+    print(AsyncApiHelper.mr_num)
 
 
 
