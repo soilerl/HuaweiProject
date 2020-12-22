@@ -6,7 +6,7 @@ import pymongo
 from datetime import datetime
 
 import source.utils.ApiUtils as ApiUtils
-import source.database.mongoDB.StringMongoDBUtils as StringMongoDBUtils
+import analyzeData.common as common
 
 from source.utils.StringKeyUtils import StringKeyUtils
 from source.data.service.AsyncApiHelper import AsyncApiHelper
@@ -17,10 +17,13 @@ from source.database.mongoDB.MongoUtil import singleton
 
 class AsyncGetProjectInformationHelper:
 
-    pageIndex = ''
+    # 存放符合要求的mergeRequest的iid
+    mergeRequestIdList = []
 
-    def __init__(self, pageIndex):
+    def __init__(self, pageIndex='', timeTuple=()):
         self.pageIndex =pageIndex
+        #时间限制元组
+        self.timeTuple = timeTuple
 
 
 
@@ -40,27 +43,21 @@ class AsyncGetProjectInformationHelper:
     async def downloadInformation(self, repo_id, semaphore):
         async with semaphore:
             async with aiohttp.ClientSession() as session:
-                api = self.getProjectApi(repo_id)
+                api = self.getOnePageMergeRequestApi(repo_id)
                 jsonList = await ApiUtils.fetchData(session, api)
-                print(len(jsonList))
-                for mergeRequest in jsonList:
+                print(jsonList)
 
-                    singleton.writeIntoDatabase(StringMongoDBUtils.COLLECTION_NAME_MERGEREQUEST, mergeRequest)
-
-    # #校验要写入的mergeRequest是否已经存在
-    # def checkExist(self, mergeRequest={}) -> bool:
-    #     if mergeRequest == None:
-    #         return False
-    #     id = mergeRequest['id']
-    #     id ==
-    def getProjectApi(self, repo_id):
+    def getOnePageMergeRequestApi(self, repo_id):
         api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_MERGE_REQUESTS + \
-              "?scope=all&state=all&page=" + self.pageIndex
+              "?scope=all&state=all&page=" + self.pageIndex + ""
         api = api.replace(StringKeyUtils.STR_GITLAB_REPO_ID, repo_id)
         return api
 
+    # def selectTimeSuitMergeRequest(self, mergeRequestList=[]):
+
+
 if __name__ == '__main__':
-    getParameterHelper = GetInformationOfParameterHelper("https://gitlab.com/tezos/tezos")
+    getParameterHelper = GetInformationOfParameterHelper("https://gitlab.com/tezos/tezos", (2019, 9, 2020, 10))
     projectID = getParameterHelper.getProjectID()
     pages = getParameterHelper.getMergeRequestPages()
     for i in range(1, 3):

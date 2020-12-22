@@ -2,5 +2,6 @@ from flask import Flask
 
 app = Flask(__name__)
 
-@app.route('/getData')
-def getData():
+@app.route('/')
+def hello_world():
+    return 'Hello, World硕大的'

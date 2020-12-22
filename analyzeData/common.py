@@ -2,6 +2,7 @@ import csv
 
 import numpy
 from pandas import DataFrame
+from datetime import datetime
 
 from source.data.bean import MergeRequest, Notes
 import source.utils.pandas.pandasHelper as pandasHelper
@@ -127,6 +128,26 @@ def getTimeListFromTuple(date):
             y = y - 1
         timeList.append((y, m))
     return timeList
+
+#判断传入的时间是否符合时间限制
+def checkTime(time=datetime, timeLimit = ()) -> bool:
+    year = time.year
+    month = time.month
+
+    #时间下限
+    yearDown = timeLimit[0]
+    monthDown = timeLimit[1]
+    #时间上限
+    yearUp = timeLimit[2]
+    monthUp = timeLimit[3]
+    if year >= yearDown and year <= yearUp:
+        if month <= monthUp and month >= monthDown:
+            return True
+        else:
+            return False
+    else:
+        return False
+
 
 
 def getTimeLableFromTime(time_list):
