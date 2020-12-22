@@ -125,7 +125,7 @@ class TimeSpan:
                 """ 获取created """
                 time = mr.created_at[0:10]
                 """ 获取第一个note的时间 """
-                time_fir_nt = self.get_first_note_time(mr.iid)
+                time_fir_nt = self.get_first_note_time(mr.iid, mr.closed_at)
                 """ 获取ended """
                 time_ended = self.get_ended_time(mr)
 
@@ -150,7 +150,7 @@ class TimeSpan:
                 self.ended_rate[index].append(self.ended_mr_num[project][i])
 
 
-    def get_first_note_time(self, mr_iid):
+    def get_first_note_time(self, mr_iid, endtime=None):
         """获取此mr的第一个note的时间
 
         mr_iid:要获取的那个mr

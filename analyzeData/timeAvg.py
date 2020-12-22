@@ -132,26 +132,27 @@ class TimeAvg:
                 head_time = self.get_datetime(mr.created_at)
                 if time in self.merge_request_num[project].keys():
                     """ 获取第一个note的时间 """
-                    time_fir_nt = self.get_first_note_time(mr.iid)
                     # 我们忽略状态为open的pr
                     time_ended = self.get_ended_time(mr)
+
+                    time_fir_nt = self.get_first_note_time(mr.iid, time_ended)
                     if time_ended == self.default_time:
                         continue
                     if time_fir_nt == self.default_time:
                         if time_ended != self.default_time:
                             """ 统计数量 """
                             self.ended_mr_num[project][time] += 1
-                            self.note_time_sum[project][time] += 1
+                            self.note_mr_num[project][time] += 1
                             """ 统计时长 """
                             self.fill_time_sum(project, time, time_ended, head_time, self.note_time_sum)
                             self.fill_time_sum(project, time, time_ended, head_time, self.ended_time_sum)
                     else:
-                        self.opened_mr_num[project][time] += 1
+                        self.note_mr_num[project][time] += 1
                         self.fill_time_sum(project, time, time_fir_nt, head_time, self.note_time_sum)
-                        self.ended_time_sum[project][time] += 1
+                        self.ended_mr_num[project][time] += 1
                         self.fill_time_sum(project, time, time_ended, head_time, self.ended_time_sum)
                         if time_ended != self.default_time:
-                            self.note_mr_num[project][time] += 1
+                            self.opened_mr_num[project][time] += 1
                             self.fill_time_sum(project, time, time_ended, self.get_datetime(time_fir_nt), self.opened_time_sum)
 
             """ 计算每个月平均时长 """
@@ -178,14 +179,14 @@ class TimeAvg:
             time = mr.closed_at
         return time
 
-    def get_first_note_time(self, mr_iid):
+    def get_first_note_time(self, mr_iid, endtime):
         """获取此mr的第一个note的时间
 
         mr_iid:要获取的那个mr
         """
         time = self.default_time
         for note in self.notes:
-            if note.merge_request_id == mr_iid:
+            if note.merge_request_id == mr_iid and endtime > note.created_at:
                 time = min(note.created_at, time)
         return time
 
@@ -205,6 +206,7 @@ class TimeAvg:
         """ 以秒结算填充至对应项目对应月份 """
         try:
             timelist[pj][time] += span_time.days * 86400 + span_time.seconds
+            timelist[pj][time] /= 3600  # 单位还是统一到小时
         except Exception as e:
             print(e)
 

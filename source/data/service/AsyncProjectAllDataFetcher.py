@@ -55,7 +55,7 @@ class AsyncProjectAllDataFetcher:
         await asyncio.wait(tasks)
 
     @staticmethod
-    def getProjectAllMergeRequestNum(repo_id, owner, repo):
+    def getProjectAllMergeRequestNum(repo_id, owner=None, repo=None):
         """获取某个项目的最大mr数量  需要项目id
           这里的owner就是gitlab中的namespace
           由于异步函数的原因，现在获取的数量保存在了AsuncApiHelper的mr_num里面 2020.12.21
@@ -70,6 +70,22 @@ class AsyncProjectAllDataFetcher:
         """异步多协程爬虫爬取pull-request信息"""
         loop = asyncio.get_event_loop()
         task = [AsyncApiHelper.fetchMergeRequestNum(semaphore)]
+        loop.run_until_complete(asyncio.wait(task))
+
+    @staticmethod
+    def getProjectsByGroup(owner):
+        """获取某个group内所有的项目owner, repo, id信息，以三元组形式返回
+          2020.12.22
+          @张逸凡
+        """
+        AsyncApiHelper.setRepo(owner, None)
+
+        """准备工作"""
+        semaphore = asyncio.Semaphore(configPraser.getSemaphore())  # 对速度做出限制
+
+        """异步多协程爬虫爬取pull-request信息"""
+        loop = asyncio.get_event_loop()
+        task = [AsyncApiHelper.fetchProjectsByGroup(semaphore)]
         loop.run_until_complete(asyncio.wait(task))
 
 
@@ -94,6 +110,9 @@ if __name__ == '__main__':
 
     AsyncProjectAllDataFetcher.getProjectAllMergeRequestNum(3836952, "tezos", "tezos")
     print(AsyncApiHelper.mr_num)
+
+    AsyncProjectAllDataFetcher.getProjectsByGroup("tezos")
+    print(AsyncApiHelper.projectList)
 
 
 

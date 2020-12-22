@@ -3,7 +3,7 @@ import os
 
 
 class projectConfig:
-    projectName = 'HuaweiProject'
+    projectName = 'NJU_HUAWEI'
     PATH_CONFIG = 'source' + os.sep + 'config' + os.sep + 'config.txt'
     # PATH_CONFIG = os.sep + 'config.txt'
     PATH_TEST_INPUT_EXCEL = 'data' + os.sep + 'Test200.xlsx'
