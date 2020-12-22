@@ -40,7 +40,7 @@ class AsyncGetProjectInformationHelper:
         tasks = [asyncio.ensure_future(self.downloadInformation(repo_id, semaphore, mergeRequestIidList))]
         await asyncio.wait(tasks)
 
-    #下载数据并写入数据库
+    #下载数据
     async def downloadInformation(self, repo_id, semaphore, mergeRequestIidList=[]):
         async with semaphore:
             async with aiohttp.ClientSession() as session:
@@ -62,17 +62,27 @@ class AsyncGetProjectInformationHelper:
         for mergeRequest in mergeRequestList:
             time = common.tranformStrToDateTime(mergeRequest[StringKeyUtils.STR_KEY_CREATE_AT])
             if common.checkTime(time, self.timeTuple):
-                resIdList.append((mergeRequest[StringKeyUtils.STR_KEY_IID], time))
-            # else:
-            #     if common.che
+                resIdList.append(mergeRequest[StringKeyUtils.STR_KEY_IID])
+            else:
+                if common.checkTimeIsLessThan(time, self.timeTuple):
+                    self.shouldFinish = True
         return resIdList
+
+    #对外暴露的接口，获取某个项目的符合时间限制的所有mergeRequestIid
+    @staticmethod
+    def getMergeRequestIidList(url='', timeLimit=()) -> []:
+        getParameterHelper = GetInformationOfParameterHelper(url)
+        projectID = getParameterHelper.getProjectID()
+        pages = getParameterHelper.getMergeRequestPages()
+        mergeRequestIidList = []
+        for i in range(1, pages + 1):
+            helper = AsyncGetProjectInformationHelper(str(i), timeLimit)
+            helper.getOnePageMergeRequestDataOfProject(projectID, mergeRequestIidList)
+            if helper.shouldFinish:
+                break
+        return mergeRequestIidList
+
 if __name__ == '__main__':
-    getParameterHelper = GetInformationOfParameterHelper("https://gitlab.com/tezos/tezos") #
-    projectID = getParameterHelper.getProjectID()
-    pages = getParameterHelper.getMergeRequestPages()
-    mergeRequestIidList = []
-    for i in range(1, pages+1):
-        helper = AsyncGetProjectInformationHelper(str(i), (2020, 9, 2020, 10))
-        helper.getOnePageMergeRequestDataOfProject(projectID)
-    for iid in mergeRequestIidList:
-        print(iid)
+    arr = AsyncGetProjectInformationHelper.getMergeRequestIidList("https://gitlab.com/tezos/tezos", (2020, 9, 2020, 10))
+    for i in arr:
+        print(i)
