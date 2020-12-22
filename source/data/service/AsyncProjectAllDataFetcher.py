@@ -72,6 +72,22 @@ class AsyncProjectAllDataFetcher:
         task = [AsyncApiHelper.fetchMergeRequestNum(semaphore)]
         loop.run_until_complete(asyncio.wait(task))
 
+    @staticmethod
+    def getProjectsByGroup(owner):
+        """获取某个group内所有的项目owner, repo, id信息，以三元组形式返回
+          2020.12.22
+          @张逸凡
+        """
+        AsyncApiHelper.setRepo(owner, None)
+
+        """准备工作"""
+        semaphore = asyncio.Semaphore(configPraser.getSemaphore())  # 对速度做出限制
+
+        """异步多协程爬虫爬取pull-request信息"""
+        loop = asyncio.get_event_loop()
+        task = [AsyncApiHelper.fetchProjectsByGroup(semaphore)]
+        loop.run_until_complete(asyncio.wait(task))
+
 
 if __name__ == '__main__':
     # print(sys.argv)
@@ -92,8 +108,11 @@ if __name__ == '__main__':
     # for p in projects:
     #     AsyncProjectAllDataFetcher.getDataForRepository(p[0], p[1], p[2], p[3], p[4])
 
-    AsyncProjectAllDataFetcher.getProjectAllMergeRequestNum(3836952, "tezos", "tezos")
-    print(AsyncApiHelper.mr_num)
+    # AsyncProjectAllDataFetcher.getProjectAllMergeRequestNum(3836952, "tezos", "tezos")
+    # print(AsyncApiHelper.mr_num)
+
+    AsyncProjectAllDataFetcher.getProjectsByGroup("tezos")
+    print(AsyncApiHelper.projectList)
 
 
 

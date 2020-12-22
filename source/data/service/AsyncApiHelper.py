@@ -36,6 +36,7 @@ class AsyncApiHelper:
     repo = None
     repo_id = None
     mr_num = 0  # 如果获取了某个项目的merge request的最大数量，放在这里 2020.12.21
+    projectList = None  # 用于存放某个group的项目
 
     @staticmethod
     def setRepo(owner, repo):  # 使用之前设置项目名和所有者
@@ -241,6 +242,24 @@ class AsyncApiHelper:
                         """取第一个，第一个就是最新的mr"""
                         merge_request = await AsyncApiHelper.parserMergeRequest(json[0])
                         AsyncApiHelper.mr_num = merge_request.iid
+
+    @staticmethod
+    async def fetchProjectsByGroup(semaphore):
+        async with semaphore:
+            async with aiohttp.ClientSession() as session:
+                api = AsyncApiHelper.getGroupApi()
+                json = await AsyncApiHelper.fetchBeanData(session, api)
+                print(json)
+                projectList = []
+                if json is not None and isinstance(json, dict):
+                    projectsData = json.get(StringKeyUtils.STR_KEY_PROJECTS)
+                    if projectsData is not None and isinstance(projectsData, list):
+                        for data in projectsData:
+                            project_id = data.get(StringKeyUtils.STR_KEY_ID, None)
+                            project_name = data.get(StringKeyUtils.STR_KEY_PATH, None)
+                            projectList.append((AsyncApiHelper.owner, project_name, project_id))
+                AsyncApiHelper.projectList = projectList
+
 
     @staticmethod
     async def downloadInformation(merge_request_iid, semaphore, statistic):
@@ -495,6 +514,13 @@ class AsyncApiHelper:
     def getMergeRequestListApi():
         api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_MERGE_PULL_REQUEST_LIST
         api = api.replace(StringKeyUtils.STR_GITLAB_REPO_ID, str(AsyncApiHelper.repo_id))
+        return api
+
+    # 根据获取某group的一页项目列表
+    @staticmethod
+    def getGroupApi():
+        api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_GROUP
+        api = api.replace(StringKeyUtils.STR_OWNER, str(AsyncApiHelper.owner))
         return api
 
     @staticmethod
