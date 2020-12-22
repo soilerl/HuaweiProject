@@ -11,7 +11,7 @@ class configPraser:  # 用于解析config.ini文件
     STR_TOKEN = 'token'
     STR_AUTHORIZATION = 'authorization'
     STR_PRIVATE_TOKEN = 'privateToken'
-    STR_DATABASE = 'database'
+    STR_MONGODB = 'mongoDB'
     STR_DEBUG = 'debug'
     STR_PROJECT = 'project'
     STR_NETWORK = 'network'
@@ -20,7 +20,6 @@ class configPraser:  # 用于解析config.ini文件
 
     STR_USERNAME = 'username'
     STR_PASSWORD = 'password'
-    STR_HOST = 'host'
     STR_PRINT = 'print'
     STR_TRUE = 'True'
     STR_RETRY = 'retry'
@@ -40,8 +39,11 @@ class configPraser:  # 用于解析config.ini文件
     STR_COMMIT_FETCH_LOOP = 'commitFetchLoop'
     STR_CHANGE_TRIGGER_BY_LINE = 'changeTriggerByLine'
     STR_JVM_PATH = 'JVMPath'
-    STR_PORT = 'port'
     STR_STANFORD_MODEL_PATH = 'stanfordModelPath'
+
+    STR_HOST = 'host'
+    STR_PORT = 'port'
+    STR_DB_NAME = 'databaseName'
 
     cacheDict = {}  # 用于缓存的字典，防止多次访问拖慢速度
 
@@ -69,29 +71,6 @@ class configPraser:  # 用于解析config.ini文件
         else:
             return temp[random.randint(0, temp.__len__() - 1)]
 
-    @staticmethod
-    def getDataBaseUserName():
-        cp = configparser.ConfigParser()
-        cp.read(projectConfig.getConfigPath())
-        return cp.get(configPraser.STR_DATABASE, configPraser.STR_USERNAME)
-
-    @staticmethod
-    def getDataBasePassword():
-        cp = configparser.ConfigParser()
-        cp.read(projectConfig.getConfigPath())
-        return cp.get(configPraser.STR_DATABASE, configPraser.STR_PASSWORD)
-
-    @staticmethod
-    def getDataBaseHost():
-        cp = configparser.ConfigParser()
-        cp.read(projectConfig.getConfigPath())
-        return cp.get(configPraser.STR_DATABASE, configPraser.STR_HOST)
-
-    @staticmethod
-    def getDataBasePort():
-        cp = configparser.ConfigParser()
-        cp.read(projectConfig.getConfigPath())
-        return cp.get(configPraser.STR_DATABASE, configPraser.STR_PORT)
 
     @staticmethod
     def getPrintMode():
@@ -267,6 +246,24 @@ class configPraser:  # 用于解析config.ini文件
         else:
             return temp
 
+    #封装获取configParser方法
+    @staticmethod
+    def get(keyPre='', key=''):
+        cp = configparser.ConfigParser()
+        cp.read(projectConfig.getConfigPath())
+        return cp.get(keyPre, key)
+
+    @staticmethod
+    def getMongoDBHost():
+        return configPraser.get(configPraser.STR_MONGODB, configPraser.STR_HOST)
+
+    @staticmethod
+    def getMongoDBPort():
+        return configPraser.get(configPraser.STR_MONGODB, configPraser.STR_PORT)
+
+    @staticmethod
+    def getMongoDBDatabaseName():
+        return configPraser.get(configPraser.STR_MONGODB, configPraser.STR_DB_NAME)
 
 if __name__ == '__main__':
     print(configPraser.getPrivateToken())

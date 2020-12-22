@@ -46,9 +46,6 @@ class projectConfig:
     @staticmethod
     def getRootPath():
         curPath = os.path.abspath(os.path.dirname(__file__))
-        print(curPath)
-        # projectName = projectConfig.projectName
-        # rootPath = os.path.join(curPath.split(projectName)[0], projectName)  # 获取myProject，也就是项目的根路径
         return curPath
 
     @staticmethod
@@ -95,9 +92,4 @@ class projectConfig:
         return os.path.join(projectConfig.getRootPath(), projectConfig.PATH_DATA_NOTES)
 
 
-if __name__ == "__main__":
-    print(projectConfig.getRootPath())
-    print(projectConfig.getConfigPath())
-    print(projectConfig.getTestInputExcelPath())
-    print(projectConfig.getDataPath())
-    print(projectConfig.getTestoutputExcelPath())
+

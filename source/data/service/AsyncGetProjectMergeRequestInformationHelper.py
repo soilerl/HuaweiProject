@@ -47,12 +47,12 @@ class AsyncGetProjectInformationHelper:
 
                     singleton.writeIntoDatabase(StringMongoDBUtils.COLLECTION_NAME_MERGEREQUEST, mergeRequest)
 
-    #校验要写入的mergeRequest是否已经存在
-    def checkExist(self, mergeRequest={}) -> bool:
-        if mergeRequest == None:
-            return False
-        id = mergeRequest['id']
-        id ==
+    # #校验要写入的mergeRequest是否已经存在
+    # def checkExist(self, mergeRequest={}) -> bool:
+    #     if mergeRequest == None:
+    #         return False
+    #     id = mergeRequest['id']
+    #     id ==
     def getProjectApi(self, repo_id):
         api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_MERGE_REQUESTS + \
               "?scope=all&state=all&page=" + self.pageIndex

@@ -1,0 +1,1 @@
+1.创建名为 mergeRequests 的集合，在id列上建唯一索引

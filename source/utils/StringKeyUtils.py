@@ -472,3 +472,6 @@ class StringKeyUtils:
     """关键词提取方法"""
     STR_ALGORITHM_HYPER_GRAPH = 'hyper_graph'
     STR_ALGORITHM_ATF_PDF = 'atf_pdf'
+
+    #使用BeautifulSoup分析提取ProjectID时用到的属性
+    DIC_ANALYZE_PROJECT_ID_ATTR = {'data-qa-selector':'project_id_content'}

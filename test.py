@@ -1,5 +1,3 @@
-import time, datetime
-
-timeStamp = 1381419600
-timeArray = time.localtime(timeStamp)
-print(timeArray.tm_year)
+import pymongo
+client = pymongo.MongoClient(host='localhost', port=27017)
+print(client.list_database_names())
