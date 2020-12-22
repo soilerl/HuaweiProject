@@ -60,15 +60,7 @@ def sortTime(time='', notesList=[]) -> []:
 
 # 把字符串的时间转成时间戳
 def tranformStrToTimestamp(timeStr='') -> float:
-    try:
-        if '.' in timeStr:
-            timeStr = timeStr.split(".")[0]
-        else:
-            timeStr = timeStr[:-1]
-        timeArray = datetime.datetime.strptime(timeStr, "%Y-%m-%dT%H:%M:%S")
-    except:
-        print(timeStr)
-    return timeArray.timestamp()
+    return common.tranformStrToDateTime(timeStr).timestamp()
 
 def classifyByTimeByProject(date, projects=[]):
     columns = ["project"]
