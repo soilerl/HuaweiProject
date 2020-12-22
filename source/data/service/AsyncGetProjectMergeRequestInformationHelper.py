@@ -12,7 +12,7 @@ from source.utils.StringKeyUtils import StringKeyUtils
 from source.data.service.AsyncApiHelper import AsyncApiHelper
 from source.config.configPraser import configPraser
 from source.data.service.GetInformationOfParameter import GetInformationOfParameterHelper
-from source.database.mongoDB.MongoUtil import singleton
+# from source.database.mongoDB.MongoUtil import singleton
 
 
 class AsyncGetProjectInformationHelper:
@@ -52,7 +52,7 @@ class AsyncGetProjectInformationHelper:
         if mergeRequest == None:
             return False
         id = mergeRequest['id']
-        id ==
+        # id ==
     def getProjectApi(self, repo_id):
         api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_MERGE_REQUESTS + \
               "?scope=all&state=all&page=" + self.pageIndex
@@ -62,7 +62,8 @@ class AsyncGetProjectInformationHelper:
 if __name__ == '__main__':
     getParameterHelper = GetInformationOfParameterHelper("https://gitlab.com/tezos/tezos")
     projectID = getParameterHelper.getProjectID()
-    pages = getParameterHelper.getMergeRequestPages()
-    for i in range(1, 3):
-        helper = AsyncGetProjectInformationHelper(str(i))
-        helper.getOnePageMergeRequestDataOfProject(projectID)
+    print(projectID)
+    # pages = getParameterHelper.getMergeRequestPages()
+    # for i in range(1, 3):
+    #     helper = AsyncGetProjectInformationHelper(str(i))
+    #     helper.getOnePageMergeRequestDataOfProject(projectID)

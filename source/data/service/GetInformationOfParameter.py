@@ -31,7 +31,7 @@ class GetInformationOfParameterHelper:
     #在html网页中提取ProjectID
     def analyzeProjectID(self, soup=BeautifulSoup) -> str:
         strTemp = []
-        for span in soup.find_all('span', attrs=StringKeyUtils.DIC_ANALYZE_PROJECT_ID_ATTR):
+        for span in soup.find_all('span', attrs={'data-qa-selector': 'project_id_content'}):
             strTemp.append(span.string)
         if len(strTemp) == 1:
             #allStr格式为 Project ID: 3836952
