@@ -55,7 +55,7 @@ class AsyncProjectAllDataFetcher:
         await asyncio.wait(tasks)
 
     @staticmethod
-    def getProjectAllMergeRequestNum(repo_id, owner, repo):
+    def getProjectAllMergeRequestNum(repo_id, owner=None, repo=None):
         """获取某个项目的最大mr数量  需要项目id
           这里的owner就是gitlab中的namespace
           由于异步函数的原因，现在获取的数量保存在了AsuncApiHelper的mr_num里面 2020.12.21
@@ -108,8 +108,8 @@ if __name__ == '__main__':
     # for p in projects:
     #     AsyncProjectAllDataFetcher.getDataForRepository(p[0], p[1], p[2], p[3], p[4])
 
-    # AsyncProjectAllDataFetcher.getProjectAllMergeRequestNum(3836952, "tezos", "tezos")
-    # print(AsyncApiHelper.mr_num)
+    AsyncProjectAllDataFetcher.getProjectAllMergeRequestNum(3836952, "tezos", "tezos")
+    print(AsyncApiHelper.mr_num)
 
     AsyncProjectAllDataFetcher.getProjectsByGroup("tezos")
     print(AsyncApiHelper.projectList)
