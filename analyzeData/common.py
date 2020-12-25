@@ -16,18 +16,30 @@ notesTsv = "../data/file/notes.tsv"
 
 
 def getMergeRequestDataFrameByProject(project) -> DataFrame:
-    # 通用的获取项目数据的接口，所有的指标都是从这个接口拿MergeRequest数据，便于后续服务化  2020.12.14
-    df = pandasHelper.pandasHelper.readTSVFile(
-        projectConfig.projectConfig.getMergeRequestDataPath() + os.sep + f"mergeRequest_{project}.tsv",
-        header=pandasHelper.pandasHelper.INT_READ_FILE_WITH_HEAD)
+    try:
+        # 通用的获取项目数据的接口，所有的指标都是从这个接口拿MergeRequest数据，便于后续服务化  2020.12.14
+        df = pandasHelper.pandasHelper.readTSVFile(
+            projectConfig.projectConfig.getMergeRequestDataPath() + os.sep + f"mergeRequest_{project}.tsv",
+            header=pandasHelper.pandasHelper.INT_READ_FILE_WITH_HEAD)
+    except:
+        columns = ["repository", "id", "iid", "project_id", "title", "description", "state", "created_at", "updated_at",
+                   "merged_by_user_name", "merged_at", "closed_by_user_name", "closed_at", "target_branch",
+                   "source_branch", "author_user_name", "source_project_id", "target_project_id", "sha", "merge_commit_sha",
+                   "squash_commit_sha", "changes_count", "additions", "changes", "deletions", "file_count"]
+        df = DataFrame(columns=columns)
     return df
 
 
 def getNotesDataFrameByProject(project) -> DataFrame:
-    # 通用的获取项目数据的接口，所有的指标都是从这个接口拿Notes数据，便于后续服务化  2020.12.14
-    df = pandasHelper.pandasHelper.readTSVFile(
-        projectConfig.projectConfig.getNotesDataPath() + os.sep + f"notes_{project}.tsv",
-        header=pandasHelper.pandasHelper.INT_READ_FILE_WITH_HEAD)
+    try:
+        # 通用的获取项目数据的接口，所有的指标都是从这个接口拿Notes数据，便于后续服务化  2020.12.14
+        df = pandasHelper.pandasHelper.readTSVFile(
+            projectConfig.projectConfig.getNotesDataPath() + os.sep + f"notes_{project}.tsv",
+            header=pandasHelper.pandasHelper.INT_READ_FILE_WITH_HEAD)
+    except:
+        columns = ["id", "type", "body", "author_user_name", "created_at", "updated_at", "isSystem", "noteable_id",
+                   "noteable_type", "noteable_iid", "change_trigger", "repo", "merge_request_id"]
+        df = DataFrame(columns=columns)
     return df
 
 
@@ -79,15 +91,18 @@ def getMergeRequestInstances(project) -> []:
     # 需要注意重复数据的情况
     df.drop_duplicates(subset=["iid"], inplace=True)
 
-    # 去除状态为closed并且closedtime为空的异常数据
-    df['closed_error_label'] = df.apply(lambda x: x["state"] == "closed" and isinstance(x["closed_at"], float), axis=1)
-    df = df.loc[df['closed_error_label'] == 0].copy(deep=True)
-    df.drop(['closed_error_label'], axis=1, inplace=True)
+    if df.shape[0] > 0:
+        # 去除状态为closed并且closedtime为空的异常数据
+        df['closed_error_label'] = df.apply(lambda x: x["state"] == "closed" and isinstance(x["closed_at"], float),
+                                            axis=1)
+        df = df.loc[df['closed_error_label'] == 0].copy(deep=True)
+        df.drop(['closed_error_label'], axis=1, inplace=True)
 
-    # 去除状态为merged并且mergedtime为空的异常数据
-    df['merged_error_label'] = df.apply(lambda x: x["state"] == "merged" and isinstance(x["merged_at"], float), axis=1)
-    df = df.loc[df['merged_error_label'] == 0].copy(deep=True)
-    df.drop(['merged_error_label'], axis=1, inplace=True)
+        # 去除状态为merged并且mergedtime为空的异常数据
+        df['merged_error_label'] = df.apply(lambda x: x["state"] == "merged" and isinstance(x["merged_at"], float),
+                                            axis=1)
+        df = df.loc[df['merged_error_label'] == 0].copy(deep=True)
+        df.drop(['merged_error_label'], axis=1, inplace=True)
 
     for index, row in df.iterrows():
         t = tuple(row)
