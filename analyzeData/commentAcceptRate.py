@@ -15,7 +15,7 @@ from analyzeData import common
 from source.config.projectConfig import projectConfig
 from source.utils.ExcelHelper import ExcelHelper
 from source.utils.pandas.pandasHelper import pandasHelper
-import matplotlib.pyplot as plt
+
 
 
 class commentAcceptRate:
