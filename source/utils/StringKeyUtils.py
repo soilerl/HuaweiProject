@@ -97,6 +97,7 @@ class StringKeyUtils:
     STR_KEY_IID = 'iid'
     STR_KEY_PROJECT_ID = 'project_id'
     STR_KEY_PROJECT = 'project'
+    STR_KEY_PROJECTS = 'projects'
     STR_KEY_MERGE_REQUEST_V4 = 'mergeRequest'
     STR_KEY_MERGED_BY = 'merged_by'
     STR_KEY_CLOSED_BY = 'closed_by'
@@ -342,6 +343,7 @@ class StringKeyUtils:
     STR_KEY_REFERENCED_EVENT = 'ReferencedEvent'  # commit引用，一般在最后merge到主干前做这个动作
 
     API_GITHUB = 'https://api.github.com'
+    # API_GITLAB = 'https://git.huawei.com/api/v4'  # 华为使用
     API_REVIEWS_FOR_PULL_REQUEST = '/repos/:owner/:repo/pulls/:pull_number/reviews'
     API_PULL_REQUEST_FOR_PROJECT = '/repos/:owner/:repo/pulls'
     API_COMMENTS_FOR_REVIEW = '/repos/:owner/:repo/pulls/:pull_number/reviews/:review_id/comments'
@@ -361,7 +363,9 @@ class StringKeyUtils:
     API_GITLAB = 'https://gitlab.com/api/v4'
     API_GITLAB_GRAPHQL = 'https://gitlab.com/api/graphql'
     API_GITLAB_MERGE_PULL_REQUEST = '/projects/:id/merge_requests/:merge_request_iid'
-    API_GITLAB_NOTES = '/projects/:id/merge_requests/:merge_request_iid/notes'
+    API_GITLAB_MERGE_PULL_REQUEST_LIST = '/projects/:id/merge_requests'
+    API_GITLAB_GROUP = '/groups/:owner'
+    API_GITLAB_NOTES = '/projects/:id/merge_requests/:merge_request_iid/notes?page=:page_index'
     API_GITLAB_COMMITS = '/projects/:id/merge_requests/:merge_request_iid/commits'
     API_GITLAB_COMMITS_COMPARE = '/projects/:id/repository/compare'
     #获取某个项目下的mergeRequest列表
@@ -405,6 +409,7 @@ class StringKeyUtils:
     STR_COMMENT_ID = ':comment_id'
     STR_GITLAB_REPO_ID = ':id'
     STR_GITLAB_MR_NUMBER = ':merge_request_iid'
+    STR_PAGE_INDEX = ':page_index'
 
     STR_PARM_STARE = 'state'
     STR_PARM_ALL = 'all'
@@ -473,5 +478,344 @@ class StringKeyUtils:
     STR_ALGORITHM_HYPER_GRAPH = 'hyper_graph'
     STR_ALGORITHM_ATF_PDF = 'atf_pdf'
 
+<<<<<<< HEAD
     #使用BeautifulSoup分析提取ProjectID时用到的属性
     DIC_ANALYZE_PROJECT_ID_ATTR = {'data-qa-selector':'project_id_content'}
+=======
+
+    """华为项目配置"""
+    # 配置华为的项目信息
+    pps_list = [
+        "PPSADXService",
+        "PPSDSPPerfmService",
+        "PPSBillingService",
+        "PPSSSPService",
+        "PPSDSPPortalService",
+        "PPSDSPService",
+        "PPSOpsService",
+        "PPSCreativeService",
+        "Attributionservice"]
+
+    PPSADXServic_list = [
+        ("ADX", "https://git.huawei.com/open_platform/OpenPlatform_WTS_adx.git"),
+        ("ADXPortal_LF_Dev", "https://git.huawei.com/open_platform/OP_PaidPresentationService_adx-portal.git"),
+        ("PPSADXCreativeService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSADXCreativeService.git"),
+        ("PPSADXCreativeDbScript",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSADXCreativeService.git"),
+        ("PPSADXStaticFileService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSADXStaticFileService.git"),
+        ("AdxOpsPortal", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ADXSerivice_AdxOpsPortal"),
+        ("AdxOpsService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ADXSerivice_AdxOpsService"),
+        ("PPSCreativeProcessService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSCreativeProcessService"),
+        ("SDKServer", "https://git.huawei.com/open_platform/OpenPlatform_WTS_sdkserver.git")]
+
+    PPSDSPPerfmService_list = [
+        ("OCPX_Offline", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ocpx_offline.git"),
+        ("IMS", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ims.git"),
+        ("OcpxService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_DSPServiceCPP.git"),
+        ("ALT_oversea_receive",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSCreativeLibraryService.git"),
+        ("ALT_oversea_send",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSCreativeLibraryService.git"),
+        (
+            "ALT_receive",
+            "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSCreativeLibraryService.git"),
+        ("ALT_send", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSCreativeLibraryService.git"),
+        ("IECService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_IEC.git"),
+        ("IECSService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_IECS.git"),
+        ("ALT_common", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSCreativeLibraryService"),
+        ("PctrLiteOffline",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_BidAdPlatformOffline"),
+        ("PcvrLiteOffline",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_BidAdPlatformOffline"),
+        ("ScoreLiteRule",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_BidAdPlatformOffline"),
+        ("AL_LF_Dev", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSCreativeLibraryService"),
+        ("CDOService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_IECS"),
+        ("PPSFCAppInfoService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_FeatureCenter.git"),
+        ("PPSFCDataPrepService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_FeatureCenter"),
+        ("PPSFCACMInfoService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_FeatureCenter"),
+        ("StatisticFeature",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_FeatureCenter"),
+        ("PPSFCSyncService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_FeatureCenter"),
+        ("TBR", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ims.git"),
+        ("IMS_Person_Log_Processor", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ims.git"),
+        ("IMS_Log_Processor", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ims.git"),
+        ("IMS_Person_Predictor", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ims.git"),
+        ("PPSFCAppBehaviorService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_FeatureCenter.git"),
+        ("PPSDistributedComputationService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPerfm_DistributedComputation"),
+        ("UACService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_UAC"),
+        ("PPSMOEService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_BidAdPlatformOffline"),
+        ("AseRetrievalService", "https://git.huawei.com/open_platform/op_paidpresentationservice_ase"),
+        ("Person_TBR", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ims.git"),
+        ("PcvrOfflineOversea", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ocpx_offline"),
+        ("PcvrServiceOversea", "https://git.huawei.com/open_platform/OP_PaidPresentationService_DSPServiceCPP.git"),
+        ("AcceptModel-offline",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_BidAdPlatformOffline.git"),
+    ]
+
+    PPSBillingService_list = [
+        ("AcceptModel-offline",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_BidAdPlatformOffline.git"),
+        ("CDRServer", "https://git.huawei.com/open_platform/OpenPlatform_WTS_cdrserver.git"),
+        ("ChargeManager", "https://git.huawei.com/open_platform/OpenPlatform_WTS_prediction.git"),
+        ("KafkaConnectHdfsPPS", "https://git.huawei.com/open_platform/OpenPlatform_WTS_prediction.git"),
+        ("OfflineReport", "https://git.huawei.com/open_platform/OpenPlatform_WTS_prediction.git"),
+        ("RealtimeCharge", "https://git.huawei.com/open_platform/OpenPlatform_WTS_prediction.git"),
+        ("RealtimeChargeDbScript", "https://git.huawei.com/open_platform/OpenPlatform_WTS_prediction.git"),
+        ("Settlement", "https://git.huawei.com/KIA/OpenPlatform_WTS_settlement.git"),
+        ("SettlementDbScript", "https://git.huawei.com/KIA/OpenPlatform_WTS_settlement.git"),
+        ("PPSHdfsToDcsService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSBillingService_PPSHdfsToDcsService.git"),
+        ("PPSPersonaService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSBillingService_PPSPersonaService.git"),
+        ("PPSIdMappingService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSBillingService_PPSIdMappingService"),
+        ("PPSDataFoundationService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSBillingService_PPSDataFoundationService"),
+        ("PPSWOIService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSBillingService_WOI"),
+        ("CS", "https://git.huawei.com/open_platform/OpenPlatform_WTS_cs.git")
+    ]
+
+    PPSSSPService_list = [
+        ("PPSSSPPortal", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSSSPPortal.git"),
+        ("PPSSSPService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSSSPService.git"),
+        ("PPSSSPServiceDbScript", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSSSPService.git"),
+        ("PPSSSPServiceWO", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSSSPService_WO"),
+        ("PPSSSPPortal", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSSSPPortal.git"),
+        ("PPSSSPPortal", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSSSPPortal.git"),
+        ("PPSSSPPartnerService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSSSPService_Partner.git"),
+        ("PPSSSPOrchestrationService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSSSPService_Orchestration.git"),
+        ("PPSSSPPartnerServiceInstanceIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSSSPService_IAC"),
+        ("PPSSSPServiceWOInstanceIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSSSPService_IAC"),
+        ("PPSSSPServiceInstanceIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSSSPService_IAC"),
+        ("PPSSSPOrchestrationServiceDB",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSSSPService_Orchestration.git"),
+        ("PPSSSPPartnerServiceDbScript",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSSSPService_Partner.git"),
+    ]
+
+    PPSDSPPortalService_list = [
+        ("PPSAgencyPortal",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSAgencyPortal"),
+        ("PPSDSPPortal_frontend", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortal"),
+        ("PPSChannelPortal", "https://git.huawei.com/open_platform/OpenPlatform_WTS_inapp.git"),
+        ("PPSChannelService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSChannelService.git"),
+        ("PPSChannelServiceDbScript",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSChannelService.git"),
+        ("PPSDSPPortal_frontend", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortal.git"),
+        ("PPSDSPPortal", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortal.git"),
+        ("PPSDSPService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService.git"),
+        ("PPSDSPServiceIACInstance",
+         "https://git.huawei.com/iac/open_platform_iac/OP_PaidPresentationService_PPSDSPService_IAC"),
+        ("PPSDSPServiceDB", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService.git"),
+        ("PPSLogService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSLogService.git"),
+        ("PPSMarketingAPIService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_marketingAPIService"),
+        ("PPSLogServiceDb", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSLogService.git"),
+        ("PPSUserMgtPortal_frontend",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSUserMgtPortal.git"),
+        ("PPSUserMgtPortal", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSUserMgtPortal.git"),
+        ("PPSMarketingAPIServiceIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSDSPPortal_IAC"),
+        ("PPSAgencyPortal_frontend",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSAgencyPortal.git"),
+        ("PPSAgencyPortal",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSAgencyPortal.git"),
+        ("Venusfrontend", "https://git.huawei.com/DevEco/venus/venusfrontend"),
+        ("Venusbackend", "https://git.huawei.com/DevEco/venus/venusbackend"),
+        ("PPSDMPPortalIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSDSPPortal_IAC.git"),
+        ("PPSDSPPortalServiceIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSDSPPortal_IAC.git"),
+        ("PPSAPPManageService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSAPPManageService"),
+        ("PPSMessageService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSMessageService"),
+        ("PPSMessageServiceDB",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSMessageService"),
+        ("PPSAPPManageServiceDB",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSAPPManageService"),
+        ("PPSMessageService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSMessageService"),
+        ("PPSMessageServiceDB",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSMessageService"),
+        ("PPSAPPManageService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSAPPManageService"),
+        ("PPSMetaDataPushService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_PPSMetaDataPushService.git"),
+        ("PPSAPPManageServiceDB",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSAPPManageService"),
+        ("PPSDMPPortal",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSDMPPortal.git"),
+        ("PPSMetaDataPushServiceDb",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_PPSMetaDataPushService.git"),
+        ("PPSPromOpenServiceDB",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSPromOpenService"),
+        ("PPSUserMgtPortal_TW_PPS1",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSUserMgtPortal.git"),
+        ("PPSUserMgtPortal_TW_PPS4",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSUserMgtPortal.git"),
+        ("PPSDSPPortal_TW_PPS4", "https://git.huawei.com/tw-pps4/OP_PaidPresentationService_PPSDSPPortal.git"),
+        ("PPSDSPService_TW_PPS4", "https://git.huawei.com/tw-pps4/OP_PaidPresentationService_PPSDSPService.git"),
+        ("PPSDSPToolsService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPPortalService_PPSDSPToolsService.git"),
+        ("PPSDSPToolsService_TW_PPS4",
+         "https://git.huawei.com/tw-pps4/OP_PaidPresentationService_PPSDSPPortalService_PPSDSPToolsService.git"),
+        ("PPSDMPManage", "https://git.huawei.com/open_platform/OpenPlatform_WTS_inapp.git"),
+    ]
+
+    PPSDSPService_list = [
+        ("AapRetrievalService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_DSPServiceCPP.git"),
+        ("AapService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_DSPServiceCPP.git"),
+        ("ABtestProxy", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ocpx_dcs"),
+        ("PPSFCAseServer", "https://git.huawei.com/open_platform/op_paidpresentationservice_ase.git"),
+        ("PPSFCAseService", "https://git.huawei.com/open_platform/op_paidpresentationservice_ase.git"),
+        ("PPSAseService", "https://git.huawei.com/open_platform/op_paidpresentationservice_ase.git"),
+        ("AseCorrect", "https://git.huawei.com/open_platform/op_paidpresentationservice_ase"),
+        ("ASEService", "https://git.huawei.com/open_platform/op_paidpresentationservice_ase.git"),
+        ("AseSubscribe", "https://git.huawei.com/open_platform/op_paidpresentationservice_ase.git"),
+        ("AudienceSync", "https://git.huawei.com/open_platform/OpenPlatform_WTS_cc.git"),
+        ("BapDataSyncService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_DSPServiceCPP"),
+        ("BapRetrievalService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_DSPServiceCPP.git"),
+        ("BapService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_DSPServiceCPP.git"),
+        ("CM_LF_Dev", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSCreativeLibraryService.git"),
+        ("Connector", "https://git.huawei.com/open_platform/OpenPlatform_WTS_connector.git"),
+        ("Connector3", "https://git.huawei.com/open_platform/OP_PaidPresentationService_Connector3.git"),
+        ("DataStorage",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_DataCollector.git"),
+        ("DeliveryService", "https://git.huawei.com/open_platform/op_paidpresentationservice_ase"),
+        ("DSP", "https://git.huawei.com/open_platform/OpenPlatform_WTS_dsp.git"),
+        ("DspSequence", "https://git.huawei.com/open_platform/OP_PaidPresentationService_DSPServiceCPP.git"),
+        ("IMSPredictorDLComponent",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_IMSPredictorDLComponent"),
+        ("IMSPredictorDLModel",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_IMSPredictorDLModel"),
+        ("AudienceTagging", "https://git.huawei.com/open_platform/OP_PaidPresentationService_AudienceTagging.git"),
+        ("CPPSecurityLibrary", "https://git.huawei.com/open_platform/OP_PaidPresentationService_CPPSecurityLibrary"),
+        ("OCPX-DCS", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ocpx_dcs.git"),
+        ("PersonaSync", "https://git.huawei.com/open_platform/OpenPlatform_WTS_prediction.git"),
+        ("PPSZookeeper", "https://git.huawei.com/open_platform/OP_PaidPresentationService_DSPServiceCPP"),
+        ("RTAService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_RTA"),
+        ("SubscribeService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_DSPServiceCPP.git"),
+        ("BID-DCS", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ocpx_dcs.git"),
+        ("AAP-DCS", "https://git.huawei.com/open_platform/OP_PaidPresentationService_ocpx_dcs.git"),
+        ("PPSDeferredDeepLink",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_DSPService_DeferredDeepLink.git"),
+        ("TargetingService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSDSPService_TargetingService.git"),
+    ]
+
+    PPSOpsService_list = [
+        ("AOSSDbScript", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSAossService.git"),
+        ("Ccbase", "https://git.huawei.com/open_platform/OpenPlatform_WTS_cc.git"),
+        ("CCScript", "https://git.huawei.com/open_platform/OpenPlatform_WTS_cc.git"),
+        ("CommonOpsPortal",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_CommonOpsPortal "),
+        (
+            "CustMgtServiceDbScript",
+            "https://git.huawei.com/open_platform/OP_PaidPresentationService_CustMgtService.git"),
+        ("datacut", "https://git.huawei.com/open_platform/OpenPlatform_WTS_cc.git"),
+        ("InAppAdm", "https://git.huawei.com/open_platform/OpenPlatform_WTS_inapp.git"),
+        ("PPSAossService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSAossService.git"),
+        ("PPSClientFrontend",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_PPSClientService"),
+        ("PPSCustMgtService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_CustMgtService.git"),
+        ("PPSDSPServiceIAC",
+         "https://git.huawei.com/iac/open_platform_iac/OP_PaidPresentationService_PPSDSPService_IAC"),
+        ("PPSOpsCommonServiceDb",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_common"),
+        (
+            "PPSOpsService_common",
+            "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_common"),
+        ("PPSOpsService_UE", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_UE"),
+        ("PPSThirdPartyService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSThirdPartyService.git"),
+        ("PPSMetaDataPushServiceDb",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_OpsDspService.git"),
+        ("PPSThirdPartyServiceIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSOSPService_IAC.git"),
+        ("PPSDSPPortalServiceIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSDSPService_IAC"),
+        ("PPSOpsDSPServiceIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSOSPService_IAC"),
+        ("PPSOpsServiceInstanceIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSOSPService_IAC"),
+        ("PPSOpsCommonServiceIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSOSPService_IAC"),
+        ("CommonOpsPortalIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSOSPService_IAC"),
+        ("PPSOpsUEServiceIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSOSPService_IAC"),
+        ("UEOpsPortalIAC", "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSOSPService_IAC"),
+        ("OpsDspService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_OpsDspService.git"),
+        ("OpsDspPortal",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_OpsDspPortal.git"),
+        ("OpsDspServiceDB",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_OpsDspService"),
+        ("WeService", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_weService"),
+        ("PushUI", "https://git.huawei.com/open_platform/OP_PPSOpsService_pushUI"),
+        ("PushSend", "https://git.huawei.com/open_platform/OpenPlatform_WTS_cc.git"),
+        ("PPSAuditService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_OpsAuditService"),
+        ("OpsAuditPortal",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_OpsAuditPortal"),
+        ("UEOpsPortal", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSOpsService_UEOpsPortal")
+    ]
+
+    PPSCreativeService_list = [
+        ("CreativeTool", "https://git.huawei.com/open_platform/OP_PPSCreativeService_Creative.git"),
+        ("CreativeTool_DB", "https://git.huawei.com/open_platform/OP_PPSCreativeService_Creative.git"),
+        ("PPSCreativeServiceIAC",
+         "https://git.huawei.com/IAC/Open_Platform_IAC/OP_PaidPresentationService_PPSCreativeService_IAC"),
+        ("CreativeService", "https://git.huawei.com/open_platform/OP_PPSCreativeService_Creative.git"),
+    ]
+
+    Attributionservice_list = [
+        ("ALT_oversea_receive",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSCreativeLibraryService.git"),
+        ("ALT_oversea_send",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSCreativeLibraryService.git"),
+        (
+            "ALT_receive",
+            "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSCreativeLibraryService.git"),
+        ("ALT_send", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSCreativeLibraryService.git"),
+        ("ALT_common", "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSCreativeLibraryService"),
+        ("PPSAttributionService_Matching_IAC1",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSAttributionService_Matching"),
+        ("PPSAttributionService_Commons",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSAttributionService_Commons"),
+        ("PPSAttributionService_MediaEventService",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSAttributionService_MediaEventService"),
+        ("PPSAttributionService_Matching",
+         "https://git.huawei.com/open_platform/OP_PaidPresentationService_PPSAttributionService_Matching")
+    ]
+
+    HW_CloudPlantform_Projectname = ["WiseCloudIMService",
+                                     "WiseCloudHotaService",
+                                     "WiseCloudMediaHostingService",
+                                     "WiseCloudSNService",
+                                     "WiseCloudContentCommunityService"]
+
+    HW_CloudPlantform_ProjectURL = [
+        "https://git.huawei.com/CloudPlatform/CloudPlatform_SocialIMPlatform_SocialIM_Platform",
+        "https://git.huawei.com/CloudPlatform/cp_wisecontent_wisecloudhotaservice",
+        "https://git.huawei.com/CloudPlatform/WiseCloudContentCenterService",
+        "https://git.huawei.com/CloudPlatform/CP_WiseCloudSNService.git",
+        "https://git.huawei.com/CloudPlatform/WiseCloud_UserConnPlatform_Service"]
+>>>>>>> 15aea558989b1075694541c2255a118662f1d0d7

@@ -21,12 +21,17 @@ class pandasHelper:
     @staticmethod
     def readTSVFile(fileName, header=INT_READ_FILE_WITHOUT_HEAD, sep=StringKeyUtils.STR_SPLIT_SEP_TSV, low_memory=True,
                     encoding='utf-8'):  # 负一为无表头
+<<<<<<< HEAD
         try:
             train = pandas.read_csv(fileName, sep=sep, header=header, low_memory=low_memory, encoding=encoding)
             return train
         except Exception as e:
             print(fileName)
             raise e
+=======
+        train = pandas.read_csv(fileName, sep=sep, header=header, low_memory=low_memory, encoding=encoding)
+        return train
+>>>>>>> 15aea558989b1075694541c2255a118662f1d0d7
 
     @staticmethod
     def toDataFrame(data, columns=None, dtype=None):

@@ -81,6 +81,8 @@ class commentDensity:
 
 if __name__ == '__main__':
     d = commentDensity()
-    d.calculateCommentDensityByProject(["tezos"], (2020, 7, 2020, 9))
+    d.calculateCommentDensityByProject(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
     changes_density_df = d.getNotesChangesDensityByProject()
+    print(changes_density_df)
     files_density_df = d.getNotesFilesDensityByProject()
+    print(files_density_df)

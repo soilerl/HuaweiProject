@@ -61,7 +61,7 @@ class commentDistribution:
             df_notes.sort_values(by='merge_request_id', ascending=False, inplace=True)
             print(df_notes.shape)
 
-            df_notes['label'] = df_notes["created_at"].apply(lambda x: (time.strptime(x, "%Y-%m-%dT%H:%M:%SZ")))
+            df_notes['label'] = df_notes["created_at"].apply(lambda x: (time.strptime(x[0:19], "%Y-%m-%dT%H:%M:%S")))
             df_notes['label_y'] = df_notes['label'].apply(lambda x: x.tm_year)
             df_notes['label_m'] = df_notes['label'].apply(lambda x: x.tm_mon)
             df_notes['label_d'] = df_notes['label'].apply(lambda x: x.tm_mday)
@@ -179,32 +179,45 @@ class commentDistribution:
                     tempDict[str(i)] = df_fre_map.get((p, d, i), 0)
                 result_df = result_df.append(tempDict, ignore_index=True)
             print(result_df)
+            # 在我的 notebook 里，要设置下面两行才能显示中文
+            plt.rcParams['font.family'] = ['Times New Roman']
+            # 如果是在 PyCharm 里，只要下面一行，上面的一行可以删除
+            plt.rcParams['font.sans-serif'] = ['Times New Roman']
+            result_df[list(result_df.columns)] = result_df[list(result_df.columns)].astype(float)
             plt.subplot(210 + 1 + index)
-            ax = seaborn.heatmap(result_df, annot=True, square=True, yticklabels=range(0, 7), xticklabels=range(0, 24),
+            # plt.xlabel("hour")
+            # plt.ylabel("weekday")
+            ax = seaborn.heatmap(result_df, annot=True, square=True, yticklabels=["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+                                 , xticklabels=[x for x in range(0, 24)], fmt=".20g",
                                  cmap='GnBu')
             ax.set_title(p)
         plt.show()
 
 
 if __name__ == "__main__":
-    # baseDf = commentDistribution.commentDistributionByProject(['tezos'], (2019, 9, 2020, 11))
+    # baseDf = commentDistribution.commentDistributionByProject(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
+    # """时间和周的交叉详细统计，描述看文档"""
     # """计算的df写入xlsx"""
     # fileName = "project_index.xls"
     # sheetName = "commentDistributionALL"
     # print(baseDf)
     # ExcelHelper().writeDataFrameToExcel(fileName, sheetName, baseDf)
     #
-    # df = commentDistribution.commentDistributionByProjectWithWeekDay(['tezos'], (2019, 9, 2020, 11), baseDf)
+    # df = commentDistribution.commentDistributionByProjectWithWeekDay(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12), baseDf)
+    # """周的单独统计，描述看文档"""
     # """计算的df写入xlsx"""
     # fileName = "project_index.xls"
     # sheetName = "commentDistributionByWeekday"
     # print(df)
     # ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
     #
-    # df = commentDistribution.commentDistributionByProjectWithInterval(['tezos'], (2019, 9, 2020, 11), baseDf)
+    # df = commentDistribution.commentDistributionByProjectWithInterval(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12), baseDf)
+    # """时间的单独统计，描述看文档"""
     # """计算的df写入xlsx"""
     # fileName = "project_index.xls"
     # sheetName = "commentDistributionByInterval"
     # print(df)
     # ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
-    commentDistribution.commentDistributionByProjectWithWeekDayAndInterval(['tezos', 'veloren'], (2019, 9, 2020, 11))
+
+    """绘制项目在时间和周维度上面的评审分布的热力图，由于布局的要求，项目的列表只能选择1~2个项目，不然不好看"""
+    commentDistribution.commentDistributionByProjectWithWeekDayAndInterval(['libadblockplus-android'], (2019, 9, 2020, 12))

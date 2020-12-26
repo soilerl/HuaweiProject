@@ -8,6 +8,7 @@
 import os
 import time
 
+import numpy
 import pandas
 from pandas import DataFrame
 
@@ -38,6 +39,8 @@ class commentCount:
             df_notes.drop_duplicates(subset=['id'], inplace=True, keep="last")
             df_notes.sort_values(by='merge_request_id', ascending=False, inplace=True)
             print(df_notes.shape)
+            #
+            # data = df_notes
 
             df_mr = common.getMergeRequestDataFrameByProject(project)
             df_mr.dropna(subset=["iid"], inplace=True)
@@ -55,6 +58,7 @@ class commentCount:
 
             data = pandas.merge(left=df_notes, right=df_mr, left_on="merge_request_id", right_on="iid")
             data['label'] = data["created_at_y"].apply(lambda x: (time.strptime(x, "%Y-%m-%dT%H:%M:%S.%fZ")))
+            # data['label'] = data["created_at"].apply(lambda x: (time.strptime(x, "%Y-%m-%dT%H:%M:%S.%f%z"))) 华为备用
             data['label_y'] = data['label'].apply(lambda x: x.tm_year)
             data['label_m'] = data['label'].apply(lambda x: x.tm_mon)
 
@@ -65,14 +69,18 @@ class commentCount:
             for y, m in common.getTimeListFromTuple(date):
                 df = data.loc[(data['label_y'] == y) & (data['label_m'] == m)].copy(deep=True)
                 commentCount = df.shape[0]
+                mrCount = list(set(df['iid'])).__len__()
                 t = common.getTimeLableFromTime([(y, m)])[0]
-                tempDict[t] = commentCount
+                if mrCount > 0:
+                    tempDict[t] = commentCount / mrCount
+                else:
+                    tempDict[t] = numpy.NAN
             result_df = result_df.append(tempDict, ignore_index=True)
         return result_df
 
 if __name__ == "__main__":
-    df = commentCount.commentCountByProject(['meltano', 'tezos', 'veloren'], (2019, 9, 2020, 12))
+    df = commentCount.commentCountByProject(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
-    sheetName = "commentAcceptRatio"
+    sheetName = "commentCount"
     ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)

@@ -128,19 +128,8 @@ class commentAcceptRate:
 
         print(df_mr.shape)
 
-        # x = range(-2, 11)
-        # y = []
-        # for i in x:
-        #     y.append(df_notes.loc[df_notes['change_trigger'] == i].shape[0])
-        # plt.bar(x=x, height=y)
-        # plt.title(f'review comment({project})')
-        # for a, b in zip(x, y):
-        #     plt.text(a, b, '%.0f' % b, ha='center', va='bottom', fontsize=11)
-        #
-        # print("review comment useful:", df_notes.shape[0] - df_notes.loc[df_notes['change_trigger'] < 0].shape[0])
-        # plt.show()
-
         data = pandas.merge(left=df_notes, right=df_mr, left_on="merge_request_id", right_on="iid")
+        # data['label'] = data["created_at_y"].apply(lambda x: (time.strptime(x, "%Y-%m-%dT%H:%M:%S.%f%z")))  # 华为备用
         data['label'] = data["created_at_y"].apply(lambda x: (time.strptime(x, "%Y-%m-%dT%H:%M:%S.%fZ")))
         data['label_y'] = data['label'].apply(lambda x: x.tm_year)
         data['label_m'] = data['label'].apply(lambda x: x.tm_mon)
@@ -194,8 +183,8 @@ class commentAcceptRate:
 
 
 if __name__ == "__main__":
-    df = commentAcceptRate.commentAcceptRatioByProject(["tezos"], (2020, 7, 2020, 9))
+    df = commentAcceptRate.commentAcceptRatioByProject(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
     """计算的df写入xlsx"""
-    fileName = "project_index.xlsx"
+    fileName = "project_index.xls"
     sheetName = "commentAcceptRatio"
     ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)

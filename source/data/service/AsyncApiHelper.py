@@ -35,6 +35,8 @@ class AsyncApiHelper:
     owner = None
     repo = None
     repo_id = None
+    mr_num = 0  # 如果获取了某个项目的merge request的最大数量，放在这里 2020.12.21
+    projectList = None  # 用于存放某个group的项目
 
     @staticmethod
     def setRepo(owner, repo):  # 使用之前设置项目名和所有者
@@ -229,6 +231,37 @@ class AsyncApiHelper:
             return json.get(StringKeyUtils.STR_KEY_DIFFS, None)
 
     @staticmethod
+    async def fetchMergeRequestNum(semaphore):
+        async with semaphore:
+            async with aiohttp.ClientSession() as session:
+                api = AsyncApiHelper.getMergeRequestListApi()
+                json = await AsyncApiHelper.fetchBeanData(session, api)
+                print(json)
+                if json is not None and isinstance(json, list):
+                    if json.__len__() > 0:
+                        """取第一个，第一个就是最新的mr"""
+                        merge_request = await AsyncApiHelper.parserMergeRequest(json[0])
+                        AsyncApiHelper.mr_num = merge_request.iid
+
+    @staticmethod
+    async def fetchProjectsByGroup(semaphore):
+        async with semaphore:
+            async with aiohttp.ClientSession() as session:
+                api = AsyncApiHelper.getGroupApi()
+                json = await AsyncApiHelper.fetchBeanData(session, api)
+                print(json)
+                projectList = []
+                if json is not None and isinstance(json, dict):
+                    projectsData = json.get(StringKeyUtils.STR_KEY_PROJECTS)
+                    if projectsData is not None and isinstance(projectsData, list):
+                        for data in projectsData:
+                            project_id = data.get(StringKeyUtils.STR_KEY_ID, None)
+                            project_name = data.get(StringKeyUtils.STR_KEY_PATH, None)
+                            projectList.append((AsyncApiHelper.owner, project_name, project_id))
+                AsyncApiHelper.projectList = projectList
+
+
+    @staticmethod
     async def downloadInformation(merge_request_iid, semaphore, statistic):
         """获取一个项目 单个merge-request 相关的信息"""
 
@@ -270,14 +303,21 @@ class AsyncApiHelper:
 
                         change_sha = commitList[0].id
 
-                        api = AsyncApiHelper.getNotesApi(merge_request_iid)
-                        json = await AsyncApiHelper.fetchBeanData(session, api)
-                        print(json)
-
+                        page_index = 1
                         nodesList = []
-                        if json is not None and isinstance(json, list):
-                            nodesList = await AsyncApiHelper.parserNotes(json)
-
+                        isMorePage = True
+                        while isMorePage:
+                            api = AsyncApiHelper.getNotesApi(merge_request_iid, page_index)
+                            json = await AsyncApiHelper.fetchBeanData(session, api)
+                            print(json)
+                            if json is not None and isinstance(json, list):
+                                nodesList.extend(await AsyncApiHelper.parserNotes(json))
+                                if (json.__len__()) < 20:
+                                    isMorePage = False
+                                else:
+                                    page_index += 1
+                            else:
+                                isMorePage = False
                         for nodes in nodesList:
                             nodes.merge_request_id = merge_request_iid
                             if nodes.position is not None:
@@ -299,7 +339,6 @@ class AsyncApiHelper:
 
                     statistic.lock.acquire()
                     statistic.usefulRequestNumber += usefulMergeRequestsCount
-
 
                     print("useful pull request:", statistic.usefulRequestNumber,
                           " useful review:", statistic.usefulReviewNumber,
@@ -462,12 +501,26 @@ class AsyncApiHelper:
         api = StringKeyUtils.API_GITLAB_GRAPHQL
         return api
 
-    #根据iid获取用于爬取的api
+    # 根据iid获取用于爬取的api
     @staticmethod
     def getMergeRequestApi(merge_request_iid):
         api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_MERGE_PULL_REQUEST
         api = api.replace(StringKeyUtils.STR_GITLAB_REPO_ID, str(AsyncApiHelper.repo_id))
         api = api.replace(StringKeyUtils.STR_GITLAB_MR_NUMBER, str(merge_request_iid))
+        return api
+
+    # 根据获取某项目的一页mergeRequest列表
+    @staticmethod
+    def getMergeRequestListApi():
+        api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_MERGE_PULL_REQUEST_LIST
+        api = api.replace(StringKeyUtils.STR_GITLAB_REPO_ID, str(AsyncApiHelper.repo_id))
+        return api
+
+    # 根据获取某group的一页项目列表
+    @staticmethod
+    def getGroupApi():
+        api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_GROUP
+        api = api.replace(StringKeyUtils.STR_OWNER, str(AsyncApiHelper.owner))
         return api
 
     @staticmethod
@@ -477,10 +530,11 @@ class AsyncApiHelper:
         return api
 
     @staticmethod
-    def getNotesApi(merge_request_iid):
+    def getNotesApi(merge_request_iid, page_index):
         api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_NOTES
         api = api.replace(StringKeyUtils.STR_GITLAB_REPO_ID, str(AsyncApiHelper.repo_id))
         api = api.replace(StringKeyUtils.STR_GITLAB_MR_NUMBER, str(merge_request_iid))
+        api = api.replace(StringKeyUtils.STR_PAGE_INDEX, str(page_index))
         return api
 
     @staticmethod
@@ -490,17 +544,15 @@ class AsyncApiHelper:
         api = api.replace(StringKeyUtils.STR_GITLAB_MR_NUMBER, str(merge_request_iid))
         return api
 
-
-
     @staticmethod
     async def fetchBeanData(session, api, isMediaType=False):
         """异步获取数据通用接口（重要）"""
 
         """初始化请求头"""
         headers = {}
-        #设置agent
+        # 设置agent
         headers = AsyncApiHelper.getUserAgentHeaders(headers)
-        #设置Token
+        # 设置Token
         headers = AsyncApiHelper.getPrivateTokensHeaders(headers)  # 现在用token好似有点问题 先注释掉 2020.10.7
 
         while True:

@@ -3,6 +3,9 @@ import datetime, time
 import source.data.service.BeanParserHelper as bp
 import source.data.bean.MergeRequest as mr
 from pandas import DataFrame
+
+from source.utils.ExcelHelper import ExcelHelper
+
 """计算评审意见反馈时间"""
 
 
@@ -62,7 +65,7 @@ def sortTime(time='', notesList=[]) -> []:
 def tranformStrToTimestamp(timeStr='') -> float:
     return common.tranformStrToDateTime(timeStr).timestamp()
 
-def classifyByTimeByProject(date, projects=[]):
+def classifyByTimeByProject(projects, date):
     columns = ["project"]
     columns.extend(common.getTimeLableFromTime(common.getTimeListFromTuple(date)))
     replyTimeDf = DataFrame(columns=columns)
@@ -101,6 +104,8 @@ def classifyByTimeByProject(date, projects=[]):
 if __name__ == '__main__':
     project = "tezos"
 
-    classifyByTimeByProject(["tezos"], (2020, 7, 2020, 9))
-    # for i in res:
-    #     print(res)
+    df = classifyByTimeByProject(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
+    """计算的df写入xlsx"""
+    fileName = "project_index.xls"
+    sheetName = "calReplyTime"
+    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
