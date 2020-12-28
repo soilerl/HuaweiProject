@@ -207,6 +207,7 @@ class TimeAvg:
         try:
             timelist[pj][time] += span_time.days * 86400 + span_time.seconds
             timelist[pj][time] /= 3600  # 单位还是统一到小时
+            return
         except Exception as e:
             print(e)
 
@@ -228,7 +229,7 @@ class TimeAvg:
 
 
 if __name__ == '__main__':
-    ta = TimeAvg(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
+    ta = TimeAvg(['tezos'], (2019, 9, 2020, 12))
     df1 = ta.get_df_ended_time_avg()
     print(df1)
     print('f')

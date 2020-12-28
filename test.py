@@ -1,3 +1,7 @@
-import pymongo
-client = pymongo.MongoClient(host='localhost', port=27017)
-print(client.list_database_names())
+class test:
+    t = 2
+    def test(self):
+        print(self.t)
+
+t = test()
+t.test()

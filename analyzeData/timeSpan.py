@@ -200,7 +200,7 @@ class TimeSpan:
 
 
 if __name__ == '__main__':
-    ts = TimeSpan(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
+    ts = TimeSpan(['tezos'], (2019, 9, 2020, 12))
     df = ts.get_df_no_note_count()
     """计算的df写入xlsx"""
     fileName = "project_index1.xls"
