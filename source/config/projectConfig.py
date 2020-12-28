@@ -46,14 +46,11 @@ class projectConfig:
     @staticmethod
     def getRootPath():
         curPath = os.path.abspath(os.path.dirname(__file__))
-<<<<<<< HEAD
-        return curPath
-=======
         # print(curPath)
         projectName = projectConfig.projectName
         rootPath = os.path.join(curPath.split(projectName)[0], projectName)  # 获取myProject，也就是项目的根路径
         return rootPath
->>>>>>> 15aea558989b1075694541c2255a118662f1d0d7
+
 
     @staticmethod
     def getConfigPath():
