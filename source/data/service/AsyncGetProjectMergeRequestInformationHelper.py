@@ -49,18 +49,8 @@ class AsyncGetProjectInformationHelper:
                 idList = self.selectTimeSuitMergeRequest(jsonList)
                 mergeRequestIidList.extend(idList)
 
-<<<<<<< HEAD
     def getOnePageMergeRequestApi(self, repo_id):
-        #默认按照created_at排序
-=======
-    #校验要写入的mergeRequest是否已经存在
-    def checkExist(self, mergeRequest={}) -> bool:
-        if mergeRequest == None:
-            return False
-        id = mergeRequest['id']
-        # id ==
-    def getProjectApi(self, repo_id):
->>>>>>> 15aea558989b1075694541c2255a118662f1d0d7
+        # 默认按照created_at排序
         api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_MERGE_REQUESTS + \
               "?scope=all&state=all&page=" + self.pageIndex
         api = api.replace(StringKeyUtils.STR_GITLAB_REPO_ID, repo_id)
@@ -93,11 +83,9 @@ class AsyncGetProjectInformationHelper:
         return mergeRequestIidList
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     arr = AsyncGetProjectInformationHelper.getMergeRequestIidList("https://gitlab.com/tezos/tezos", (2020, 9, 2020, 10))
     for i in arr:
         print(i)
-=======
     getParameterHelper = GetInformationOfParameterHelper("https://gitlab.com/tezos/tezos")
     projectID = getParameterHelper.getProjectID()
     print(projectID)
@@ -105,4 +93,4 @@ if __name__ == '__main__':
     # for i in range(1, 3):
     #     helper = AsyncGetProjectInformationHelper(str(i))
     #     helper.getOnePageMergeRequestDataOfProject(projectID)
->>>>>>> 15aea558989b1075694541c2255a118662f1d0d7
+

@@ -100,10 +100,10 @@ if __name__ == '__main__':
     # for p in projects:
     #     AsyncProjectAllDataFetcher.getDataForRepository(p[0], p[1], p[2], p[3], p[4])
     # """1. 获取基础数据"""
-    # # 格式说明: 项目编号repo_id, namespace, name, 需要爬取的pr数量, pr的结束编号
-    # projects = [(3836952, "tezos", "tezos", 50, 2240)]
-    # for p in projects:
-    #     AsyncProjectAllDataFetcher.getDataForRepository(p[0], p[1], p[2], p[3], p[4])
+    #格式说明: 项目编号repo_id, namespace, name, 需要爬取的pr数量, pr的结束编号
+    projects = [(3836952, "tezos", "tezos", 50, 2240)]
+    for p in projects:
+        AsyncProjectAllDataFetcher.getDataForRepository(p[0], p[1], p[2], p[3], p[4])
     # projects = [(8817162, "eyeo/adblockplus", "libadblockplus-android", 172, 2363)]
     # for p in projects:
     #     AsyncProjectAllDataFetcher.getDataForRepository(p[0], p[1], p[2], p[3], p[4])
