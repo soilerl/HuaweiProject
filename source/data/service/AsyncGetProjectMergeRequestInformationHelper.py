@@ -30,6 +30,8 @@ class AsyncGetProjectInformationHelper:
 
     #获取项目一页的MergeRequest的信息
     def getOnePageMergeRequestDataOfProject(self, projectId, mergeRequestIidList=[]):
+        new_loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(new_loop)
         loop = asyncio.get_event_loop()
         task = [asyncio.ensure_future(self.preProcess(projectId, mergeRequestIidList))]
         tasks = asyncio.gather(*task)
