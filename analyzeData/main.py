@@ -26,12 +26,8 @@ from source.utils.StringKeyUtils import StringKeyUtils as sku
 
 
 
-    #跑所有的指标
-def runAllIndex(cProject_list=[], DATE=()):
-    cProject_list = ["tezos"]
-    DATE = (2019, 9, 2020, 11)
 
-    # cProject_list = getDataFromExcel()
+    #跑所有指标
 def runAllIndex(cProject_list=[], DATE=()):
     cProject_list = ["tezos"]
     DATE = (2019, 9, 2020, 11)
