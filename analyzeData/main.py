@@ -14,15 +14,14 @@ from source.utils.StringKeyUtils import StringKeyUtils as sku
 
 
 
-def getDataFromExcel():
-    excel = xlrd.open_workbook(r'PPS9个服务去重整理.xlsx')
-    sheet = excel.sheet_by_name('de_duplicates')
-    spnameList = sheet.col_values(2)[1:]
-    dic = {}
-    for spname in spnameList:
-        dic[spname] = 1
-    return list(dic.keys())
-
+# def getDataFromExcel():
+#     excel = xlrd.open_workbook(r'PPS9个服务去重整理.xlsx')
+#     sheet = excel.sheet_by_name('de_duplicates')
+#     spnameList = sheet.col_values(2)[1:]
+#     dic = {}
+#     for spname in spnameList:
+#         dic[spname] = 1
+#     return list(dic.keys())
 
 
 
@@ -32,6 +31,10 @@ def runAllIndex(cProject_list=[], DATE=()):
     cProject_list = ["tezos"]
     DATE = (2019, 9, 2020, 11)
 
+    # cProject_list = getDataFromExcel()
+def runAllIndex(cProject_list=[], DATE=()):
+    cProject_list = ["tezos"]
+    DATE = (2019, 9, 2020, 11)
     df = commentAcceptRate.commentAcceptRatioByProject(cProject_list, DATE)
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
