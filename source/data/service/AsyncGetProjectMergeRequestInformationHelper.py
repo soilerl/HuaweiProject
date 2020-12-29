@@ -49,8 +49,10 @@ class AsyncGetProjectInformationHelper:
                 idList = self.selectTimeSuitMergeRequest(jsonList)
                 mergeRequestIidList.extend(idList)
 
+
+
+
     def getOnePageMergeRequestApi(self, repo_id):
-        # 默认按照created_at排序
         api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_MERGE_REQUESTS + \
               "?scope=all&state=all&page=" + self.pageIndex
         api = api.replace(StringKeyUtils.STR_GITLAB_REPO_ID, repo_id)
