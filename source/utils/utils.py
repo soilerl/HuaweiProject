@@ -33,10 +33,12 @@ def getRepoFromUrl(url='') -> str:
 def getOwnerFromUrl(url='') -> str:
     owner = url.split('/')[-2]
     return owner
+#根据owner和仓库名获取ProjectId
+def getProjectIdByOwnerAndRepo(owner='', repoName=''):
+    projectId = owner + r"%2F" + repoName
+    return projectId
 
 
 
 if __name__ == '__main__':
-    # mergeRequestFileExistAndDelete("tezos")
-    notesFileExistAndDelete("tezos")
-
+    print(getProjectIdByOwnerAndRepo("ss", "aa"))

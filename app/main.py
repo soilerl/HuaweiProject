@@ -20,8 +20,7 @@ def getData():
     owner = utils.getOwnerFromUrl(url)
     mergeRequestIidList = AsyncGetProjectInformationHelper.getMergeRequestIidList(url, date)
 
-    helper = GetInformationOfParameterHelper(url)
-    projectId = helper.getProjectID()
+    projectId = utils.getProjectIdByOwnerAndRepo(owner, repo)
 
     mergeRequestIidList.sort()
     limit = mergeRequestIidList[-1] - mergeRequestIidList[0]

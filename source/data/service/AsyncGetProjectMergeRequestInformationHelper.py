@@ -20,8 +20,8 @@ class AsyncGetProjectInformationHelper:
     #一页里含有的mergeRequest的数量
     numberOfMergeRequestInOnePage = 20
 
-    def __init__(self, pageIndex='', timeTuple=()):
-        self.pageIndex =pageIndex
+    def __init__(self, pageIndex, timeTuple=()):
+        self.pageIndex = pageIndex
         #时间限制元组
         self.timeTuple = timeTuple
         #判断是否应该停止爬取mergeRequest列表
@@ -48,6 +48,9 @@ class AsyncGetProjectInformationHelper:
             async with aiohttp.ClientSession() as session:
                 api = self.getOnePageMergeRequestApi(repo_id)
                 jsonList = await ApiUtils.fetchData(session, api)
+                if jsonList == None or len(jsonList) < self.numberOfMergeRequestInOnePage:
+                    self.shouldFinish = True
+                    print("获取mergeRequest列表完成，最后pageIndex为：" + self.pageIndex)
                 idList = self.selectTimeSuitMergeRequest(jsonList)
                 mergeRequestIidList.extend(idList)
 
@@ -56,7 +59,7 @@ class AsyncGetProjectInformationHelper:
 
     def getOnePageMergeRequestApi(self, repo_id):
         api = StringKeyUtils.API_GITLAB + StringKeyUtils.API_GITLAB_MERGE_REQUESTS + \
-              "?scope=all&state=all&page=" + self.pageIndex
+              "?scope=all&state=all&page=" + str(self.pageIndex)
         api = api.replace(StringKeyUtils.STR_GITLAB_REPO_ID, repo_id)
         return api
 
@@ -77,22 +80,24 @@ class AsyncGetProjectInformationHelper:
     def getMergeRequestIidList(url='', timeLimit=()) -> []:
         getParameterHelper = GetInformationOfParameterHelper(url)
         projectID = getParameterHelper.getProjectID()
-        pages = getParameterHelper.getMergeRequestPages()
+        # pages = getParameterHelper.getMergeRequestPages()
+        pageIndex = 1
         mergeRequestIidList = []
-        for i in range(1, pages + 1):
-            helper = AsyncGetProjectInformationHelper(str(i), timeLimit)
+        while True:
+            helper = AsyncGetProjectInformationHelper(pageIndex, timeLimit)
             helper.getOnePageMergeRequestDataOfProject(projectID, mergeRequestIidList)
             if helper.shouldFinish:
                 break
+            pageIndex += 1
         return mergeRequestIidList
 
 if __name__ == '__main__':
-    arr = AsyncGetProjectInformationHelper.getMergeRequestIidList("https://gitlab.com/tezos/tezos", (2020, 9, 2020, 10))
-    for i in arr:
-        print(i)
-    getParameterHelper = GetInformationOfParameterHelper("https://gitlab.com/tezos/tezos")
-    projectID = getParameterHelper.getProjectID()
-    print(projectID)
+    arr = AsyncGetProjectInformationHelper.getMergeRequestIidList("https://gitlab.com/tezos/tezos", (2000, 9, 2020, 10))
+    # for i in arr:
+    #     print(i)
+    # getParameterHelper = GetInformationOfParameterHelper("https://gitlab.com/tezos/tezos")
+    # projectID = getParameterHelper.getProjectID()
+    # print(projectID)
     # pages = getParameterHelper.getMergeRequestPages()
     # for i in range(1, 3):
     #     helper = AsyncGetProjectInformationHelper(str(i))
