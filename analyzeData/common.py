@@ -1,10 +1,13 @@
 import calendar
 import csv
+import time
 
 import numpy
 import pandas
 from pandas import DataFrame
 from datetime import datetime
+
+from pandas._libs.tslib import Timestamp
 
 from source.data.bean import MergeRequest, Notes
 import source.utils.pandas.pandasHelper as pandasHelper
@@ -13,6 +16,8 @@ import source.config.projectConfig as projectConfig
 from source.data.service.BeanParserHelper import BeanParserHelper
 
 # 文件路径
+from source.utils.ExcelHelper import ExcelHelper
+
 mergeRequestTsv = "../data/file/mergeRequest.tsv"
 notesTsv = "../data/file/notes.tsv"
 
@@ -89,17 +94,20 @@ def getMergeRequestInstances(project) -> []:
 
     if df.shape[0] > 0:
         # 去除状态为closed并且closedtime为空的异常数据
-        df['closed_error_label'] = df.apply(lambda x: x["state"] == "closed" and isinstance(x["closed_at"], float), axis=1)
+        df['closed_error_label'] = df.apply(lambda x: x["state"] == "closed" and isinstance(x["closed_at"], float),
+                                            axis=1)
         df = df.loc[df['closed_error_label'] == 0].copy(deep=True)
         df.drop(['closed_error_label'], axis=1, inplace=True)
 
         # 去除状态为closed并且closedtime小于createTime的异常数据
-        df['closed_error_label'] = df.apply(lambda x: x["state"] == "closed" and x["closed_at"] < x["created_at"], axis=1)
+        df['closed_error_label'] = df.apply(lambda x: x["state"] == "closed" and x["closed_at"] < x["created_at"],
+                                            axis=1)
         df = df.loc[df['closed_error_label'] == 0].copy(deep=True)
         df.drop(['closed_error_label'], axis=1, inplace=True)
 
         # 去除状态为merged并且mergedtime为空的异常数据
-        df['merged_error_label'] = df.apply(lambda x: x["state"] == "merged" and isinstance(x["merged_at"], float), axis=1)
+        df['merged_error_label'] = df.apply(lambda x: x["state"] == "merged" and isinstance(x["merged_at"], float),
+                                            axis=1)
         df = df.loc[df['merged_error_label'] == 0].copy(deep=True)
         df.drop(['merged_error_label'], axis=1, inplace=True)
 
@@ -143,7 +151,8 @@ def getTimeListFromTuple(date):
         timeList.append((y, m))
     return timeList
 
-#检查给定时间是否晚于限制时间
+
+# 检查给定时间是否晚于限制时间
 def checkTimeIsMoreThan(time=datetime, timeLimit=()) -> bool:
     # 时间上限
     yearUp = timeLimit[2]
@@ -160,7 +169,9 @@ def checkTimeIsMoreThan(time=datetime, timeLimit=()) -> bool:
             return False
     else:
         return False
-#检查时间是否早于限制时间
+
+
+# 检查时间是否早于限制时间
 def checkTimeIsLessThan(time=datetime, timeLimit=()) -> bool:
     year = time.year
     month = time.month
@@ -179,14 +190,18 @@ def checkTimeIsLessThan(time=datetime, timeLimit=()) -> bool:
     else:
         return False
 
-#判断传入的时间是否符合时间限制
+
+# 判断传入的时间是否符合时间限制
 def checkTime(time=datetime, timeLimit=()) -> bool:
+    if not isinstance(time, Timestamp):  # 新增类型判断 2020.12.30
+        return False
     if checkTimeIsMoreThan(time, timeLimit):
         return False
     elif checkTimeIsLessThan(time, timeLimit):
         return False
     else:
         return True
+
 
 # 把字符串转成Datetime格式
 def tranformStrToDateTime(timeStr='') -> datetime:
@@ -261,7 +276,95 @@ def getDayLabelFromTime(time_list):
     return time_label
 
 
+def getParticipantCount(project, date):
+    """给定一个项目名字 和时间范围四元组
+    返回项目涉及参与开发的人数"""
+    df_notes = getNotesDataFrameByProject(project)
+    df_notes.drop_duplicates(subset=['id'], inplace=True, keep="last")
+    df_notes.sort_values(by='merge_request_id', ascending=False, inplace=True)
+
+    df_mr = getMergeRequestDataFrameByProject(project)
+    df_mr.dropna(subset=["iid"], inplace=True)
+
+    """日期修补"""
+    for index, row in df_mr.iterrows():
+        if row["created_at"] is None:
+            row["created_at"] = row["merged_at"]
+
+    df_mr = df_mr[["iid", "created_at", 'author_user_name']].copy(deep=True)
+    df_mr["iid"] = df_mr["iid"].apply(lambda x: int(x))
+    df_mr.drop_duplicates(subset=['iid'], inplace=True)
+
+    data = pandas.merge(left=df_notes, right=df_mr, left_on="merge_request_id", right_on="iid")
+    data['label'] = data["created_at_y"].apply(lambda x: tranformStrToDateTime(x))  # 用日期转化的兼容方法
+    data['label'] = data["label"].apply(lambda x: checkTime(x, date))  # 过滤时间段
+    data = data.loc[data['label'] == 1].copy(deep=True)
+
+    print(data.shape)
+    userList = []  # 统计参与用户列表
+    userList.extend(data['author_user_name_x'])
+    userList.extend(data['author_user_name_y'])
+    userList = list(set(userList))
+    return userList.__len__()
+
+
+def modifyIndexByProjectUserScale(filename, sheetname, date):
+    """提供一个excel文件和对应的sheet名称.
+       提供希望统计项目人数的时间范围，
+    对目标sheet上面的指标做人数的加权处理(现在是人数的相除)"""
+
+    # 注： 要结合指标的场景使用，必须是常用的条状excel表格可以计算
+    # 现在由于解决项目稀疏问题，人为的指定项目的时间范围
+
+    sheet = ExcelHelper().readExcelSheet(filename, sheetname)
+    print(sheet)
+
+    nrows = sheet.nrows
+    ncols = sheet.ncols
+    cols = sheet.row_values(0)
+    df = pandas.DataFrame(columns=cols)
+
+    # 先统计项目参与人数加权
+    projectList = []  # 项目名字列表
+    projectScaleList = []  # 项目参与人数列表
+    projectRatioList = []  # 加权因子列表
+    maxNum = -1
+    for i in range(1, nrows):
+        project = sheet.cell(i, 0).value
+        projectList.append(project)
+        projectScale = getParticipantCount(project, date)
+        if maxNum < projectScale:
+            maxNum = projectScale
+        projectScaleList.append(projectScale)
+
+    """先人数归一化，作为x计算   
+       =>  e^(-x)
+    """
+
+    for index, project in enumerate(projectList):
+        ratio = projectScaleList[index] / maxNum
+        ratio = numpy.exp(-1 * ratio)
+        projectRatioList.append(ratio)
+
+    for i in range(1, nrows):
+        row = sheet.row_values(i)
+        print(row)
+        tempDict = {cols[0]: row[0]}
+        for j in range(1, ncols):
+            v = row[j]
+            if v != "" and not numpy.isnan(v):
+                tempDict[cols[j]] = v * projectRatioList[i-1]
+            else:
+                tempDict[cols[j]] = v  # 否则不变
+        df = df.append(tempDict, ignore_index=True)
+    print(df.shape)
+
+    # 添加结果到新的sheet
+    newSheetName = f"{sheetname}_ratio"
+    ExcelHelper().writeDataFrameToExcel(filename, newSheetName, df)
+
 
 if __name__ == "__main__":
-    print(getTimeLableFromTime([(2020,9),(2020,10)]))
-
+    # getParticipantCount('tezos', (2019, 9, 2020, 11))
+    filename = projectConfig.projectConfig.getRootPath() + os.sep + 'analyzeData' + os.sep + 'project_index.xls'
+    modifyIndexByProjectUserScale(filename, 'commentAcceptRatio', (2019, 9, 2020, 11))
