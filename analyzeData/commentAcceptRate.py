@@ -5,6 +5,7 @@
 # @Version：V 0.1
 # @File : commentAcceptRate.py
 # @desc :
+import datetime
 import os
 import time
 
@@ -29,12 +30,15 @@ class commentAcceptRate:
            如（2019,10,2020,11） 是闭区间
         """
         columns = ["project"]
-        timeList = common.getTimeListFromTuple(date)
-        columns.extend(common.getTimeLableFromTime(timeList))
+        timeList = common.getDayTimeListFromTuple(date)
+        columns.extend(common.getDayTimeLableFromTime(timeList))
 
         result_df = DataFrame(columns=columns)  # 用于存储最后结果的 dataframe
 
+        res_df = []
+
         for project in projects:
+            res_df.append(project)
             df_notes = common.getNotesDataFrameByProject(project)
             df_notes.drop_duplicates(subset=['id'], inplace=True, keep="last")
             df_notes.sort_values(by='merge_request_id', ascending=False, inplace=True)
@@ -71,6 +75,7 @@ class commentAcceptRate:
             data['label'] = data["created_at_y"].apply(lambda x: (time.strptime(x, "%Y-%m-%dT%H:%M:%S.%fZ")))
             data['label_y'] = data['label'].apply(lambda x: x.tm_year)
             data['label_m'] = data['label'].apply(lambda x: x.tm_mon)
+            data['label_d'] = data['label'].apply(lambda x: x.tm_mday)
 
             data = data.loc[data["change_trigger"] != -2].copy(deep=True)
 
@@ -84,28 +89,39 @@ class commentAcceptRate:
             # date = (minYear, minMonth, maxYear, maxMonth)
             tempDict = {"project": project}
 
-            for i in range(date[0] * 12 + date[1], date[2] * 12 + date[3] + 1):  # 拆分的数据做拼接
-                y = int((i - i % 12) / 12)
-                m = i % 12
-                if m == 0:
-                    m = 12
-                    y = y - 1
-
-                df = data.loc[(data['label_y'] == y) & (data['label_m'] == m)].copy(deep=True)
+            startDate = datetime.date(date[0], date[1], date[2])
+            endDate = datetime.date(date[3], date[4], date[5])
+            # for i in range(date[0] * 12 + date[1], date[2] * 12 + date[3] + 1):  # 拆分的数据做拼接
+            #     y = int((i - i % 12) / 12)
+            #     m = i % 12
+            #     if m == 0:
+            #         m = 12
+            #         y = y - 1
+            son = 0
+            par = 0
+            for n in common.date_range(startDate, endDate):
+                y = n.year
+                m = n.month
+                d = n.day
+                df = data.loc[(data['label_y'] == y) & (data['label_m'] == m) & (date['label_d'] == d)].copy(deep=True)
                 commentCount = df.shape[0]
                 if commentCount == 0:
                     pass
                 else:
                     validCount = df.loc[df['change_trigger'] >= 0].shape[0]
-                    t = common.getTimeLableFromTime([(y, m)])[0]
+                    t = common.getDayTimeLableFromTime([(y, m, d)])[0]
                     # tempDict[f'{y}年{m}月'] = validCount / commentCount
                     tempDict[t] = validCount / commentCount
+                    son += validCount
+                    par += commentCount
             result_df = result_df.append(tempDict, ignore_index=True)
 
             print(result_df.shape)
             # result_df.to_excel("q5_change_trigger_ratio.xls")
 
-        return result_df
+            res_df.append(son/par)
+
+        return pandas.DataFrame(res_df)
 
     @staticmethod
     def commentAcceptRatioByReviewer(project):
@@ -183,7 +199,7 @@ class commentAcceptRate:
 
 
 if __name__ == "__main__":
-    df = commentAcceptRate.commentAcceptRatioByProject(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
+    df = commentAcceptRate.commentAcceptRatioByProject(['tezos'], (2019, 9, 2, 2019, 10, 3))
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "commentAcceptRatio"

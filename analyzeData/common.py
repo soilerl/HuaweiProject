@@ -5,7 +5,7 @@ import time
 import numpy
 import pandas
 from pandas import DataFrame
-from datetime import datetime
+import datetime
 
 from pandas._libs.tslib import Timestamp
 
@@ -152,6 +152,19 @@ def getTimeListFromTuple(date):
     return timeList
 
 
+def getDayTimeListFromTuple(date):
+    timeList = []
+    start_date = datetime.date(date[0], date[1], date[2])
+    end_date = datetime.date(date[3], date[4], date[5])
+    for n in date_range(start_date, end_date):
+        timeList.append((n.year, n.month, n.day))
+    return timeList
+
+
+def date_range(start_date,end_date):
+    for n in range(int((end_date-start_date).days)):
+        yield start_date+datetime.timedelta(n)
+
 # 检查给定时间是否晚于限制时间
 def checkTimeIsMoreThan(time=datetime, timeLimit=()) -> bool:
     # 时间上限
@@ -216,6 +229,17 @@ def tranformStrToDateTime(timeStr='') -> datetime:
     return timeArray
 
 
+def tranformStrToDateTimeDay(timeStr='') -> datetime:
+    try:
+        if '.' in timeStr:
+            timeStr = timeStr.split(".")[0]
+        else:
+            timeStr = timeStr[:-1]
+        timeArray = datetime.strptime(timeStr, "%Y-%m-%d")
+    except:
+        print(timeStr)
+    return timeArray
+
 def getDayListFromTuple(date):
     """输入一个时间的四元组，返回一个时间列表,粒度精确到日期
        如输入: (2020, 1, 2020, 2)
@@ -250,6 +274,23 @@ def getTimeLableFromTime(time_list):
             timeStr = timeStr + "-" + str(time[1])
         time_label.append(timeStr)
 
+    return time_label
+
+
+def getDayTimeLableFromTime(time_list):
+    time_label = []
+    for time in time_list:
+        timeStr = str(time[0])
+        if time[1] < 10:
+            timeStr = timeStr + "-0" + str(time[1])
+        else:
+            timeStr = timeStr + "-" + str(time[1])
+
+        if time[2] < 10:
+            timeStr = timeStr + "-0" + str(time[2])
+        else:
+            timeStr = timeStr + "-" + str(time[2])
+        time_label.append(timeStr)
     return time_label
 
 

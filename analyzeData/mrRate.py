@@ -1,4 +1,6 @@
 # _*_ coding: utf-8 _*_
+import copy
+
 import pandas as pd
 import datetime
 
@@ -38,6 +40,10 @@ class MergeRequestRate:
     closed_rate = []  # closed的比例
     opened_rate = []  # opened的比例
 
+    merged_rate_ver = []
+    closed_rate_ver = []
+    opened_rate_ver = []
+
     default_time = '9999-99'
 
     def __init__(self, projects, date):
@@ -69,6 +75,10 @@ class MergeRequestRate:
             self.closed_rate.append([project])
             self.opened_rate.append([project])
 
+            self.merged_rate_ver.append([project])
+            self.closed_rate_ver.append([project])
+            self.opened_rate_ver.append([project])
+
             self.set_pj_lists(project)
 
     def set_pj_lists(self, project):
@@ -84,9 +94,9 @@ class MergeRequestRate:
     def set_tm(self, date):
         """ 设置时间列表 """
 
-        self.time_list = common.getTimeListFromTuple(date)
-        self.time_label = common.getTimeLableFromTime(self.time_list)
-        self.head_label = common.getTimeLableFromTime(self.time_list)
+        self.time_list = common.getDayTimeListFromTuple(date)
+        self.time_label = common.getDayTimeLableFromTime(self.time_list)
+        self.head_label = copy.deepcopy(self.time_label)
         self.head_label.insert(0, 'project')
 
     def set_pj(self, projects):
@@ -116,7 +126,7 @@ class MergeRequestRate:
 
             """ 对三种状态下的mr数量进行统计 """
             for mr in self.merge_request:
-                time = mr.created_at[0:7]
+                time = mr.created_at[0:10]
                 if time in self.merge_request_num[project].keys():
                     self.merge_request_num[project][time] += 1
                     if mr.state == 'merged':
@@ -127,6 +137,10 @@ class MergeRequestRate:
                         self.opened_mr_num[project][time] += 1
 
             """ 对三种状态下的mr比例进行统计 """
+            mer = 0
+            clo = 0
+            ope = 0
+            tot = 0
             for i in self.merge_request_num[project].keys():
                 sum = self.merge_request_num[project][i]
                 if sum != 0:
@@ -138,6 +152,16 @@ class MergeRequestRate:
                     self.closed_rate[index].append(None)
                     self.opened_rate[index].append(None)
 
+                tot += sum
+                mer += self.merged_mr_num[project][i]
+                clo += self.closed_mr_num[project][i]
+                ope += self.opened_mr_num[project][i]
+
+            self.merged_rate_ver[index].append(mer / tot)
+            self.closed_rate_ver[index].append(clo / tot)
+            self.opened_rate_ver[index].append(ope / tot)
+
+
     def get_df_merged_rate(self):
         return pd.DataFrame(self.merged_rate, columns=self.head_label)
 
@@ -147,23 +171,32 @@ class MergeRequestRate:
     def get_df_opened_rate(self):
         return pd.DataFrame(self.opened_rate, columns=self.head_label)
 
+    def get_df_mer(self):
+        return pd.DataFrame(self.merged_rate_ver)
+
+    def get_df_clo(self):
+        return pd.DataFrame(self.closed_rate_ver)
+
+    def get_df_ope(self):
+        return pd.DataFrame(self.opened_rate_ver)
+
 
 if __name__ == '__main__':
-    mrRate = MergeRequestRate(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
-    df = mrRate.get_df_closed_rate()
+    mrRate = MergeRequestRate(['tezos'], (2019, 9, 2, 2020, 1, 4))
+    df = mrRate.get_df_clo()
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "mrClosedRatio"
-    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
+    # ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
 
-    df = mrRate.get_df_opened_rate()
+    df = mrRate.get_df_ope()
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "mrOpenedRatio"
-    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
+    # ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
 
-    df = mrRate.get_df_merged_rate()
+    df = mrRate.get_df_mer()
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "mrMergedRatio"
-    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
+    # ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)

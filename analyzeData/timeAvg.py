@@ -1,4 +1,6 @@
 # _*_ coding: utf-8 _*_
+import copy
+
 import pandas as pd
 import datetime
 
@@ -41,6 +43,10 @@ class TimeAvg:
     note_time_avg = []
     ended_time_avg = []  # 各个月的平均时长
 
+    opened_time_avg_ver = []
+    note_time_avg_ver = []
+    ended_time_avg_ver = []
+
     default_time = '9999-99'
 
     def __init__(self, projects, date):
@@ -76,6 +82,10 @@ class TimeAvg:
             self.note_time_avg.append([project])
             self.ended_time_avg.append([project])
 
+            self.opened_time_avg_ver.append([project])
+            self.note_time_avg_ver.append([project])
+            self.ended_time_avg_ver.append([project])
+
             self.set_pj_lists(project)
 
     def set_pj_lists(self, project):
@@ -95,9 +105,9 @@ class TimeAvg:
     def set_tm(self, date):
         """ 设置时间列表 """
 
-        self.time_list = common.getTimeListFromTuple(date)
-        self.time_label = common.getTimeLableFromTime(self.time_list)
-        self.head_label = common.getTimeLableFromTime(self.time_list)
+        self.time_list = common.getDayTimeListFromTuple(date)
+        self.time_label = common.getDayTimeLableFromTime(self.time_list)
+        self.head_label = copy.deepcopy(self.time_label)
         self.head_label.insert(0, 'project')
 
     def set_pj(self, projects):
@@ -128,7 +138,7 @@ class TimeAvg:
 
             """ 统计数量与时长 """
             for mr in self.merge_request:
-                time = mr.created_at[0:7]
+                time = mr.created_at[0:10]
                 head_time = self.get_datetime(mr.created_at)
                 if time in self.merge_request_num[project].keys():
                     """ 获取第一个note的时间 """
@@ -155,11 +165,28 @@ class TimeAvg:
                             self.opened_mr_num[project][time] += 1
                             self.fill_time_sum(project, time, time_ended, self.get_datetime(time_fir_nt), self.opened_time_sum)
 
+            ope = 0
+            note = 0
+            end = 0
+            ope_tot = 0
+            note_tot = 0
+            end_tot = 0
             """ 计算每个月平均时长 """
             for i in self.merge_request_num[project].keys():
                 self.cal_avg(self.opened_time_avg[index], self.opened_time_sum[project][i], self.opened_mr_num[project][i])
                 self.cal_avg(self.note_time_avg[index], self.note_time_sum[project][i], self.note_mr_num[project][i])
                 self.cal_avg(self.ended_time_avg[index], self.ended_time_sum[project][i], self.ended_mr_num[project][i])
+
+                ope += self.opened_time_sum[project][i]
+                note += self.note_time_sum[project][i]
+                end += self.ended_time_sum[project][i]
+                ope_tot += self.opened_mr_num[project][i]
+                note_tot += self.note_mr_num[project][i]
+                end_tot += self.ended_mr_num[project][i]
+
+            self.opened_time_avg_ver[index].append(ope / ope_tot)
+            self.note_time_avg_ver[index].append(note / note_tot)
+            self.ended_time_avg_ver[index].append(end / end_tot)
 
     def cal_avg(self, content, son, parent):
         if parent != 0:
@@ -227,9 +254,18 @@ class TimeAvg:
     def get_df_ended_time_avg(self):
         return pd.DataFrame(self.ended_time_avg, columns=self.head_label)
 
+    def get_df_ope(self):
+        return pd.DataFrame(self.opened_time_avg_ver)
+
+    def get_df_note(self):
+        return pd.DataFrame(self.note_time_avg_ver)
+
+    def get_df_end(self):
+        return pd.DataFrame(self.ended_time_avg_ver)
+
 
 if __name__ == '__main__':
-    ta = TimeAvg(['tezos'], (2019, 9, 2020, 12))
+    ta = TimeAvg(['tezos'], (2019, 9, 2, 2020, 1, 4))
     df1 = ta.get_df_ended_time_avg()
     print(df1)
     print('f')

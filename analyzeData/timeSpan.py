@@ -1,4 +1,6 @@
 # _*_ coding: utf-8 _*_
+import copy
+
 import pandas
 import pandas as pd
 import datetime
@@ -88,9 +90,9 @@ class TimeSpan:
         """ 设置时间列表 """
 
         """粒度换成了day"""
-        self.time_list = common.getDayListFromTuple(date)
-        self.time_label = common.getDayLabelFromTime(self.time_list)
-        self.head_label = common.getDayLabelFromTime(self.time_list)
+        self.time_list = common.getDayTimeListFromTuple(date)
+        self.time_label = common.getDayTimeLableFromTime(self.time_list)
+        self.head_label = copy.deepcopy(self.time_label)
         self.head_label.insert(0, 'project')
 
     def set_pj(self, projects):
@@ -200,7 +202,7 @@ class TimeSpan:
 
 
 if __name__ == '__main__':
-    ts = TimeSpan(['tezos'], (2019, 9, 2020, 12))
+    ts = TimeSpan(['tezos'], (2019, 9, 2, 2020, 1, 4))
     df = ts.get_df_no_note_count()
     """计算的df写入xlsx"""
     fileName = "project_index1.xls"
