@@ -137,8 +137,7 @@ def classifyByTimeByProjectHong(projects, date):
 
 if __name__ == '__main__':
     project = "tezos"
-
-    df = classifyByTimeByProject(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
+    df = classifyByTimeByProject(['tezos'], (2019, 9, 2020, 12))
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "calReplyTime"

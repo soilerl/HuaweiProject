@@ -152,5 +152,8 @@ def runAllIndex(cProject_list=[], DATE=()):
 
     print("all finished！")
 
+if __name__ == "__main__":
+    runAllIndex()
+
 
 
