@@ -139,6 +139,40 @@ def classifyByTimeByProject(projects, date):
         replyTimeDf = replyTimeDf.append(resDict, ignore_index=True)
     return replyTimeDf
 
+def classifyByTimeByProjectHong(projects, date):
+    columns = ["project"]
+    columns.extend(common.getTimeLableFromTime(common.getTimeListFromTuple(date)))
+    replyTimeDf = DataFrame(columns=columns)
+    for project in projects:
+        mergeRequestMap = common.getMergeRequestMap(project)
+        notesMap = common.getNotesMap(project)
+        data, res = calTime(mergeRequestMap, notesMap)
+        replyTimeDict = {}
+        for y, m in common.getTimeListFromTuple(date):
+            for index in range(len(data)):
+                # 第一个数据是created_at，以created_at归入
+                timeArray = time.localtime(data[index][0])
+                if timeArray.tm_year == y and timeArray.tm_mon == m:
+                    key = common.getTimeLableFromTime([(y, m)])[0]
+                    if key in replyTimeDict.keys():
+                        replyTimeDict[key].append(res[index])
+                    else:
+                        replyTimeDict[key] = []
+                        replyTimeDict[key].append(res[index])
+        resDict = {}
+        for k, v in replyTimeDict.items():
+
+            sonSum = 0
+            parSum = 0
+            for d in v:
+                for i in d:
+                    sonSum += i
+                parSum += len(d)
+            av = sonSum / parSum
+            resDict[k] = av
+        resDict["project"] = project
+        replyTimeDf = replyTimeDf.append(resDict, ignore_index=True)
+    return replyTimeDf
 
 if __name__ == '__main__':
     project = "tezos"
