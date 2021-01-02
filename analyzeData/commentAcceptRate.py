@@ -18,6 +18,7 @@ from source.utils.pandas.pandasHelper import pandasHelper
 
 import analyzeData.calReplyTime as calReplyTime
 
+
 class commentAcceptRate:
     """专门用于计算评审意见认可度的工具函数"""
 
@@ -181,9 +182,69 @@ class commentAcceptRate:
         print(ratio_df.shape)
         # ratio_df.to_excel("q5_change_trigger_ratio.xls")
 
+    @staticmethod
+    def commentAcceptRatioByProjectVersion(project, dateList):
+        """计算以项目为粒度的评审意见认可度，通过时间来划分
+           project: 指定某个项目
+           dateList: 是列表，列表元素
+                     有两个部分，第一个部分是版本名字，第二个部分是时间六元组
+                     四元组，指定计算指标的开始时间和结束时间 （minYear, minMonth, minDay, maxYear, maxMonth, minDay）
+                     [("v1", (2020, 1, 1, 2020, 2, 1)), ("v2", (2020, 2, 1, 2020, 3, 1))]
+        """
+        columns = ["project"]
+        versionList, timeMap = common.getVersionFromTuple(dateList)
+        columns.extend(versionList)
+
+        result_df = DataFrame(columns=columns)  # 用于存储最后结果的 dataframe
+
+        df_notes = common.getNotesDataFrameByProject(project)
+        df_notes.drop_duplicates(subset=['id'], inplace=True, keep="last")
+        df_notes.sort_values(by='merge_request_id', ascending=False, inplace=True)
+        print(df_notes.shape)
+
+        df_mr = common.getMergeRequestDataFrameByProject(project)
+
+        df_mr.dropna(subset=["iid"], inplace=True)
+
+        """日期修补"""
+        for index, row in df_mr.iterrows():
+            if row["created_at"] is None:
+                row["created_at"] = row["merged_at"]
+
+        df_mr = df_mr[["iid", "created_at"]].copy(deep=True)
+        df_mr["iid"] = df_mr["iid"].apply(lambda x: int(x))
+        df_mr.drop_duplicates(subset=['iid'], inplace=True)
+
+        print(df_mr.shape)
+
+        data = pandas.merge(left=df_notes, right=df_mr, left_on="merge_request_id", right_on="iid")
+        data['time'] = data["created_at_y"].apply(lambda x: (time.strptime(x[0:10], "%Y-%m-%d")))
+
+        data = data.loc[data["change_trigger"] != -2].copy(deep=True)
+
+        tempDict = {"project": project}
+        for v in versionList:
+            df = data.copy(deep=True)
+            df['label'] = df["time"].apply(lambda x: common.checkDateTimeInGap(x, timeMap[v]))
+            df = df.loc[df['label'] > 0].copy(deep=True)
+            commentCount = df.shape[0]
+            if commentCount == 0:
+                pass
+            else:
+                validCount = df.loc[df['change_trigger'] >= 0].shape[0]
+                tempDict[v] = validCount / commentCount
+        result_df = result_df.append(tempDict, ignore_index=True)
+
+        print(result_df.shape)
+
+        return result_df
+
 
 if __name__ == "__main__":
-    df = commentAcceptRate.commentAcceptRatioByProject(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
+    df = commentAcceptRate.commentAcceptRatioByProjectVersion('tezos', [("v1", (2020, 7, 20, 2020, 9, 1)),
+                                                                        ("v2", (2020, 9, 1, 2020, 10, 9)),
+                                                                        ("v3", (2020, 10, 9, 2020, 11, 14)),
+                                                                        ("v4", (2020, 11, 14, 2020, 12, 4))])
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "commentAcceptRatio"

@@ -5,7 +5,7 @@ import time
 import numpy
 import pandas
 from pandas import DataFrame
-from datetime import datetime
+import datetime
 
 from pandas._libs.tslib import Timestamp
 
@@ -152,8 +152,42 @@ def getTimeListFromTuple(date):
     return timeList
 
 
+def getDayTimeListFromTuple(date):
+    timeList = []
+    start_date = datetime.date(date[0], date[1], date[2])
+    end_date = datetime.date(date[3], date[4], date[5])
+    for n in date_range(start_date, end_date):
+        timeList.append((n.year, n.month, n.day))
+    return timeList
+
+
+def date_range(start_date, end_date):
+    for n in range(int((end_date-start_date).days)):
+        yield start_date + datetime.timedelta(n)
+
+
+def getVersionFromTuple(dateList):
+    """输入一个[(v2, (2020, 1,1,2020,2,1))]的列表，返回版本列表和映射map
+       如输入: [(v2, (2020, 1,1,2020,2,1))]
+       输出：["v2"],{"v2":(2020, 1, 1, 2020, 2 1)}
+    """
+    versionList = []
+    timeMap = {}
+    for v, date in dateList:
+        versionList.append(v)
+        timeMap[v] = date
+    return versionList, timeMap
+
+
+def checkDateTimeInGap(targetTime, gap):
+    startYear, startMonth, startDay, endYear, endMonth, endDay = gap
+    startTime = time.strptime(f"{startYear}-{startMonth}-{startDay}", "%Y-%m-%d")
+    endTime = time.strptime(f"{endYear}-{endMonth}-{endDay}", "%Y-%m-%d")
+    return startTime < targetTime <= endTime  # 左不含，右含
+
+
 # 检查给定时间是否晚于限制时间
-def checkTimeIsMoreThan(time=datetime, timeLimit=()) -> bool:
+def checkTimeIsMoreThan(time=datetime.datetime, timeLimit=()) -> bool:
     # 时间上限
     yearUp = timeLimit[2]
     monthUp = timeLimit[3]
@@ -172,7 +206,7 @@ def checkTimeIsMoreThan(time=datetime, timeLimit=()) -> bool:
 
 
 # 检查时间是否早于限制时间
-def checkTimeIsLessThan(time=datetime, timeLimit=()) -> bool:
+def checkTimeIsLessThan(time=datetime.datetime, timeLimit=()) -> bool:
     year = time.year
     month = time.month
 
@@ -192,7 +226,7 @@ def checkTimeIsLessThan(time=datetime, timeLimit=()) -> bool:
 
 
 # 判断传入的时间是否符合时间限制
-def checkTime(time=datetime, timeLimit=()) -> bool:
+def checkTime(time=datetime.datetime, timeLimit=()) -> bool:
     if not isinstance(time, Timestamp):  # 新增类型判断 2020.12.30
         return False
     if checkTimeIsMoreThan(time, timeLimit):
@@ -204,13 +238,13 @@ def checkTime(time=datetime, timeLimit=()) -> bool:
 
 
 # 把字符串转成Datetime格式
-def tranformStrToDateTime(timeStr='') -> datetime:
+def tranformStrToDateTime(timeStr='') -> datetime.datetime:
     try:
         if '.' in timeStr:
             timeStr = timeStr.split(".")[0]
         else:
             timeStr = timeStr[:-1]
-        timeArray = datetime.strptime(timeStr, "%Y-%m-%dT%H:%M:%S")
+        timeArray = datetime.datetime.strptime(timeStr, "%Y-%m-%dT%H:%M:%S")
     except:
         print(timeStr)
     return timeArray
@@ -353,7 +387,7 @@ def modifyIndexByProjectUserScale(filename, sheetname, date):
         for j in range(1, ncols):
             v = row[j]
             if v != "" and not numpy.isnan(v):
-                tempDict[cols[j]] = v * projectRatioList[i-1]
+                tempDict[cols[j]] = v * projectRatioList[i - 1]
             else:
                 tempDict[cols[j]] = v  # 否则不变
         df = df.append(tempDict, ignore_index=True)
