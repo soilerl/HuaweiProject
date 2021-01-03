@@ -65,6 +65,39 @@ def sortTime(time='', notesList=[]) -> []:
 def tranformStrToTimestamp(timeStr='') -> float:
     return common.tranformStrToDateTime(timeStr).timestamp()
 
+#根据版本和项目进行划分
+def classifyByVersionByProject(project, date):
+    columns = ["project"]
+    versionList, timeMap = common.getVersionFromTuple(date)
+    columns.extend(versionList)
+    replyTimeDf = DataFrame(columns=columns)
+    mergeRequestMap = common.getMergeRequestMap(project)
+    notesMap = common.getNotesMap(project)
+    data, res = calTime(mergeRequestMap, notesMap)
+    replyTimeDict = {}
+    for v in versionList:
+        replyTimeDict[v] = []
+        timeTuple = timeMap[v]
+        for index in range(len(data)):
+            timeStruct = time.localtime(data[index][0])
+            targetTime = time.strptime(f"{timeStruct.tm_year}-{timeStruct.tm_mon}-{timeStruct.tm_mday}", "%Y-%m-%d")
+            if common.checkDateTimeInGap(targetTime, timeTuple):
+                replyTimeDict[v].append(res[index])
+        resDict = {}
+        for k, v in replyTimeDict.items():
+            sum = 0
+            avSum = 0
+            for d in v:
+                s = 0
+                for i in d:
+                    s += i
+                avSum += s / len(d)
+            av = avSum / len(v)
+            resDict[k] = av
+        resDict["project"] = project
+        replyTimeDf = replyTimeDf.append(resDict, ignore_index=True)
+    return replyTimeDf
+#根据项目和时间进行划分
 def classifyByTimeByProject(projects, date):
     columns = ["project"]
     columns.extend(common.getTimeLableFromTime(common.getTimeListFromTuple(date)))
@@ -78,6 +111,7 @@ def classifyByTimeByProject(projects, date):
             for index in range(len(data)):
                 # 第一个数据是created_at，以created_at归入
                 timeArray = time.localtime(data[index][0])
+                print(timeArray)
                 if timeArray.tm_year == y and timeArray.tm_mon == m:
                     key = common.getTimeLableFromTime([(y, m)])[0]
                     if key in replyTimeDict.keys():
@@ -103,8 +137,9 @@ def classifyByTimeByProject(projects, date):
 
 if __name__ == '__main__':
     project = "tezos"
-    df = classifyByTimeByProject(['tezos'], (2019, 9, 2020, 12))
+    # df = classifyByTimeByProject(['tezos'], (2019, 9, 2020, 12))
     """计算的df写入xlsx"""
+    df = classifyByVersionByProject("tezos", [("v1", (2020, 7, 1, 2020, 7, 31))])
     fileName = "project_index.xls"
     sheetName = "calReplyTime"
     ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
