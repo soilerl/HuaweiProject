@@ -1,3 +1,6 @@
+import numpy
+import pandas
+
 import analyzeData.common as common
 import datetime, time
 import source.data.service.BeanParserHelper as bp
@@ -75,6 +78,7 @@ def classifyByVersionByProject(project, date):
     notesMap = common.getNotesMap(project)
     data, res = calTime(mergeRequestMap, notesMap)
     replyTimeDict = {}
+    resDict = {}
     for v in versionList:
         replyTimeDict[v] = []
         timeTuple = timeMap[v]
@@ -83,19 +87,20 @@ def classifyByVersionByProject(project, date):
             targetTime = time.strptime(f"{timeStruct.tm_year}-{timeStruct.tm_mon}-{timeStruct.tm_mday}", "%Y-%m-%d")
             if common.checkDateTimeInGap(targetTime, timeTuple):
                 replyTimeDict[v].append(res[index])
-        resDict = {}
-        for k, v in replyTimeDict.items():
-            sum = 0
-            avSum = 0
-            for d in v:
-                s = 0
-                for i in d:
-                    s += i
-                avSum += s / len(d)
+    for k, v in replyTimeDict.items():
+        avSum = 0
+        for d in v:
+            s = 0
+            for i in d:
+                s += i
+            avSum += s / len(d)
+        if len(v) == 0:
+            av = numpy.NAN
+        else:
             av = avSum / len(v)
-            resDict[k] = av
-        resDict["project"] = project
-        replyTimeDf = replyTimeDf.append(resDict, ignore_index=True)
+        resDict[k] = av / 3600
+    resDict["project"] = project
+    replyTimeDf = replyTimeDf.append(resDict, ignore_index=True)
     return replyTimeDf
 #根据项目和时间进行划分
 def classifyByTimeByProject(projects, date):
