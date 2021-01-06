@@ -1,6 +1,8 @@
 import os
 
+import random
 
+from source.utils.StringKeyUtils import StringKeyUtils
 from source.config.projectConfig import projectConfig
 
 """整个项目的工具类"""
@@ -38,7 +40,12 @@ def getProjectIdByOwnerAndRepo(owner='', repoName=''):
     projectId = owner + r"%2F" + repoName
     return projectId
 
-
+privateToken = "S3CB7yAH9_gepQS8kMT_"
+def getHeader() -> dict:
+    header = {}
+    header[StringKeyUtils.STR_HEADER_USER_AGENT] = random.choice(StringKeyUtils.USER_AGENTS)
+    header[StringKeyUtils.STR_HEADER_PRIVATE_TOKEN] = privateToken
+    return header
 
 if __name__ == '__main__':
     print(getProjectIdByOwnerAndRepo("ss", "aa"))

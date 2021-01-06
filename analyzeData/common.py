@@ -227,7 +227,7 @@ def checkTimeIsLessThan(time=datetime.datetime, timeLimit=()) -> bool:
 
 # 判断传入的时间是否符合时间限制
 def checkTime(time=datetime.datetime, timeLimit=()) -> bool:
-    if not isinstance(time, Timestamp):  # 新增类型判断 2020.12.30
+    if not isinstance(time, datetime.datetime):  # 新增类型判断 2020.12.30
         return False
     if checkTimeIsMoreThan(time, timeLimit):
         return False

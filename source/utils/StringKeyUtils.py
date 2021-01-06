@@ -368,6 +368,7 @@ class StringKeyUtils:
     API_GITLAB_NOTES = '/projects/:id/merge_requests/:merge_request_iid/notes?page=:page_index'
     API_GITLAB_COMMITS = '/projects/:id/merge_requests/:merge_request_iid/commits'
     API_GITLAB_COMMITS_COMPARE = '/projects/:id/repository/compare'
+    API_ISSUE_OF_PROJECT = '/projects/:id/issues'
     #获取某个项目下的mergeRequest列表
     API_GITLAB_MERGE_REQUESTS = '/projects/:id/merge_requests'
     # 获取mergeRequest列表的参数，表示获取全部列表
