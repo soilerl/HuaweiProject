@@ -5,6 +5,7 @@ from analyzeData.mrRate import MergeRequestRate
 from analyzeData.timeAvg import TimeAvg
 from analyzeData.timeSpan import TimeSpan
 from source.utils.ExcelHelper import ExcelHelper
+import analyzeData.common as common
 import pandas
 import pandas as pd
 import datetime
@@ -29,9 +30,11 @@ from source.utils.StringKeyUtils import StringKeyUtils as sku
 
     #跑所有指标
 def runAllIndex(cProject_list=[], DATE=()):
+    resDic = {}
     cProject_list = ["tezos"]
     DATE = (2019, 9, 2020, 11)
     df = commentAcceptRate.commentAcceptRatioByProject(cProject_list, DATE)
+    resDic["commentAcceptRatio"] = common.transformDfIntoArray(df, DATE)
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "commentAcceptRatio"
@@ -39,6 +42,7 @@ def runAllIndex(cProject_list=[], DATE=()):
     print("commentAcceptRatio calculate finished！")
 
     baseDf = commentDistribution.commentDistributionByProject(cProject_list, DATE)
+    resDic["commentDistributionALL"] = common.transformDfIntoArray(baseDf, DATE)
     """时间和周的交叉详细统计，描述看文档"""
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
@@ -48,6 +52,7 @@ def runAllIndex(cProject_list=[], DATE=()):
     print("commentDistributionALL calculate finished！")
 
     df = commentDistribution.commentDistributionByProjectWithWeekDay(cProject_list, DATE, baseDf)
+    resDic["commentDistributionByWeekday"] = common.transformDfIntoArray(df, DATE)
     """周的单独统计，描述看文档"""
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
@@ -57,6 +62,7 @@ def runAllIndex(cProject_list=[], DATE=()):
     print("commentDistributionByWeekday calculate finished！")
 
     df = commentDistribution.commentDistributionByProjectWithInterval(cProject_list, DATE, baseDf)
+    resDic["commentDistributionByInterval"] = common.transformDfIntoArray(df, DATE)
     """时间的单独统计，描述看文档"""
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
@@ -66,6 +72,7 @@ def runAllIndex(cProject_list=[], DATE=()):
     print("commentDistributionByInterval calculate finished！")
 
     df = classifyByTimeByProject(cProject_list, DATE)
+    resDic["calReplyTime"] = common.transformDfIntoArray(df, DATE)
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "calReplyTime"
@@ -75,12 +82,14 @@ def runAllIndex(cProject_list=[], DATE=()):
     # time avg
     ta = TimeAvg(cProject_list, DATE)
     df1 = ta.get_df_ended_time_avg()
+    resDic["df_ended_time_avg"] = common.transformDfIntoArray(df1, DATE)
     fileName = "project_index.xls"
     sheetName = "df_ended_time_avg"
     ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df1)
     print("df_ended_time_avg calculate finished！")
 
     df1 = ta.get_df_opened_time_avg()
+    resDic["df_opened_time_avg"] = common.transformDfIntoArray(df1, DATE)
     fileName = "project_index.xls"
     sheetName = "df_opened_time_avg"
     ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df1)
@@ -88,6 +97,7 @@ def runAllIndex(cProject_list=[], DATE=()):
 
 
     df1 = ta.get_df_note_time_avg()
+    resDic["df_note_time_avg"] = common.transformDfIntoArray(df1, DATE)
     fileName = "project_index.xls"
     sheetName = "df_note_time_avg"
     ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df1)
@@ -96,6 +106,7 @@ def runAllIndex(cProject_list=[], DATE=()):
 #     timeSpan
     ts = TimeSpan(cProject_list, DATE)
     df = ts.get_df_no_note_count()
+    resDic["df_no_note_count"] = common.transformDfIntoArray(df, DATE)
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "df_no_note_count"
@@ -108,6 +119,7 @@ def runAllIndex(cProject_list=[], DATE=()):
 
 
     df = ts.get_df_has_note_count()
+    resDic["df_has_note_count"] = common.transformDfIntoArray(df, DATE)
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "df_has_note_count"
@@ -120,6 +132,7 @@ def runAllIndex(cProject_list=[], DATE=()):
 
 
     df = ts.get_df_ended_count()
+    resDic["df_ended_count"] = common.transformDfIntoArray(df, DATE)
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "df_ended_count"
@@ -133,24 +146,27 @@ def runAllIndex(cProject_list=[], DATE=()):
     # mrRate
     mrRate = MergeRequestRate(cProject_list, DATE)
     df = mrRate.get_df_closed_rate()
+    resDic["mrClosedRatio"] = common.transformDfIntoArray(df, DATE)
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "mrClosedRatio"
     ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
 
     df = mrRate.get_df_opened_rate()
+    resDic["mrOpenedRatio"] = common.transformDfIntoArray(df, DATE)
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "mrOpenedRatio"
     ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
 
     df = mrRate.get_df_merged_rate()
+    resDic["mrMergedRatio"] = common.transformDfIntoArray(df, DATE)
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "mrMergedRatio"
     ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
-
     print("all finished！")
+    return resDic
 
 if __name__ == "__main__":
     runAllIndex()

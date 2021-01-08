@@ -116,7 +116,6 @@ def classifyByTimeByProject(projects, date):
             for index in range(len(data)):
                 # 第一个数据是created_at，以created_at归入
                 timeArray = time.localtime(data[index][0])
-                print(timeArray)
                 if timeArray.tm_year == y and timeArray.tm_mon == m:
                     key = common.getTimeLableFromTime([(y, m)])[0]
                     if key in replyTimeDict.keys():
@@ -177,7 +176,8 @@ def classifyByTimeByProjectHong(projects, date):
 if __name__ == '__main__':
     project = "tezos"
     df = classifyByTimeByProject(['tezos'], (2019, 9, 2020, 12))
-    print(df)
+    for row in df.iterrows():
+        print(row)
     """计算的df写入xlsx"""
     # df = classifyByVersionByProject("tezos", [("v1", (2020, 7, 1, 2020, 7, 31))])
     # fileName = "project_index.xls"

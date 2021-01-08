@@ -28,4 +28,5 @@ def getData():
     utils.notesFileExistAndDelete(repo)
     AsyncProjectAllDataFetcher.getDataForRepository(projectId, owner, repo, limit, mergeRequestIidList[-1])
     utils.indexFileExistAndDelete()
-    runAllIndex([repo], date)
+    indexDic = runAllIndex([repo], date)
+    return indexDic

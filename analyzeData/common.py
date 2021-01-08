@@ -397,6 +397,14 @@ def modifyIndexByProjectUserScale(filename, sheetname, date):
     newSheetName = f"{sheetname}_ratio"
     ExcelHelper().writeDataFrameToExcel(filename, newSheetName, df)
 
+def transformDfIntoArray(df=DataFrame, date=()):
+    timeList = getTimeListFromTuple(date)
+    timeLabelList = getTimeLableFromTime(timeList)
+    res = []
+    for timeLabel in timeLabelList:
+        data = df.to_dict()[timeLabel][0]
+        res.append(data)
+    return res
 
 if __name__ == "__main__":
     # getParticipantCount('tezos', (2019, 9, 2020, 11))
