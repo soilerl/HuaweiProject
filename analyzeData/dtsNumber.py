@@ -2,7 +2,7 @@ import pymongo
 import datetime
 import re
 import xlrd as xlrd
-
+import analyzeData.common as common
 
 import analyzeData.common as common
 from pandas import DataFrame
@@ -44,9 +44,9 @@ def createDf(date=()) -> DataFrame:
     dtsNumberDf = DataFrame(columns=columns)
     return dtsNumberDf
 
-def calDtsNumber(serviceName='', date=(), dtsNumberDf=DataFrame):
+def calDtsNumberDic(projectName, date=()):
     resDict = {}
-    dtsList = analyzeData(serviceName, date)
+    dtsList = analyzeData(projectName, date)
     for dts in dtsList:
         createdAt = dts["dtimecreated"]
         month = createdAt.month
@@ -60,15 +60,47 @@ def calDtsNumber(serviceName='', date=(), dtsNumberDf=DataFrame):
             resDict[key] += 1
         else:
             resDict[key] = 1
-    resDict["project"] = serviceName
-    dtsNumberDf = dtsNumberDf.append(resDict, ignore_index=True)
+    resDict["project"] = projectName
+    return resDict
+
+#计算问题单的数量
+def calDtsNumber(serviceName='', date=(), dtsNumberDf=DataFrame):
+    dtsDic = calDtsNumberDic(serviceName, date)
+    dtsNumberDf = dtsNumberDf.append(dtsDic, ignore_index=True)
     return dtsNumberDf
+
+#计算问题反馈率（问题单数/mr数）
+def calDtsRate(projectName='', date=()):
+    dtsDic = calDtsNumberDic(projectName, date)
+    mrDic = getMrCountDic(serviceName, date)
+    resDic = {}
+    for k, v in dtsDic:
+        temp = dtsDic[k] / mrDic[k]
+        resDic[k] = temp
+    return dtsDic
+
+def getMrCountDic(projectName='', date=()):
+    mrList = common.getMergeRequestInstances(projectName)
+    resDict = {}
+    for mr in mrList:
+        createdAt = mr.created_at
+        time = common.tranformStrToDateTime(createdAt)
+        if common.checkTime(time, date):
+            if time.month < 10:
+                monthStr = '0' + str(time.month)
+            timeStr = str(time.year) + "-" + monthStr
+            if timeStr in resDict.keys():
+                resDict[timeStr] += 1
+            else:
+                resDict[timeStr] = 1
+    resDict["project"] = projectName
+    return resDict
 
 def getServiceNameList(excelName, sheetName):
     excel = xlrd.open_workbook(excelName)
     sheet = excel.sheet_by_name(sheetName)
     serviceNameList = sheet.col_values(0)[1:]
-    dic  = {}
+    dic = {}
     for serviceName in serviceNameList:
         dic[serviceName] = 1
     return list(dic.keys())

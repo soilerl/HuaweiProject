@@ -47,10 +47,10 @@ class projectConfig:
     @staticmethod
     def getRootPath():
         curPath = os.path.abspath(os.path.dirname(__file__))
-        # rootPath = os.path.join(curPath, os.path.pardir, os.path.pardir)
+        rootPath = os.path.join(curPath, os.path.pardir, os.path.pardir)
         # return rootPath
-        projectName = projectConfig.projectName
-        rootPath = os.path.join(curPath.split(projectName)[0], projectName)  # 获取myProject，也就是项目的根路径
+        # projectName = projectConfig.projectName
+        # rootPath = os.path.join(curPath.split(projectName)[0], projectName)  # 获取myProject，也就是项目的根路径
         return rootPath
 
 

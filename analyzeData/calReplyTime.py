@@ -176,9 +176,10 @@ def classifyByTimeByProjectHong(projects, date):
 
 if __name__ == '__main__':
     project = "tezos"
-    # df = classifyByTimeByProject(['tezos'], (2019, 9, 2020, 12))
+    df = classifyByTimeByProject(['tezos'], (2019, 9, 2020, 12))
+    print(df)
     """计算的df写入xlsx"""
-    df = classifyByVersionByProject("tezos", [("v1", (2020, 7, 1, 2020, 7, 31))])
-    fileName = "project_index.xls"
-    sheetName = "calReplyTime"
-    ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
+    # df = classifyByVersionByProject("tezos", [("v1", (2020, 7, 1, 2020, 7, 31))])
+    # fileName = "project_index.xls"
+    # sheetName = "calReplyTime"
+    # ExcelHelper().writeDataFrameToExcel(fileName, sheetName, df)
