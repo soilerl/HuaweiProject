@@ -17,28 +17,30 @@ class MergeRequestRate:
     仅对一个项目进行rate计算与返回
     若要计算多个，请在外层进行循环
     """
-    projects = []
-    time_list = []
-    time_label = []
-    head_label = []
 
-    merge_request = []  # 存放一个项目的mr列表
-
-    notes = []
-
-    merge_request_num = {}  # mr总个数
-    merged_mr_num = {}  # merged的mr个数
-    closed_mr_num = {}  # closed个数
-    opened_mr_num = {}  # opened个数
-
-    merged_rate = []  # merged的mr比例
-    closed_rate = []  # closed的比例
-    opened_rate = []  # opened的比例
-
-    default_time = '9999-99'
 
     def __init__(self, projects, date):
         """ 初始化构造函数 """
+
+        self.projects = []
+        self.time_list = []
+        self.time_label = []
+        self.head_label = []
+
+        self.merge_request = []  # 存放一个项目的mr列表
+
+        self.notes = []
+
+        self.merge_request_num = {}  # mr总个数
+        self.merged_mr_num = {}  # merged的mr个数
+        self.closed_mr_num = {}  # closed个数
+        self.opened_mr_num = {}  # opened个数
+
+        self.merged_rate = []  # merged的mr比例
+        self.closed_rate = []  # closed的比例
+        self.opened_rate = []  # opened的比例
+
+        self.default_time = '9999-99'
 
         """ 初始化项目列表 """
         self.set_pj(projects)

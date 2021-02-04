@@ -22,29 +22,32 @@ class TimeSpan:
     仅对一个项目进行rate计算与返回
     若要计算多个，请在外层进行循环
     """
-    projects = []
-    time_list = []
-    time_label = []
-    head_label = []
 
-    merge_request = []  # 存放一个项目的mr列表
-
-    notes = []  # 存放一个项目的notes
-
-    merge_request_num = {}  # mr总个数
-
-    no_note_num = {}  # 提交但未有note的数量
-    has_note_num = {}  # 有note但未完结的数量
-    ended_mr_num = {}  # 结束之后的数量
-
-    no_note_rate = []  # 提交但未有note的比例
-    has_note_rate = []  # 有note但未完结的比例
-    ended_rate = []  # 结束之后的比例
-
-    default_time = '9999-99-99'
 
     def __init__(self, projects, date):
         """ 初始化构造函数 """
+
+        self.projects = []
+        self.time_list = []
+        self.time_label = []
+        self.head_label = []
+
+        self.merge_request = []  # 存放一个项目的mr列表
+
+        self.notes = []  # 存放一个项目的notes
+
+        self.merge_request_num = {}  # mr总个数
+
+        self.no_note_num = {}  # 提交但未有note的数量
+        self.has_note_num = {}  # 有note但未完结的数量
+        self.ended_mr_num = {}  # 结束之后的数量
+
+        self.no_note_rate = []  # 提交但未有note的比例
+        self.has_note_rate = []  # 有note但未完结的比例
+        self.ended_rate = []  # 结束之后的比例
+
+        self.default_time = '9999-99-99'
+
 
         """ 初始化项目列表 """
         self.set_pj(projects)

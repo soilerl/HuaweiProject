@@ -132,11 +132,11 @@ class commentCount:
 
 
 if __name__ == "__main__":
-    # df = commentCount.commentCountByProject(['tezos', 'libadblockplus-android'], (2019, 9, 2020, 12))
-    df = commentCount.commentCountByProjectVersion('tezos',  [("v1", (2020, 7, 20, 2020, 9, 1)),
-                                                              ("v2", (2020, 9, 1, 2020, 10, 9)),
-                                                              ("v3", (2020, 10, 9, 2020, 11, 14)),
-                                                              ("v4", (2020, 11, 14, 2020, 12, 4))])
+    df = commentCount.commentCountByProject(['tezos'], (2019, 9, 2020, 12))
+    # df = commentCount.commentCountByProjectVersion('tezos',  [("v1", (2020, 7, 20, 2020, 9, 1)),
+    #                                                           ("v2", (2020, 9, 1, 2020, 10, 9)),
+    #                                                           ("v3", (2020, 10, 9, 2020, 11, 14)),
+    #                                                           ("v4", (2020, 11, 14, 2020, 12, 4))])
     """计算的df写入xlsx"""
     fileName = "project_index.xls"
     sheetName = "commentCount"

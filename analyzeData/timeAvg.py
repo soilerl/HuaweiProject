@@ -20,31 +20,34 @@ class TimeAvg:
     仅对一个项目进行rate计算与返回
     若要计算多个，请在外层进行循环
     """
-    projects = []
-    time_list = []
-    time_label = []
-    head_label = []
 
-    merge_request = []  # 存放一个项目的mr列表
 
-    merge_request_num = {}  # mr总个数
-
-    opened_time_sum = {}
-    note_time_sum = {}
-    ended_time_sum = {}  # 各个月的时间总长
-
-    opened_mr_num = {}
-    note_mr_num = {}
-    ended_mr_num = {}  # 各个月ended的mr个数
-
-    opened_time_avg = []
-    note_time_avg = []
-    ended_time_avg = []  # 各个月的平均时长
-
-    default_time = '9999-99'
 
     def __init__(self, projects, date):
         """ 初始化构造函数 """
+
+        self.projects = []
+        self.time_list = []
+        self.time_label = []
+        self.head_label = []
+
+        self.merge_request = []  # 存放一个项目的mr列表
+
+        self.merge_request_num = {}  # mr总个数
+
+        self.opened_time_sum = {}
+        self.note_time_sum = {}
+        self.ended_time_sum = {}  # 各个月的时间总长
+
+        self.opened_mr_num = {}
+        self.note_mr_num = {}
+        self.ended_mr_num = {}  # 各个月ended的mr个数
+
+        self.opened_time_avg = []
+        self.note_time_avg = []
+        self.ended_time_avg = []  # 各个月的平均时长
+
+        self.default_time = '9999-99'
 
         """ 初始化项目列表 """
         self.set_pj(projects)
@@ -225,7 +228,10 @@ class TimeAvg:
         return pd.DataFrame(self.note_time_avg, columns=self.head_label)
 
     def get_df_ended_time_avg(self):
-        return pd.DataFrame(self.ended_time_avg, columns=self.head_label)
+        try:
+            return pd.DataFrame(self.ended_time_avg, columns=self.head_label)
+        except:
+            print(self.ended_time_avg, self.head_label)
 
 
 if __name__ == '__main__':
