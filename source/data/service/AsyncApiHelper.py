@@ -274,6 +274,9 @@ class AsyncApiHelper:
                     beanList = []
                     api = AsyncApiHelper.getMergeRequestApi(merge_request_iid)
                     json = await AsyncApiHelper.fetchBeanData(session, api)
+                    print(merge_request_iid, "获取失败")
+                    if json == None or json == '':
+                        return
                     print(json)
                     merge_request = await AsyncApiHelper.parserMergeRequest(json)
                     print(merge_request)
@@ -545,7 +548,7 @@ class AsyncApiHelper:
         return api
 
     @staticmethod
-    async def fetchBeanData(session, api, isMediaType=False):
+    async def fetchBeanData(session, api, isMediaType=False, times = 0):
         """异步获取数据通用接口（重要）"""
 
         """初始化请求头"""
@@ -580,12 +583,15 @@ class AsyncApiHelper:
         except Exception as e:
             """非 403的网络请求出错  循环重试"""
             print(e)
+            if times > 5:
+                return
             if proxy is not None:
                 proxy = proxy.split('//')[1]
                 await ProxyHelper.judgeProxy(proxy, ProxyHelper.INT_NEGATIVE_POINT)
             # print("judge end")
             """循环重试"""
-            return await AsyncApiHelper.fetchBeanData(session, api, isMediaType=isMediaType)
+            times += 1
+            return await AsyncApiHelper.fetchBeanData(session, api, isMediaType=isMediaType, times=times)
 
     @staticmethod
     async def postGraphqlData(session, api, query=None, args=None):
