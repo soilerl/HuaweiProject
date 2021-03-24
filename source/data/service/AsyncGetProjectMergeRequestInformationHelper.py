@@ -2,6 +2,7 @@ import aiohttp
 import asyncio
 import json
 import pymongo
+from source.utils import utils as utils
 
 from datetime import datetime
 
@@ -79,7 +80,10 @@ class AsyncGetProjectInformationHelper:
     @staticmethod
     def getMergeRequestIidList(url='', timeLimit=()) -> []:
         getParameterHelper = GetInformationOfParameterHelper(url)
-        projectID = getParameterHelper.getProjectID()
+        # projectID = getParameterHelper.getProjectID()
+        owner = utils.getRepoFromUrl(url)
+        repo = utils.getRepoFromUrl(url)
+        projectID = utils.getProjectIdByOwnerAndRepo(owner, repo)
         # pages = getParameterHelper.getMergeRequestPages()
         pageIndex = 1
         mergeRequestIidList = []
