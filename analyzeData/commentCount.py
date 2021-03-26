@@ -57,7 +57,7 @@ class commentCount:
             print(df_mr.shape)
 
             data = pandas.merge(left=df_notes, right=df_mr, left_on="merge_request_id", right_on="iid")
-            data['label'] = data["created_at_y"].apply(lambda x: (time.strptime(x, "%Y-%m-%dT%H:%M:%S.%fZ")))
+            data['label'] = data["created_at_y"].apply(lambda x: (time.strptime(x[:19], "%Y-%m-%dT%H:%M:%S")))
             # data['label'] = data["created_at"].apply(lambda x: (time.strptime(x, "%Y-%m-%dT%H:%M:%S.%f%z"))) 华为备用
             data['label_y'] = data['label'].apply(lambda x: x.tm_year)
             data['label_m'] = data['label'].apply(lambda x: x.tm_mon)

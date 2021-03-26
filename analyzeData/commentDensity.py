@@ -27,7 +27,7 @@ class commentDensity:
         for iid, mr in mergeRequestMap.items():
             # 可能存在mergeRequest中的iid不在notes文件中
             # 但是依旧需要返回，因为需要算比例   2020.11.16
-            createdAt = time.strptime(mr.created_at, "%Y-%m-%dT%H:%M:%S.%fZ")
+            createdAt = time.strptime(mr.created_at[:19], "%Y-%m-%dT%H:%M:%S")
             """返回五元组
                [mr中notes数量, mr改动的代码行数, mr改动的文件行数, mr创建的年, mr创建的月]
             """

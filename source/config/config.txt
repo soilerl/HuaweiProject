@@ -1,6 +1,7 @@
 [authorization]
-token=37fe1865db5deb1549572be38688ac3e90e35b49
-privateToken=S3CB7yAH9_gepQS8kMT_
+;token无用
+token=KgMaLpSaXuyEyxmVrJZq
+privateToken=GEK8Z4d6QHb4sYrse7hQ
 [mongoDB]
 host=localhost
 port=27017
@@ -20,8 +21,12 @@ proxy=False
 semaphore=20
 api=3
 [index]
-url = https://gitlab.com/edouardklein/falsisign,https://gitlab.com/tezos/tezos
+;url列表，用,隔开
+url = https://git.huawei.com/CloudPlatform/WiseCloudContentCenterService
+;时间范围
 startYear = 2019
 startMonth = 10
 endYear = 2020
 endMonth = 10
+;更新时间
+updateTime=13:01

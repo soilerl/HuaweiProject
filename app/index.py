@@ -1,7 +1,6 @@
 import time
 import json
 from flask import Flask, request, logging
-from apscheduler.schedulers.blocking import BlockingScheduler
 from source.data.service.GetInformationOfParameter import GetInformationOfParameterHelper
 from source.data.service.AsyncProjectAllDataFetcher import AsyncProjectAllDataFetcher
 from source.data.service.AsyncGetProjectMergeRequestInformationHelper import AsyncGetProjectInformationHelper
@@ -83,7 +82,7 @@ def updateData():
 
 
 if __name__ == '__main__':
-    schedule.every().day.at("20:11").do(updateData)
+    schedule.every().day.at(configPraser.getUpdateTime()).do(updateData)
     while True:
         schedule.run_pending()  # 运行所有可运行的任务
         time.sleep(1)

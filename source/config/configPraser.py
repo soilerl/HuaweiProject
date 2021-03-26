@@ -47,6 +47,8 @@ class configPraser:  # 用于解析config.ini文件
     STR_START_MONTH = 'startMonth'
     STR_END_YEAR = 'endYear'
     STR_END_MONTH = 'endMonth'
+    STR_UPDATE_TIME = 'updateTime'
+
 
     STR_HOST = 'host'
     STR_PORT = 'port'
@@ -287,6 +289,9 @@ class configPraser:  # 用于解析config.ini文件
                 )
         return date
 
+    @staticmethod
+    def getUpdateTime():
+        return configPraser.get(configPraser.STR_INDEX, configPraser.STR_UPDATE_TIME)
 
 if __name__ == '__main__':
     print(configPraser.getPrivateToken())

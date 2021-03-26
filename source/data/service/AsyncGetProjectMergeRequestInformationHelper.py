@@ -51,7 +51,7 @@ class AsyncGetProjectInformationHelper:
                 jsonList = await ApiUtils.fetchData(session, api)
                 if jsonList == None or len(jsonList) < self.numberOfMergeRequestInOnePage:
                     self.shouldFinish = True
-                    print("获取mergeRequest列表完成，最后pageIndex为：" + self.pageIndex)
+                    print("获取mergeRequest列表完成，最后pageIndex为：" + str(self.pageIndex))
                 idList = self.selectTimeSuitMergeRequest(jsonList)
                 mergeRequestIidList.extend(idList)
 
