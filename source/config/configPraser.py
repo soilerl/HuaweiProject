@@ -40,10 +40,18 @@ class configPraser:  # 用于解析config.ini文件
     STR_CHANGE_TRIGGER_BY_LINE = 'changeTriggerByLine'
     STR_JVM_PATH = 'JVMPath'
     STR_STANFORD_MODEL_PATH = 'stanfordModelPath'
+    STR_TIME_RANGE = 'timeRange'
+    STR_INDEX = 'index'
+    STR_URL = 'url'
+    STR_START_YEAR = 'startYear'
+    STR_START_MONTH = 'startMonth'
+    STR_END_YEAR = 'endYear'
+    STR_END_MONTH = 'endMonth'
 
     STR_HOST = 'host'
     STR_PORT = 'port'
     STR_DB_NAME = 'databaseName'
+
 
     cacheDict = {}  # 用于缓存的字典，防止多次访问拖慢速度
 
@@ -264,6 +272,21 @@ class configPraser:  # 用于解析config.ini文件
     @staticmethod
     def getMongoDBDatabaseName():
         return configPraser.get(configPraser.STR_MONGODB, configPraser.STR_DB_NAME)
+
+    #获取时间范围
+    @staticmethod
+    def getAllUrl():
+        return configPraser.get(configPraser.STR_INDEX, configPraser.STR_URL)
+
+    @staticmethod
+    def getTimeRangeTuple() -> ():
+        date = (int(configPraser.get(configPraser.STR_INDEX, configPraser.STR_START_YEAR)),
+                int(configPraser.get(configPraser.STR_INDEX, configPraser.STR_START_MONTH)),
+                int(configPraser.get(configPraser.STR_INDEX, configPraser.STR_END_YEAR)),
+                int(configPraser.get(configPraser.STR_INDEX, configPraser.STR_END_MONTH))
+                )
+        return date
+
 
 if __name__ == '__main__':
     print(configPraser.getPrivateToken())

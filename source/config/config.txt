@@ -19,3 +19,9 @@ retry=100
 proxy=False
 semaphore=20
 api=3
+[index]
+url = https://gitlab.com/edouardklein/falsisign,https://gitlab.com/tezos/tezos
+startYear = 2019
+startMonth = 10
+endYear = 2020
+endMonth = 10

@@ -81,7 +81,7 @@ class AsyncGetProjectInformationHelper:
     def getMergeRequestIidList(url='', timeLimit=()) -> []:
         getParameterHelper = GetInformationOfParameterHelper(url)
         # projectID = getParameterHelper.getProjectID()
-        owner = utils.getRepoFromUrl(url)
+        owner = utils.getOwnerFromUrl(url)
         repo = utils.getRepoFromUrl(url)
         projectID = utils.getProjectIdByOwnerAndRepo(owner, repo)
         # pages = getParameterHelper.getMergeRequestPages()
