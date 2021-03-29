@@ -6,6 +6,12 @@ privateToken=GEK8Z4d6QHb4sYrse7hQ
 host=localhost
 port=27017
 databaseName=HuaweiProject
+[pgsql]
+databaseName=NJU_HUAWEI
+user=postgres
+password=postgres
+host=localhost
+port=5432
 [debug]
 print=False
 [project]

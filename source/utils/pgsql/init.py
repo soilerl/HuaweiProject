@@ -1,9 +1,14 @@
 import psycopg2
 import source.utils.pgsql.StringSqlUtils as StringSqlUtils
-
+from source.config.configPraser import configPraser
 
 def connectPgsql():
-    conn = psycopg2.connect(database="NJU_HUAWEI", user="postgres", password="postgres", host="localhost", port="5432")
+    conn = psycopg2.connect(database=configPraser.getPgsqlDatabaseName(),
+                            user=configPraser.getPgsqlUser(),
+                            password=configPraser.getPgsqlPassword(),
+                            host=configPraser.getPgsqlHost(),
+                            port=configPraser.getPgsqlPort()
+                            )
     cur = conn.cursor()
     return cur, conn
 
@@ -31,3 +36,5 @@ def updateData(url, data):
     conn.commit()
     conn.close()
 
+if __name__ == '__main__':
+    connectPgsql()

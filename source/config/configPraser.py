@@ -49,6 +49,12 @@ class configPraser:  #用于解析config.ini文件
     STR_END_MONTH = 'endMonth'
     STR_UPDATE_TIME = 'updateTime'
 
+    STR_PGSQL = 'pgsql'
+    STR_PGSQL_DATABASE_NAME = 'databaseName'
+    STR_PGSQL_USER = 'user'
+    STR_PGSQL_PASSWORD = 'password'
+    STR_PGSQL_HOST = 'host'
+    STR_PGSQL_PORT = 'port'
 
     STR_HOST = 'host'
     STR_PORT = 'port'
@@ -289,6 +295,25 @@ class configPraser:  #用于解析config.ini文件
     def getUpdateTime():
         return configPraser.get(configPraser.STR_INDEX, configPraser.STR_UPDATE_TIME)
 
+    @staticmethod
+    def getPgsqlDatabaseName():
+        return configPraser.get(configPraser.STR_PGSQL, configPraser.STR_PGSQL_DATABASE_NAME)
+
+    @staticmethod
+    def getPgsqlUser():
+        return configPraser.get(configPraser.STR_PGSQL, configPraser.STR_PGSQL_USER)
+
+    @staticmethod
+    def getPgsqlPassword():
+        return configPraser.get(configPraser.STR_PGSQL, configPraser.STR_PGSQL_PASSWORD)
+
+    @staticmethod
+    def getPgsqlHost():
+        return configPraser.get(configPraser.STR_PGSQL, configPraser.STR_PGSQL_HOST)
+
+    @staticmethod
+    def getPgsqlPort():
+        return configPraser.get(configPraser.STR_PGSQL, configPraser.STR_PGSQL_PORT)
 if __name__ == '__main__':
     print(configPraser.getPrivateToken())
 
