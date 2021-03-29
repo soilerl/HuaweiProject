@@ -6,7 +6,7 @@ from source.config.projectConfig import projectConfig
 import configparser
 
 
-class configPraser:  # 用于解析config.ini文件
+class configPraser:  #用于解析config.ini文件
 
     STR_TOKEN = 'token'
     STR_AUTHORIZATION = 'authorization'
@@ -273,10 +273,6 @@ class configPraser:  # 用于解析config.ini文件
     def getMongoDBDatabaseName():
         return configPraser.get(configPraser.STR_MONGODB, configPraser.STR_DB_NAME)
 
-    #获取时间范围
-    @staticmethod
-    def getAllUrl():
-        return configPraser.get(configPraser.STR_INDEX, configPraser.STR_URL)
 
     @staticmethod
     def getTimeRangeTuple() -> ():

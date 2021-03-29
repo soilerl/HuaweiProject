@@ -9,6 +9,7 @@ import source.utils.utils as utils
 from analyzeData.runAllIndex import runAllIndex
 from source.utils.pgsql import init as pgsql
 from source.config.configPraser import configPraser
+from source.utils.url import url as urls
 
 #新引入
 import schedule
@@ -74,8 +75,7 @@ def getData():
 
 #更新本地数据库中的数据
 def updateData():
-    urlsStr = configPraser.getAllUrl()
-    urlList = urlsStr.split(',')
+    urlList = urls
     date = configPraser.getTimeRangeTuple()
     for url in urlList:
         updateOneProjectData(url, date)
@@ -83,11 +83,11 @@ def updateData():
 
 
 if __name__ == '__main__':
-    schedule.every().day.at("20:11").do(updateData)
-    while True:
-        schedule.run_pending()  # 运行所有可运行的任务
-        time.sleep(1)
+    # schedule.every().day.at("20:11").do(updateData)
+    # while True:
+    #     schedule.run_pending()  # 运行所有可运行的任务
+    #     time.sleep(1)
 
 
 
-    # updateData()
+    updateData()
