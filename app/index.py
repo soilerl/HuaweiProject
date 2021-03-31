@@ -39,37 +39,14 @@ def updateOneProjectData(url, date=()):
     AsyncProjectAllDataFetcher.getDataForRepository(projectId, owner, repo, limit, mergeRequestIidList[-1])
     utils.indexFileExistAndDelete()
     indexDic = runAllIndex([repo], date)
-    data = json.dumps(indexDic)
-    pgsql.updateData(url, data)
+
+    # data = json.dumps(indexDic)
+    # pgsql.updateData(url, data)
+
+
+
     return
 
-#获取数据
-# @app.route('/getData', methods=['GET'])
-def getData():
-    try:
-        url = request.args['url']
-        dateStr = request.args['date']
-        dateArr = dateStr.split(',')
-        date = (int(dateArr[0]), int(dateArr[1]), int(dateArr[2]), int(dateArr[3]))
-        # url = "https://gitlab.com/tezos/tezos"
-        # date = (2020, 9, 2020, 10)
-        repo = utils.getRepoFromUrl(url)
-        owner = utils.getOwnerFromUrl(url)
-        mergeRequestIidList = AsyncGetProjectInformationHelper.getMergeRequestIidList(url, date)
-
-        projectId = utils.getProjectIdByOwnerAndRepo(owner, repo)
-
-        mergeRequestIidList.sort()
-        limit = mergeRequestIidList[-1] - mergeRequestIidList[0]
-        utils.mergeRequestFileExistAndDelete(repo)
-        utils.notesFileExistAndDelete(repo)
-        AsyncProjectAllDataFetcher.getDataForRepository(projectId, owner, repo, limit, mergeRequestIidList[-1])
-        utils.indexFileExistAndDelete()
-        indexDic = runAllIndex([repo], date)
-        return indexDic
-    except:
-        print(url)
-        print(mergeRequestIidList)
 
 
 #更新本地数据库中的数据
