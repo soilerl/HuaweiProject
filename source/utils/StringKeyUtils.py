@@ -343,7 +343,7 @@ class StringKeyUtils:
     STR_KEY_REFERENCED_EVENT = 'ReferencedEvent'  # commit引用，一般在最后merge到主干前做这个动作
 
     # API_GITHUB = 'https://api.github.com'
-    API_GITLAB = 'https://git.huawei.com/api/v4'  # 华为使用
+    # API_GITLAB = 'https://git.huawei.com/api/v4'  # 华为使用
     API_REVIEWS_FOR_PULL_REQUEST = '/repos/:owner/:repo/pulls/:pull_number/reviews'
     API_PULL_REQUEST_FOR_PROJECT = '/repos/:owner/:repo/pulls'
     API_COMMENTS_FOR_REVIEW = '/repos/:owner/:repo/pulls/:pull_number/reviews/:review_id/comments'
@@ -360,7 +360,7 @@ class StringKeyUtils:
     API_GRAPHQL = '/graphql'
 
     """gitlab的api接口"""
-    # API_GITLAB = 'https://gitlab.com/api/v4'
+    API_GITLAB = 'https://gitlab.com/api/v4'
     API_GITLAB_GRAPHQL = 'https://gitlab.com/api/graphql'
     API_GITLAB_MERGE_PULL_REQUEST = '/projects/:id/merge_requests/:merge_request_iid'
     API_GITLAB_MERGE_PULL_REQUEST_LIST = '/projects/:id/merge_requests'

@@ -1,7 +1,8 @@
 [authorization]
 ;token无用
 token=KgMaLpSaXuyEyxmVrJZq
-privateToken=GEK8Z4d6QHb4sYrse7hQ
+;privateToken=GEK8Z4d6QHb4sYrse7hQ
+privateToken=S3CB7yAH9_gepQS8kMT_
 [mongoDB]
 host=localhost
 port=27017

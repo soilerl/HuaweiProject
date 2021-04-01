@@ -30,7 +30,7 @@ from source.utils.StringKeyUtils import StringKeyUtils as sku
 
 
     #跑所有指标
-def runAllIndex(cProject_list=[], DATE=()):
+def runAllIndex(cProject_list=[], DATE=()) -> {}:
     resDic = {}
     cProject_list = cProject_list
     DATE = DATE
