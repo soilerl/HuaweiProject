@@ -18,7 +18,7 @@ from datetime import date,datetime,timezone
 
 
 #更新某个项目的数据
-def updateOneProjectData(url, date, projectId):
+def updateOneProjectData(url, date, projectId, createdAt):
     # url = "https://gitlab.com/tezos/tezos"
     # date = (2020, 9, 2020, 10)
     repo = utils.getRepoFromUrl(url)
@@ -39,7 +39,7 @@ def updateOneProjectData(url, date, projectId):
     # data = json.dumps(metricDic)
     # pgsql.updateData(url, data)
 
-    analyzeDataAndWriteToDatabase(projectId, url, metricDic)
+    analyzeDataAndWriteToDatabase(projectId, url, createdAt, metricDic)
 
     return
 
@@ -47,20 +47,20 @@ def updateOneProjectData(url, date, projectId):
 
 #更新本地数据库中的数据
 def updateData():
+    createdAt = datetime.now(tz=timezone.utc)
     urlList = urls
     date = configPraser.getTimeRangeTuple()
     for projectId, url in urlList:
-        updateOneProjectData(url, date, projectId)
+        updateOneProjectData(url, date, projectId, createdAt)
 
 
-def analyzeDataAndWriteToDatabase(projectId, url, metricDic={}):
+def analyzeDataAndWriteToDatabase(projectId, url, createdAt, metricDic={}):
     if metricDic == None or metricDic == {}:
         return
 
     commentDistributionByWeekdayList = metricDic["commentDistributionByWeekday"]
     projectName = utils.getRepoFromUrl(url)
     calTimeRange = str(configPraser.getTimeRangeTuple())
-    createdAt = datetime.now(tz=timezone.utc)
     metricName = "commentDistributionByWeekday"
     pgsql.writeWeekDayDataToDatabase(projectName, calTimeRange, createdAt, metricName, projectId, commentDistributionByWeekdayList[0])
 
