@@ -269,18 +269,6 @@ class configPraser:  #用于解析config.ini文件
         cp.read(projectConfig.getConfigPath())
         return cp.get(keyPre, key)
 
-    @staticmethod
-    def getMongoDBHost():
-        return configPraser.get(configPraser.STR_MONGODB, configPraser.STR_HOST)
-
-    @staticmethod
-    def getMongoDBPort():
-        return configPraser.get(configPraser.STR_MONGODB, configPraser.STR_PORT)
-
-    @staticmethod
-    def getMongoDBDatabaseName():
-        return configPraser.get(configPraser.STR_MONGODB, configPraser.STR_DB_NAME)
-
 
     @staticmethod
     def getTimeRangeTuple() -> ():
