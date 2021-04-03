@@ -75,7 +75,7 @@ def analyzeDataAndWriteToDatabase(projectId, url, createdAt, metricDic={}):
             pgsql.writeMonthDataToDatabase(projectName, calTimeRange, createdAt, metricName, projectId, metricTime, metricData)
 
 if __name__ == '__main__':
-    schedule.every().day.at(configPraser.getUpdateTime()).do(updateData)
+    schedule.every().sunday.at(configPraser.getUpdateTime()).do(updateData)
     while True:
         schedule.run_pending()  # 运行所有可运行的任务
         time.sleep(1)
